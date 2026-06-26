@@ -4,26 +4,46 @@ mode: subagent
 color: success
 temperature: 0.2
 permission:
+  read: allow
   edit:
+    # Default ask; auto-allow test files so QA can author/fix tests freely.
     "*": ask
     "**/*Test*": allow
     "**/*test*": allow
     "**/*spec*": allow
+    "**/*Spec*": allow
     "**/__tests__/**": allow
+    "**/__mocks__/**": allow
     "**/*.spec.*": allow
     "**/*.test.*": allow
+    "**/*.specs.*": allow
+    "**/test-fixtures/**": allow
+  glob: allow
+  grep: allow
+  list: allow
+  external_directory: ask
+  todowrite: allow
+  webfetch: ask
+  websearch: ask
+  lsp: allow
+  skill: ask
+  question: allow
+  doom_loop: allow
   bash:
-    "*": ask
-    "dotnet test*": allow
-    "dotnet build*": allow
-    "dotnet format*": allow
-    "npm test*": allow
-    "npm run test*": allow
-    "npm run lint*": allow
-    "git diff*": allow
-    "git status*": allow
+    # QA needs to run any test/build/coverage tool and package managers.
+    "*": allow
+    "git push*": deny
+    "git commit*": deny
+    "git config*": deny
+    "git rebase*": deny
+    "git reset --hard*": deny
+    "git merge*": deny
+    "git tag*": deny
+    "sudo*": deny
+    "rm -rf /*": deny
   task:
     "explore": allow
+    "general": allow
 ---
 
 You are a QA test engineer. You own **test strategy, coverage, and the quality gate**.

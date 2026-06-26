@@ -4,18 +4,37 @@ mode: subagent
 color: primary
 temperature: 0.2
 permission:
+  read: allow
   edit: allow
+  glob: allow
+  grep: allow
+  list: allow
+  external_directory: ask
+  todowrite: allow
+  webfetch: ask
+  websearch: ask
+  lsp: allow
+  skill: allow
+  question: allow
+  doom_loop: allow
   bash:
-    "*": ask
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "dotnet test*": allow
-    "dotnet build*": allow
-    "dotnet format*": allow
-    "npm test*": allow
-    "npm run lint*": allow
-    "npm run build*": allow
+    # Default permissive — implementation needs broad toolchain access.
+    "*": allow
+    # State-changing git is handled via the /safe-commit skill, never raw.
+    "git push*": deny
+    "git commit*": deny
+    "git config*": deny
+    "git rebase*": deny
+    "git reset --hard*": deny
+    "git merge*": deny
+    "git tag*": deny
+    "git cherry-pick*": deny
+    # Destructive shell.
+    "sudo*": deny
+    "rm -rf /*": deny
+    "dd if=*": deny
+  task:
+    "*": allow
 ---
 
 You are a pragmatic software developer. You turn well-scoped tasks into minimal, correct, tested diffs.

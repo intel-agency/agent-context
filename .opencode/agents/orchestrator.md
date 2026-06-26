@@ -4,12 +4,43 @@ mode: primary
 color: secondary
 temperature: 0.2
 permission:
+  read: allow
   edit: ask
+  glob: allow
+  grep: allow
+  list: allow
+  external_directory: ask
+  todowrite: allow
+  webfetch: ask
+  websearch: ask
+  lsp: ask
+  skill: allow            # /safe-commit and other skills
+  question: allow         # escalate to human — core coordinator power
+  doom_loop: allow
   bash:
+    # Read-only coordination: inspect state and CI, delegate all build/test/scan work.
     "*": ask
     "git status*": allow
     "git diff*": allow
     "git log*": allow
+    "git show*": allow
+    "git branch*": allow
+    "git blame*": allow
+    "gh pr*": allow
+    "gh run*": allow
+    "gh issue*": allow
+    "ls*": allow
+    "cat *": allow
+    "head *": allow
+    "tail *": allow
+    "rg *": allow
+    "find *": allow
+    "tree *": allow
+    "jq *": allow
+    "wc *": allow
+    "git push*": deny
+    "git commit*": deny
+    "git config*": deny
   task:
     "*": allow
 ---
@@ -52,5 +83,6 @@ You are the orchestrator. Your job is to **plan the work, dispatch it, and synth
 
 - Do not commit, push, or open PRs unless explicitly instructed; run the `/safe-commit` skill when asked.
 - After pushing, monitor CI workflows until green; fix failures before proceeding.
+- You coordinate; you do **not** implement, review, or run validation yourself. Commission every build / scan / test / review by dispatching the right specialist (`developer`, `qa-tester`, `code-reviewer`) and verify their returned evidence first-hand (diff, command output, exit codes).
 - Every completed unit must pass build + scan + test before being marked done.
 - If a subagent reports a blocker, record it as a follow-up TODO and decide whether to re-dispatch or escalate.

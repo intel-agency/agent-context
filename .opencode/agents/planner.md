@@ -4,15 +4,47 @@ mode: subagent
 color: info
 temperature: 0.1
 permission:
+  read: allow
   edit:
+    # Plans only — deny code edits.
     "*": deny
     ".opencode/plans/**": allow
     "docs/plans/**": allow
+  glob: allow
+  grep: allow
+  list: allow
+  external_directory: ask
+  todowrite: allow
+  webfetch: allow         # best-practice / dependency / design research
+  websearch: allow        # surveys & competitive analysis
+  lsp: allow              # trace symbols & contracts while designing
+  skill: ask
+  question: allow
+  doom_loop: allow
   bash:
-    "*": deny
-    "git log*": allow
+    # Read-only investigation: default ask, allow reads, deny mutations.
+    "*": ask
+    "git status*": allow
     "git diff*": allow
+    "git log*": allow
     "git show*": allow
+    "git blame*": allow
+    "git branch*": allow
+    "gh pr*": allow
+    "gh issue*": allow
+    "gh run*": allow
+    "ls*": allow
+    "cat *": allow
+    "head *": allow
+    "tail *": allow
+    "rg *": allow
+    "find *": allow
+    "tree *": allow
+    "jq *": allow
+    "file *": allow
+    "git push*": deny
+    "git commit*": deny
+    "git config*": deny
   task:
     "explore": allow
     "researcher": allow

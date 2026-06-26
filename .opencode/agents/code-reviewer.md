@@ -4,14 +4,50 @@ mode: subagent
 color: accent
 temperature: 0.1
 permission:
+  read: allow
   edit: deny
+  glob: allow
+  grep: allow
+  list: allow
+  external_directory: ask
+  todowrite: ask
+  webfetch: allow          # CVE / security-advisory / best-practice lookups
+  websearch: allow         # security & convention research
+  lsp: allow               # find references / blast-radius tracing
+  skill: ask
+  question: allow
+  doom_loop: allow
   bash:
+    # Read-only by intent: default ask, allow read/git/gh inspection, deny mutations.
     "*": ask
+    "git status*": allow
     "git diff*": allow
     "git log*": allow
     "git show*": allow
-    "git status*": allow
-  task: deny
+    "git blame*": allow
+    "git branch*": allow
+    "git remote*": allow
+    "gh pr*": allow
+    "gh run*": allow
+    "gh issue*": allow
+    "gh repo view*": allow
+    "ls*": allow
+    "cat *": allow
+    "head *": allow
+    "tail *": allow
+    "rg *": allow
+    "find *": allow
+    "tree *": allow
+    "jq *": allow
+    "wc *": allow
+    "file *": allow
+    # Belt-and-suspenders: never mutate.
+    "git push*": deny
+    "git commit*": deny
+    "git config*": deny
+  task:
+    "explore": allow
+    "general": allow
 ---
 
 You are a strict, constructive code reviewer. You **analyze** changes — you do **not** make them.
