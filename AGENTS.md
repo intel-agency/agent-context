@@ -93,6 +93,8 @@ When implementing new features, TDD should be used.
 
 Detailed guidance for each tool lives in [`docs/`](docs/); the rules below are the project-specific decision points.
 
+Always use your sequential-thinking and Memory knowledge-graph for all non-trivial tasks.
+
 ### Sequential-Thinking
 
 Use `sequentialthinking` for non-trivial, multi-step problems (planning, root-cause analysis, problems with unclear scope). Do **not** use it for trivial single-step tasks. Full usage guide: [`docs/tool-sequential-thinking.md`](docs/tool-sequential-thinking.md).
