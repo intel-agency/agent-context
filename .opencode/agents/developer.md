@@ -21,15 +21,6 @@ permission:
   bash:
     # Default permissive — implementation needs broad toolchain access.
     "*": allow
-    # State-changing git is handled via the /safe-commit skill, never raw.
-    "git push*": deny
-    "git commit*": deny
-    "git config*": deny
-    "git rebase*": deny
-    "git reset --hard*": deny
-    "git merge*": deny
-    "git tag*": deny
-    "git cherry-pick*": deny
     # Destructive shell.
     "sudo*": deny
     "rm -rf /*": deny
