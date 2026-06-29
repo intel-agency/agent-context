@@ -19,6 +19,16 @@ A validation script must be maintained to run these steps automatically (i.e. `v
 - It should mirror exactly what is run in the CI/CD pipeline.
 - Update the local and CI/CD copies to keep them in sync with any changes.
 
+### Missing Validation Script
+
+If an agent needs to run validation and the expected script (e.g. `validation.ps1`, `validation.sh`) does not exist:
+
+1. **Create the script** before proceeding with any validation. Write it at the repository root with the platform-appropriate extension (`.ps1` for Windows, `.sh` for Unix).
+2. **Implement the three steps** — `build`, `scan`, `test` — in the order listed. Each step must fail fast (non-zero exit) on error so the script stops immediately.
+3. **Make it executable** (`chmod +x validation.sh` on Unix; on Windows ensure the execution policy allows it).
+4. **Commit the script** as its own change before running it, so CI/CD picks it up on the same branch.
+5. **Mirror CI/CD** — inspect any existing pipeline configuration (e.g. `.github/workflows/`, `azure-pipelines.yml`) and ensure the script commands match what CI runs. If no CI config exists, choose sensible defaults for the project's language/framework and document the choices in a comment at the top of the script.
+
 ### Testing
 
 An automated test suite must be maintained. 
@@ -110,3 +120,17 @@ Use `sequentialthinking` for non-trivial, multi-step problems (planning, root-ca
 ### Memory
 
 Use the Memory knowledge-graph (`@modelcontextprotocol/server-memory`) for **durable, reusable context only** — never transient scratch state or secrets/PII (the store is plaintext). Search before creating to avoid duplicates; keep observations atomic, specific, and active-voiced. Full usage guide: [`docs/tool-memory.md`](docs/tool-memory.md).
+
+### Web & Repository Research (Z.AI MCP)
+
+These three **remote** Z.AI MCP servers authenticate via the `Authorization: {env:Z_AI_API_KEY}` header and require no local install. Use them for reliable, structured external information retrieval instead of ad-hoc fetching.
+
+- **`web-search-prime`** → `webSearchPrime` — Web search returning titles, URLs, summaries, site names, and icons. Use for best-practice surveys, competitive analysis, dependency/API research, and factual questions needing current external info. Key params: `content_size` (`medium` default, `high` for comprehensive), `location` (`cn` / `us`), `search_domain_filter` (whitelist a domain), `search_recency_filter` (`oneDay` / `oneWeek` / `oneMonth` / `oneYear` / `noLimit`). Keep queries ≤ 70 chars.
+- **`web-reader`** → `webReader` — Fetches a URL and converts it to large-model-friendly input (markdown/text/html). Returns page title, main content, metadata, and optional link/image summaries. Use to read API docs, articles, release notes, and reference pages. Prefer this over generic `webfetch` when available.
+- **`zread`** — Reads **public** GitHub repositories without cloning: `search_doc` (search docs/issues/commits/PRs/contributors), `get_repo_structure` (directory tree + file list), and `read_file` (full file contents). Use for dependency evaluation, "how does library X work?" questions, and issue/commit history lookups. Requires `owner/repo` names; only public repos are supported.
+
+Decision points:
+
+- Need current facts from the open web → `webSearchPrime`, then `webReader` to drill into a specific result.
+- Need to understand an open-source repo → `zread` first (`get_repo_structure` + `search_doc`), then `read_file` for implementation details.
+- For broad, multi-source surveys, delegate to the `researcher` subagent; use these tools directly for quick, single-shot lookups.
