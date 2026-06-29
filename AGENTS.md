@@ -134,3 +134,15 @@ Decision points:
 - Need current facts from the open web → `webSearchPrime`, then `webReader` to drill into a specific result.
 - Need to understand an open-source repo → `zread` first (`get_repo_structure` + `search_doc`), then `read_file` for implementation details.
 - For broad, multi-source surveys, delegate to the `researcher` subagent; use these tools directly for quick, single-shot lookups.
+
+### Exa Search (MCP)
+
+The **remote** Exa MCP server authenticates via `exaApiKey={env:EXA_API_KEY}` and requires no local install. Use it as a complement to Z.AI when its neural search, code-context, or crawling fits better.
+
+- **`web_search_exa`** — Keyword/neural web search. Fallback when Z.AI `webSearchPrime` is rate-limited.
+- **`web_search_advanced_exa`** — Filtered search (date, domain, text-match, count). Scoped queries.
+- **`web_fetch_exa`** — Fetch a URL to clean markdown/text. Alternative to Z.AI `webReader`.
+- **`get_code_context_exa`** — Code context (functions, types, usage) for "how is X used?" before `zread` for full files.
+- **`crawling_exa`** — Crawl multiple pages of a site; collect a doc subsite in one call.
+
+Prefer Z.AI `webSearchPrime`/`webReader` as the default for single-shot lookups; reach for Exa when its neural search, code-context, or crawling fits better.
