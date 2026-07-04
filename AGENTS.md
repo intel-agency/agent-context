@@ -107,6 +107,44 @@ Use orchestration agents to **decompose and delegate** work instead of implement
 - Mark TODO items as complete when they are done.
 - Present summary after completing all plans/tasks.
 
+## Memory & Rules System
+
+A 4-layer system (adapted from Factory's guides to opencode) gives agents persistent context and codified standards.
+
+### Four layers
+
+| Layer | Purpose | Location |
+| --- | --- | --- |
+| Rules | How to write | `.opencode/rules/*.md` |
+| Memory | What & why | `.opencode/memories.md` |
+| AGENTS.md | Build/test/run | this file |
+| Skills | Task how-tos | `.opencode/skills/*/SKILL.md` |
+
+### Loading
+
+Rules + project memory are eager-loaded via the `instructions` glob in `.opencode/opencode.jsonc`. For large rule sets, use the lazy `@file` read-on-demand pattern instead.
+
+### Capture
+
+- Use `/remember <text>` (or the `memory-capture` skill) to append memory.
+- Use `/review-memory` for maintenance.
+- Use `/setup-memory` to bootstrap the personal layer in `~/.config/opencode/`.
+
+### Markdown memory vs knowledge graph
+
+The existing MCP memory-graph (see the `### Memory` subsection below) holds atomic structured facts; the markdown `.opencode/memories.md` holds narrative, team-shared, always-on context. They are complementary — do not duplicate. `/remember` writes markdown only.
+
+### When to add
+
+| Event | What | Where |
+| --- | --- | --- |
+| Made an architecture decision | decision + reasoning | project memory |
+| Discovered a preference | preference | personal memory |
+| Learned a convention | rule | `.opencode/rules/` |
+| Resolved a tricky issue | solution + context | project memory |
+
+Reference: full guide at `docs/memory-system.md`.
+
 ## Tool Usage
 
 Detailed guidance for each tool lives in [`docs/`](docs/); the rules below are the project-specific decision points.
@@ -119,7 +157,7 @@ Use `sequentialthinking` for non-trivial, multi-step problems (planning, root-ca
 
 ### Memory
 
-Use the Memory knowledge-graph (`@modelcontextprotocol/server-memory`) for **durable, reusable context only** — never transient scratch state or secrets/PII (the store is plaintext). Search before creating to avoid duplicates; keep observations atomic, specific, and active-voiced. Full usage guide: [`docs/tool-memory.md`](docs/tool-memory.md).
+Use the Memory knowledge-graph (`@modelcontextprotocol/server-memory`) for **durable, reusable context only** — never transient scratch state or secrets/PII (the store is plaintext). Search before creating to avoid duplicates; keep observations atomic, specific, and active-voiced. Full usage guide: [`docs/tool-memory.md`](docs/tool-memory.md). For narrative, team-shared context also see the markdown project memory at `.opencode/memories.md` (see `## Memory & Rules System`).
 
 ### Web & Repository Research (Z.AI MCP)
 
