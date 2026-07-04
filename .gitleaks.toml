@@ -1,0 +1,7 @@
+# Gitleaks configuration for agent-context repo
+
+[allowlist]
+description = "Exclude embedded git repos with dummy test fixtures"
+paths = [
+  '''ai-new-workflow-app-template''',
+]
