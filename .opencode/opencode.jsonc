@@ -32,7 +32,9 @@
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
       "environment": {
-        "MEMORY_FILE_PATH": "/app/.memory/memory.jsonl",
+        // Repo-local store (gitignored). A devcontainer may override this to
+        // "/app/.memory/memory.jsonl"; keep the two in sync if so.
+        "MEMORY_FILE_PATH": ".opencode/.memory/memory.jsonl",
       },
     },
     "web-reader": {

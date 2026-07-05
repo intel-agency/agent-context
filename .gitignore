@@ -1,0 +1,10 @@
+# Memory-graph local store (see opencode.jsonc MEMORY_FILE_PATH). May contain
+# atomic facts/PII; never commit.
+.opencode/.memory/
+
+# opencode local node state — prettier formatter deps + machine-specific plugin
+# manifests. Created by `npm install`; not part of the template.
+.opencode/node_modules/
+.opencode/package.json
+.opencode/package-lock.json
+.opencode/bun.lock

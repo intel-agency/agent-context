@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 # validation.sh
 #
-# Local validation gate for the agent-context repo.
-#
-# Mirrors CI. IMPORTANT: no CI pipeline (`.github/`) exists for this repo yet,
-# so the steps below are the canonical checks. When CI is added, keep it in sync
-# with this script (rule: "when adding a CI workflow check, add its equivalent
-# to validation.sh").
+# Local validation gate. Mirrors CI: when this template is specialized onto a
+# repo with CI (`.github/workflows/`), keep this script and CI in sync (rule:
+# "when adding a CI workflow check, add its equivalent to validation.sh").
 #
 # Runs three steps in order, fail-fast:
-#   1. build  - for this markdown/config repo there is nothing to compile.
+#   1. build  - no-op by default (this template ships markdown + config only);
+#               add real build commands (npm run build, dotnet build, etc.) after
+#               specialization if the repo has something to compile.
 #   2. scan   - markdownlint (if installed) + gitleaks secret scan (if installed).
 #               Missing optional tools WARN but do NOT fail the run.
-#   3. test   - structural assertions in test/test-memory-system.sh (must pass).
+#   3. test   - structural assertions in test/test-memory-system.sh (must pass),
+#               including template placeholder integrity.
 #
 # Usage:
 #   ./validation.sh            # run all steps
@@ -24,28 +24,22 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-# Files considered "ours" for markdown linting (the memory + rules system).
-MD_FILES=(
-  ".opencode/memories.md"
-  ".opencode/rules/rule-format.md"
-  ".opencode/rules/markdown-style.md"
-  ".opencode/rules/opencode-config.md"
-  ".opencode/rules/memory-format.md"
-  ".opencode/rules/validation.md"
-  ".opencode/commands/remember.md"
-  ".opencode/commands/review-memory.md"
-  ".opencode/commands/setup-memory.md"
-  ".opencode/skills/memory-capture/SKILL.md"
-  ".opencode/skills/context-aware-implementation/SKILL.md"
-  ".opencode/skills/apply-rules/SKILL.md"
-  "docs/memory-system.md"
-  "docs/rules-examples.md"
-  "AGENTS.md"
-)
+# Markdown files "owned" by this system, discovered dynamically so newly added
+# rules/commands/skills/docs are linted without editing this list. Agent
+# definitions (.opencode/agents/) are excluded: their frontmatter schema
+# (mode/permission blocks) is not markdownlint-friendly.
+MD_FILES=()
+while IFS= read -r f; do
+  MD_FILES+=("$f")
+done < <(find .opencode docs -type f -name '*.md' \
+           -not -path '*/node_modules/*' \
+           -not -path './.opencode/agents/*' 2>/dev/null)
+[[ -f AGENTS.md ]] && MD_FILES+=("AGENTS.md")
 
 step_build() {
   echo "=== build ==="
-  # This repo is markdown + JSONC config + bash only; there is nothing to compile.
+  # No-op by default: this template ships markdown + JSONC config + bash only.
+  # After specialization, replace with the repo's real build (npm run build, etc.).
   echo "build: ok (nothing to compile)"
 }
 
