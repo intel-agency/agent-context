@@ -1,0 +1,66 @@
+{
+  // Template variable manifest for the agent-context memory & rules template.
+  //
+  // Two consumers read this file:
+  //   1. `specialize-template` skill / `/specialize` command  — detects or asks
+  //      for each variable, then replaces every `{{VARIABLE}}` placeholder in
+  //      the repo with its value and flips `specialized` to true.
+  //   2. `validation.sh` (via test/test-memory-system.sh) — reads `specialized`
+  //      to switch the placeholder-integrity assertion:
+  //        specialized == false -> expect at least one {{...}} present (template)
+  //        specialized == true  -> expect ZERO {{...}} remaining (specialized)
+  //
+  // Not every variable becomes a literal `{{...}}` in a file: some (HAS_CI) drive
+  // conditional prose the skill rewrites, and the seed-ADR date is injected
+  // directly. The placeholder scan matches any `{{[A-Z][A-Z0-9_]*}}` regardless
+  // of the list below, so undeclared placeholders are caught too.
+  "specialized": false,
+  "variables": {
+    "REPO_NAME": {
+      "description": "Repository name (basename of the repo root).",
+      "detect": "git-basename",
+      "ask": false,
+    },
+    "REPO_OWNER": {
+      "description": "Owner (GitHub org or user) parsed from the origin remote.",
+      "detect": "git-owner",
+      "ask": false,
+    },
+    "REMOTE_FULL": {
+      "description": "owner/name slug, e.g. intel-agency/agent-context.",
+      "detect": "owner-slash-name",
+      "ask": false,
+    },
+    "STARTED_YEAR": {
+      "description": "Year of the first commit.",
+      "detect": "git-first-commit-year",
+      "ask": false,
+    },
+    "SPECIALIZED_DATE": {
+      "description": "ISO date (YYYY-MM-DD) the template was specialized; used for the seed ADR and first History entry.",
+      "detect": "today",
+      "ask": false,
+    },
+    "HAS_CI": {
+      "description": "true if .github/workflows/ exists, else false. Drives conditional CI wording; not a textual placeholder.",
+      "detect": "github-workflows-exist",
+      "ask": false,
+    },
+    "OWNER_TEAM": {
+      "description": "Team name shown in rule ownership headers, e.g. 'agent-context maintainers'.",
+      "detect": "none",
+      "ask": true,
+      "prefill_from": "REPO_OWNER",
+    },
+    "PROJECT_TYPE": {
+      "description": "One-line description of what this repo is.",
+      "detect": "infer-type",
+      "ask": true,
+    },
+    "STACK": {
+      "description": "Comma-separated stack list, e.g. 'TypeScript, React, Node'.",
+      "detect": "infer-stack",
+      "ask": true,
+    },
+  },
+}

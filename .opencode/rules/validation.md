@@ -1,13 +1,13 @@
 # Validation Rules
 
-**Owner**: agent-context maintainers  |  **Last Updated**: 2026-07-03  |  **Review Cycle**: Quarterly
+**Owner**: {{OWNER_TEAM}} maintainers | **Last Updated**: 2026-07-03 | **Review Cycle**: Quarterly
 
 This file governs `validation.sh` and the local validation workflow that every change must pass before commit, mirroring the build/scan/test steps required by AGENTS.md.
 
 ## Mirror CI in validation.sh
 
 - **Applies to**: `validation.sh`.
-- **Rule**: the script runs build, scan, and test in order, fail-fast on the first error; it mirrors what CI runs. Note: no CI exists yet — when one is added, keep the two in sync.
+- **Rule**: the script runs build, scan, and test in order, fail-fast on the first error; it mirrors what CI runs. If no CI exists yet, add it and keep the two in sync.
 - **Example**:
   ```bash
   ./build.sh   || exit 1

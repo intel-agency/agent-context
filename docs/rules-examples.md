@@ -1,6 +1,6 @@
 # Rules Examples (Templates for Code Projects)
 
-This file collects Factory-style **code** rules as reusable templates. They are **not active in this repo**: `agent-context` has no application code, so its active rules in `.opencode/rules/` govern only markdown, JSONC, and bash. These templates are provided for code-bearing downstream projects — including the `ai-new-workflow-app-template/` scaffold this repo also hosts — to copy or adapt into their own `.opencode/rules/` once they have app code.
+This file collects Factory-style **code** rules as reusable templates. They are **not active by default**: a freshly specialized repo's active rules in `.opencode/rules/` govern only markdown, JSONC, and bash. Copy or adapt any rule below into `.opencode/rules/` (and add the file to the `instructions` glob) once the repo has application code in the matching language. The `specialize-template` skill offers to do this automatically when it detects a code-bearing stack.
 
 Each rule follows the standard format defined in [`.opencode/rules/rule-format.md`](../.opencode/rules/rule-format.md): a `## [Rule Name]` heading with `Applies to`, `Rule`, `Correct`/`Avoid` examples, and `Rationale`. Copy a rule verbatim, or trim it to fit the downstream stack, then add the owning file to that project's `instructions` glob.
 

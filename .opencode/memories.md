@@ -4,41 +4,34 @@
 
 ## Project Context
 
-- **Name**: agent-context
-- **Type**: opencode agent-context/memory reference repo
-- **Stack**: opencode CLI, markdown, JSONC, bash, MCP servers (sequential-thinking, memory-graph)
-- **Started**: 2026
-- **Remote**: intel-agency/agent-context
+- **Name**: {{REPO_NAME}}
+- **Type**: {{PROJECT_TYPE}}
+- **Stack**: {{STACK}}
+- **Started**: {{STARTED_YEAR}}
+- **Remote**: {{REMOTE_FULL}}
 
 ## Architecture Decisions
 
-### 2026-07-03: Memory & Rules Architecture
+### {{SPECIALIZED_DATE}}: Memory & Rules System Bootstrapped
 
-- **Decision**: adopted a 4-layer Factory-derived architecture adapted to opencode (memories.md, rules/, skills, commands) loaded via the `instructions` glob in opencode.jsonc.
-- **Reasoning**: opencode has no native UserPromptSubmit/PostToolUse hooks, so capture is wired through native commands, skills, and formatters instead.
-- **Trade-offs**: capture is manual (`/remember`) rather than automatic; it relies on agent discipline.
-
-### 2026-07-03: Markdown Memory vs Knowledge-Graph
-
-- **Decision**: keep markdown memory and the MCP memory-graph complementary, not competing.
-- **Reasoning**: markdown is human-editable, team-shared, narrative, and always-in-context; the MCP memory-graph is agent-managed, atomic, and queryable.
-- **Trade-offs**: `/remember` writes markdown only; the same fact could land in both stores if the team is not disciplined.
+- **Decision**: adopted the agent-context memory & rules architecture (4-layer: project memory `.opencode/memories.md`, rules `.opencode/rules/*.md`, skills, commands; plus the MCP memory-graph for atomic structured facts).
+- **Reasoning**: gives every agent session eager-loaded conventions plus narrative context; capture is explicit via `/remember` and skills because opencode has no native auto-capture hooks.
+- **Trade-offs**: capture relies on agent discipline (no auto-hook); markdown memory and the knowledge graph can drift if not kept complementary.
 
 ## Known Technical Debt
 
-- [ ] memory-graph MCP path `/app/.memory/memory.jsonl` in opencode.jsonc is devcontainer-only and won't exist locally.
-- [ ] no CI (`.github/` absent) yet.
-- [ ] validation.sh is new and minimal.
+- [ ] `validation.sh` is the only gate; when CI is added keep the two in sync (see `.opencode/rules/validation.md`).
 
 ## Domain Knowledge
 
-- This repo also hosts `ai-new-workflow-app-template/`, a separate, more elaborate opencode GitHub-Actions template, used as a reference (not the active project).
+<!-- Repo-specific domain knowledge (business rules, glossary, architecture notes).
+     Captured via /remember or the memory-capture skill. Empty by default. -->
 
 ## Environment & Preferences
 
-- **opencode ACP permission prompts are suppressed on the opencode side, NOT Zed.** Zed has NO `always_allow_external_agent_tools` setting — zed-industries/zed PRs #56722 and #57356 were both **closed without merging**, and tracking issue #57355 was closed (verified 2026-07-03). So cards are silenced by setting tool permissions to `allow` in opencode.jsonc (`websearch`, `bash`): opencode then never sends `session/request_permission` to Zed. `deny` rules still apply.
+<!-- Team-wide environment and workflow preferences for THIS repo.
+     Personal preferences belong in ~/.config/opencode/memories.md (never committed). -->
 
 ## History
 
-- [2026-07-03] Switched ACP auto-approve from (non-existent) Zed `always_allow_external_agent_tools` to opencode-side `permission.bash: allow` after confirming zed PRs #56722/#57356 were never merged.
-- [2026-07-03] Initialized memory & rules system (Factory guide adapted to opencode).
+- [{{SPECIALIZED_DATE}}] Specialized memory & rules system from the agent-context template.

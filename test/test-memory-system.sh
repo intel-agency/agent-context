@@ -137,6 +137,44 @@ check_agents_heading() {
 }
 
 # ----------------------------------------------------------------------------
+# Template placeholder integrity.
+# ----------------------------------------------------------------------------
+# Reads the `specialized` field of `.opencode/template.config.jsonc` and asserts
+# the placeholder state matches:
+#   specialized == false -> template is unspecialized, so at least one
+#                            {{KEY}} placeholder MUST be present.
+#   specialized == true  -> specialization complete, so ZERO {{KEY}}
+#                            placeholders may remain anywhere in deliverables.
+# Skipped (advisory) when the manifest is absent or the field is unset.
+# Matched syntax: {{KEY}} where KEY is [A-Z][A-Z0-9_]* (no internal spaces).
+# Docs/prose that need to SHOW the syntax without matching write {{ KEY }} (with
+# spaces), which the regex rejects.
+TEMPLATE_MANIFEST=".opencode/template.config.jsonc"
+
+get_specialized() {
+  [[ -f "$TEMPLATE_MANIFEST" ]] || { echo "missing"; return; }
+  if grep -Eq '"specialized"[[:space:]]*:[[:space:]]*true' "$TEMPLATE_MANIFEST"; then
+    echo "true"
+  elif grep -Eq '"specialized"[[:space:]]*:[[:space:]]*false' "$TEMPLATE_MANIFEST"; then
+    echo "false"
+  else
+    echo "unset"
+  fi
+}
+
+# Print every {{KEY}} occurrence in the deliverable files. Excludes tooling that
+# legitimately documents the mechanism (the manifest itself, this test, and the
+# specialize skill/command). Empty output == none found.
+scan_placeholders() {
+  grep -rEo '[{][{][A-Z][A-Z0-9_]*[}][}]' . \
+    --exclude-dir=node_modules --exclude-dir=.git \
+    --exclude-dir=specialize-template \
+    --exclude=template.config.jsonc \
+    --exclude=test-memory-system.sh \
+    --exclude=specialize.md 2>/dev/null || true
+}
+
+# ----------------------------------------------------------------------------
 # Advisory emoji scan (best-effort; never fails the suite).
 # Scans the new .md files under .opencode/ (excluding node_modules) plus the
 # new docs for glyphs in U+1F000-1FAFF, U+2600-27BF, U+2B00-2BFF.
@@ -148,9 +186,9 @@ emoji_advisory() {
   while IFS= read -r f; do
     [[ -f "$f" ]] && files+=("$f")
   done < <(find .opencode -type f -name '*.md' -not -path '*/node_modules/*' 2>/dev/null)
-  for f in docs/memory-system.md docs/rules-examples.md; do
+  while IFS= read -r f; do
     [[ -f "$f" ]] && files+=("$f")
-  done
+  done < <(find docs -type f -name '*.md' 2>/dev/null)
 
   if ! command -v perl >/dev/null 2>&1; then
     echo "  skipped: perl not available (advisory only, no failure)"
@@ -225,8 +263,16 @@ main() {
   fi
 
   echo "-- docs non-empty (assertion 5) --"
-  expect "docs/memory-system.md non-empty" check_file_nonempty "docs/memory-system.md"
-  expect "docs/rules-examples.md non-empty" check_file_nonempty "docs/rules-examples.md"
+  shopt -s nullglob
+  local doc_files=(docs/*.md)
+  shopt -u nullglob
+  if (( ${#doc_files[@]} == 0 )); then
+    fail "docs files exist" "no docs/*.md found"
+  else
+    for f in "${doc_files[@]}"; do
+      expect "doc file non-empty: $f" check_file_nonempty "$f"
+    done
+  fi
 
   echo "-- opencode.jsonc config (assertion 6) --"
   expect "instructions array includes rules glob + memories" check_jsonc_instructions
@@ -235,7 +281,37 @@ main() {
   echo "-- AGENTS.md heading (assertion 7) --"
   expect "AGENTS.md has '## Memory & Rules System'" check_agents_heading
 
-  echo "-- advisory emoji scan (assertion 8, non-blocking) --"
+  echo "-- template placeholder integrity (assertion 8) --"
+  if [[ -f "$TEMPLATE_MANIFEST" ]]; then
+    local ph_state ph_hits
+    ph_state="$(get_specialized)"
+    ph_hits="$(scan_placeholders)"
+    case "$ph_state" in
+      false)
+        if [[ -n "$ph_hits" ]]; then
+          pass "template mode (specialized=false): placeholders present"
+        else
+          fail "template mode (specialized=false): no placeholders found" \
+               "expected at least one {{KEY}} while unspecialized"
+        fi
+        ;;
+      true)
+        if [[ -z "$ph_hits" ]]; then
+          pass "specialized mode (specialized=true): no placeholders remaining"
+        else
+          fail "specialized mode (specialized=true): unresolved placeholders remain"
+          printf '%s\n' "$ph_hits" | sed 's/^/    /'
+        fi
+        ;;
+      *)
+        echo "  SKIP: 'specialized' field unset in manifest (advisory)"
+        ;;
+    esac
+  else
+    echo "  SKIP: no template.config.jsonc (not a template repo; advisory)"
+  fi
+
+  echo "-- advisory emoji scan (assertion 9, non-blocking) --"
   emoji_advisory
 
   echo "=== summary ==="

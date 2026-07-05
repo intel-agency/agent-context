@@ -1,6 +1,6 @@
 # Markdown-Style Rules
 
-**Owner**: agent-context maintainers  |  **Last Updated**: 2026-07-03  |  **Review Cycle**: Quarterly
+**Owner**: {{OWNER_TEAM}} maintainers | **Last Updated**: 2026-07-03 | **Review Cycle**: Quarterly
 
 ## No emojis in content
 

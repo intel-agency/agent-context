@@ -1,6 +1,6 @@
 # OpenCode-Config Rules
 
-**Owner**: agent-context maintainers  |  **Last Updated**: 2026-07-03  |  **Review Cycle**: Quarterly
+**Owner**: {{OWNER_TEAM}} maintainers | **Last Updated**: 2026-07-03 | **Review Cycle**: Quarterly
 
 ## Keep instructions glob in sync with memory/rules files
 

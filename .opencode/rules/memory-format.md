@@ -1,6 +1,6 @@
 # Memory-Format Rules
 
-**Owner**: agent-context maintainers  |  **Last Updated**: 2026-07-03  |  **Review Cycle**: Quarterly
+**Owner**: {{OWNER_TEAM}} maintainers | **Last Updated**: 2026-07-03 | **Review Cycle**: Quarterly
 
 ## Date every memory entry
 
@@ -19,12 +19,13 @@
 - **Applies to**: architecture and design decisions.
 - **Rule**: use `### YYYY-MM-DD: Title` followed by `**Decision**`, `**Reasoning**`, and `**Trade-offs**`.
 - **Example**:
-  ````markdown
+  ```markdown
   ### 2026-07-03: Markdown Memory vs Knowledge-Graph
+
   - **Decision**: keep them complementary.
   - **Reasoning**: markdown is narrative and shared; the graph is atomic and queryable.
   - **Trade-offs**: possible duplication if not disciplined.
-  ````
+  ```
 
 ## Markdown vs knowledge-graph split
 
