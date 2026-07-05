@@ -13,7 +13,7 @@ Use me before implementing any feature, refactor, or non-trivial change (roughly
 
 ## Process
 
-1. **Read project memory** — `/home/nam20485/src/github/intel-agency/agent-context/.opencode/memories.md`. Look for applicable architecture decisions, constraints, conventions, and known tech debt related to the area you'll touch. Note any ADR blocks whose scope overlaps the change.
+1. **Read project memory** — `.opencode/memories.md`. Look for applicable architecture decisions, constraints, conventions, and known tech debt related to the area you'll touch. Note any ADR blocks whose scope overlaps the change.
 2. **Read the applicable rules** — scan `.opencode/rules/*.md` and pick entries whose `Applies to` matches the file types you will edit. Hand the detailed per-file rule lookup to the `apply-rules` skill when you actually start writing files.
 3. **Query the knowledge graph** — use the MCP memory-graph `search_nodes` (fuzzy) and/or `read_graph` to find prior decisions, entities, and relationships about the components involved. Use `open_nodes` for exact entity names you already know. Look for ownership edges, dependency relations, and prior ADR entities.
 4. **Read personal memory** — `~/.config/opencode/memories.md` — for the user's style/tooling preferences that bear on the change (skip if clearly irrelevant).

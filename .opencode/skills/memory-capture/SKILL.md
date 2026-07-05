@@ -14,7 +14,7 @@ Use me when the user says "remember / record / note / save / log this", or after
 ## Process
 
 1. **Determine category.** Ask or infer one of: `Decision`, `Context`, `Preference`, `History`, `Tech Debt`. If unclear, ask the user rather than guessing.
-2. **Determine scope.** Project (`/home/nam20485/src/github/intel-agency/agent-context/.opencode/memories.md`) for things the whole team/project needs, or Personal (`~/.config/opencode/memories.md`) for the individual's style/tool preferences. Default to **Project**.
+2. **Determine scope.** Project (`.opencode/memories.md`) for things the whole team/project needs, or Personal (`~/.config/opencode/memories.md`) for the individual's style/tool preferences. Default to **Project**.
 3. **Read the target file first** and check for a duplicate or related entry. Prefer editing/augmenting an existing entry over creating a near-duplicate.
 4. **Write using the standard dated format.**
    - Most categories: a dated bullet — `- [YYYY-MM-DD] (Category) ...`
