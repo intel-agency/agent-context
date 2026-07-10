@@ -16,6 +16,7 @@ The following steps must be run as part of validation:
 - test
 
 A validation script must be maintained to run these steps automatically (i.e. `validation.sh`, `validation.ps1`, etc.).
+
 - It should mirror exactly what is run in the CI/CD pipeline.
 - Update the local and CI/CD copies to keep them in sync with any changes.
 
@@ -31,7 +32,7 @@ If an agent needs to run validation and the expected script (e.g. `validation.ps
 
 ### Testing
 
-An automated test suite must be maintained. 
+An automated test suite must be maintained.
 
 - Test results and coverage reports should be generated automatically.
 - Test Coverage levels must be maintained as new code is added.
@@ -103,7 +104,7 @@ Use orchestration agents to **decompose and delegate** work instead of implement
 
 - Always create a plan before starting any non-trivial task (e.g. >= 3 steps or >= 5 minutes of work)
 - Present plans for approval before starting any non-trivial task.
-- Always use TODO lists to track work to be done. 
+- Always use TODO lists to track work to be done.
 - Mark TODO items as complete when they are done.
 - Present summary after completing all plans/tasks.
 
