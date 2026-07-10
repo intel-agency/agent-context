@@ -121,6 +121,40 @@ Use `sequentialthinking` for non-trivial, multi-step problems (planning, root-ca
 
 Use the Memory knowledge-graph (`@modelcontextprotocol/server-memory`) for **durable, reusable context only** — never transient scratch state or secrets/PII (the store is plaintext). Search before creating to avoid duplicates; keep observations atomic, specific, and active-voiced. Full usage guide: [`docs/tool-memory.md`](docs/tool-memory.md).
 
+### Semantic Search (Codebase Indexing)
+
+The `semantic_search` tool (powered by Kilo Code's codebase indexing) finds code by **meaning**, not by exact text. It uses AI embeddings to rank semantic code blocks (functions, classes, methods, markdown sections) against a natural-language query, returning ranked matches with file paths and line ranges.
+
+**Prerequisite:** Codebase indexing is enabled and available for this project. The tool errors only if the index is disabled or empty; otherwise assume it is ready.
+
+**When to use `semantic_search` — prefer it as the first probe when you:**
+
+- Are exploring an **unfamiliar** code area before you know exact identifiers.
+- Are looking for a feature, behavior, or **intent** ("authentication logic", "database connection setup", "error handling patterns", "API endpoint definitions", "rate limiting").
+- Want to locate **conceptually related** implementations or similar code patterns spread across the codebase.
+- Need to **narrow a large codebase** before following up with `Grep` / `Glob` / `Read`.
+
+**When NOT to use it — pick the specialized tool instead:**
+
+- Exact symbol, regex, or keyword lookups → `Grep`.
+- Finding files by name or extension (e.g. `**/*.ts`, `*.config.js`) → `Glob`.
+- Reading a file whose path you already know → `Read`.
+- Exploring files **outside** the current workspace → `Grep` / `Glob` / `Read` (`semantic_search` is workspace-scoped).
+
+**How to query:**
+
+- Write the query in **natural language, in English** (e.g. "where are user sessions validated before API access?").
+- Prefer **specific, descriptive** phrasing over vague nouns. "Redis retry/backoff handling" beats "redis".
+- To restrict results to a subdirectory, pass the `path` argument (relative to the workspace root). Leave it empty for a whole-workspace search.
+- After getting ranked matches, follow up with `Read` (to inspect the returned line ranges) or `Grep` (to enumerate exact occurrences of an identifier you discovered).
+
+**Tuning (optional, set in `indexing` under `kilo.jsonc`):**
+
+- `searchMaxResults` (default `50`) — lower for faster, more focused results; raise for broader context.
+- `searchMinScore` (default `0.4`) — raise to require closer matches; lower to surface tangentially related code.
+
+Full guide: [Codebase Indexing](https://github.com/Kilo-Org/kilocode/blob/main/packages/kilo-docs/pages/customize/context/codebase-indexing.md).
+
 ### Web & Repository Research (Z.AI MCP)
 
 These three **remote** Z.AI MCP servers authenticate via the `Authorization: {env:Z_AI_API_KEY}` header and require no local install. Use them for reliable, structured external information retrieval instead of ad-hoc fetching.
