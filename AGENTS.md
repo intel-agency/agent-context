@@ -1,5 +1,61 @@
 # AGENTS.md
 
+## Memory and Rules
+
+This codebase uses a dynamic memory and rules system to capture and provide agents with information, preferences, and other details specific to this project.
+
+- It is represented as a directory structure of markdown files under `.agents/` directory in the root of the repository.
+
+- Consult this before you plan, make changes, or perform work in this project.
+- Update it as you work and learn about this project.
+
+### Memory
+
+Memory is for past decisions, choices, and history.
+
+#### Examples
+
+- design decisions
+- trade-off choices
+- reasons for choosing one approach over another.
+- resolution to questions during planning or implementation
+
+#### Files
+
+Memory is a single file is located at `.agents/memory.md`.
+
+### Rules
+
+Rules dictate coding style, tools, source control, validation.
+
+#### Examples
+
+- tools
+- coding conventions
+- frameworks
+- languages
+- CI
+- testing
+- merging
+- branching
+- validation
+
+#### Files
+
+Rules files are located under the `.agents/rules/` directory, with each file named by the subject it applies to.
+
+**IMPORTANT** When working on a file, performing actions or implementation, check the relevant rules files first.
+
+Follow the conventions documented in `.factory/rules/`:
+
+- **TypeScript**: `.factory/rules/typescript.md`
+- **React**: `.factory/rules/react.md`
+- **Testing**: `.factory/rules/testing.md`
+- **API Design**: `.factory/rules/api.md`
+- **Security**: `.factory/rules/security.md`
+
+---
+
 ## Validation
 
 All changes must be validated.
