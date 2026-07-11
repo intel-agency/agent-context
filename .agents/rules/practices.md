@@ -18,7 +18,7 @@ Inspect the following to orient yourself:
 
 ## Planning
 
-- Always create a plan before starting any non-trivial task (e.g. >= 3 steps or >= 5 minutes of work)
+- Always create a plan before starting any non-trivial task (e.g. >= 3 steps or >= 5 minutes of work).
 - Present plans for approval before starting any non-trivial task.
 - Always use TODO lists to track work to be done.
 - Mark TODO items as complete when they are done.

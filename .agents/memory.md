@@ -19,9 +19,6 @@ Current project and its sub-work items that we are working on actively. This sec
 
 ## Decisions
 
-## Remeber To Do
+## Remember To Do
 
 Things to plan, add, or change when we are done with the current activity.
-
--
--
