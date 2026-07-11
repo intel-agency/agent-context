@@ -27,7 +27,7 @@ Rules dictate coding conventions, tools, validation, testing, source control, de
 
 **IMPORTANT:** Check the relevant rules file before working on any file or performing implementation.
 
-When relocating content into a rules file, the AGENTS.md section that replaces it should become a brief that 1. describes what the reader will find by following the link, and 2. inform about the most important information found— the heading and summary should describe the content, not just name the subject-- and the summary should surface the 1–2 most important directives in-context.
+When relocating content into a rules file, the AGENTS.md section that replaces it should become a two-part brief: a title describing the type of content the linked file holds (not just its subject name), and a summary previewing the 1–2 most important actual items from the file, abbreviated in-context.
 
 ### Updating Memory and Rules
 
