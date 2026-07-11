@@ -50,6 +50,10 @@ Source control rules — safe commits, workflow monitoring, branching, and pull 
 
 Delegate work to the appropriate subagent and orchestrate multi-agent tasks using the smallest layer that fits the scope. Detailed delegation and orchestration rules live in [`.agents/rules/delegation.md`](.agents/rules/delegation.md).
 
+## Orientation
+
+Always orient to the project's history and current state before starting any work — memory, plans, pending changes, and recent commits. Detailed orientation steps live in [`.agents/rules/practices.md`](.agents/rules/practices.md).
+
 ## Planning, Investigation & Making Changes
 
 Always plan non-trivial tasks before starting, investigate root causes using first-hand sources, and make the smallest surgical changes possible. Detailed rules for the full lifecycle live in [`.agents/rules/practices.md`](.agents/rules/practices.md).
