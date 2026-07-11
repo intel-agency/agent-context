@@ -27,13 +27,13 @@ Rules dictate coding conventions, tools, validation, testing, source control, de
 
 **IMPORTANT:** Check the relevant rules file before working on any file or performing implementation.
 
-When relocating content into a rules file, the AGENTS.md section should become a brief that describes what the reader will find by following the link — the heading and summary should describe the content, not just name the subject. Surface the 1–2 most important directives in-context.
+When relocating content into a rules file, the AGENTS.md section that replaces it should become a brief that 1. describes what the reader will find by following the link, and 2. inform about the most important information found— the heading and summary should describe the content, not just name the subject-- and the summary should surface the 1–2 most important directives in-context.
 
 ### Updating Memory and Rules
 
 **ALWAYS update as you go — never wait until you are done with all work.**
 
-- Update the memory file's **Current Activity** section as you progress; move completed items to **Completed Work Items**.
+- Update the memory file's **Current Activity** section as you progress; move completed items to **Completed Work Items**, move the **Project** header down when you complete the **entire** project.
 - Update the relevant rules file when you learn new conventions, requirements, or guidelines. If a rules file does not exist for a subject, create it.
 
 ---
