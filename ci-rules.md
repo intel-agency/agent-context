@@ -1,4 +1,4 @@
-IBus Destroy/InputContext_* exceptions are not written to the crash log.
+# CI/CD Rules
 
 Do we have a CI/CD section?
 

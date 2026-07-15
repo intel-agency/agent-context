@@ -102,7 +102,7 @@ if ($existingNumber) {
     }
     $editArgs = @('issue', 'edit', $existingNumber, '--repo', $Repo)
     foreach ($l in $Labels) { $editArgs += @('--add-label', $l) }
-    if ($Milestone) { $editArgs += @('--milestone', $Milestone) }
+    if ($null -ne $Milestone) { $editArgs += @('--milestone', $Milestone) }
     if ($UpdateBody) {
         if ($BodyFile) { $editArgs += @('--body-file', $BodyFile) }
         elseif ($null -ne $Body) { $editArgs += @('--body', $Body) }
@@ -124,7 +124,7 @@ $createArgs = @('issue', 'create', '--repo', $Repo, '--title', $Title)
 if ($BodyFile) { $createArgs += @('--body-file', $BodyFile) }
 else { $createArgs += @('--body', ($Body ?? '')) }
 foreach ($l in $Labels) { $createArgs += @('--label', $l) }
-if ($Milestone) { $createArgs += @('--milestone', $Milestone) }
+if ($null -ne $Milestone) { $createArgs += @('--milestone', $Milestone) }
 foreach ($a in $Assignee) { $createArgs += @('--assignee', $a) }
 
 $createOut = Invoke-Gh @createArgs

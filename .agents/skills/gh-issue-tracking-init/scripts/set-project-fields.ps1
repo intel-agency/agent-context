@@ -84,10 +84,10 @@ Initialize-Auth -DryRun:$DryRun
 
 # Collect requested single-select assignments (only those actually supplied).
 $singleSelect = [ordered]@{}
-if ($Level) { $singleSelect['Level'] = $Level }
-if ($Priority) { $singleSelect['Priority'] = $Priority }
-if ($Phase) { $singleSelect['Phase'] = $Phase }
-if ($Status) { $singleSelect['Status'] = $Status }
+if ($null -ne $Level) { $singleSelect['Level'] = $Level }
+if ($null -ne $Priority) { $singleSelect['Priority'] = $Priority }
+if ($null -ne $Phase) { $singleSelect['Phase'] = $Phase }
+if ($null -ne $Status) { $singleSelect['Status'] = $Status }
 $hasEstimate = $PSBoundParameters.ContainsKey('Estimate')
 
 $issueUrl = "https://github.com/$Repo/issues/$IssueNumber"

@@ -48,7 +48,7 @@ Component the epic lives in.
 
 ## Project Structure Area
 
-*(Highligh/indicate or only include (indicate summarized content with `...` above and below) the folders impacted by this epic.)*
+*(Highlight/indicate or only include (indicate summarized content with `...` above and below) the folders impacted by this epic.)*
 
 ```
 [ProjectName]/

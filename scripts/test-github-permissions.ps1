@@ -222,10 +222,10 @@ if ($Owner) {
     # We'll use the test repo if it was created successfully, otherwise try to find another repo
     $milestoneTest = $false
     if ($repoTest) {
-        $milestoneTest = Test-Command "gh milestone create 'Test Milestone' --repo $Owner/$TestRepoName 2>`$null || true" 'Milestone Creation'
+        $milestoneTest = Test-Command "gh milestone create 'Test Milestone' --repo $Owner/$TestRepoName 2>`$null" 'Milestone Creation'
         # Clean up milestone if created
         if ($milestoneTest -and $Cleanup) {
-            Test-Command "gh milestone close 'Test Milestone' --repo $Owner/$TestRepoName 2>`$null || true" 'Milestone Closure'
+            Test-Command "gh milestone close 'Test Milestone' --repo $Owner/$TestRepoName 2>`$null" 'Milestone Closure'
         }
     }
     if (-not $milestoneTest) {
