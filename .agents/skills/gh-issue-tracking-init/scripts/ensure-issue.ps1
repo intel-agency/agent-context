@@ -105,7 +105,7 @@ if ($existingNumber) {
     if ($Milestone) { $editArgs += @('--milestone', $Milestone) }
     if ($UpdateBody) {
         if ($BodyFile) { $editArgs += @('--body-file', $BodyFile) }
-        elseif ($Body) { $editArgs += @('--body', $Body) }
+        elseif ($null -ne $Body) { $editArgs += @('--body', $Body) }
     }
     Invoke-Gh @editArgs | Out-Null
     Write-Ok "Updated issue #$existingNumber."
