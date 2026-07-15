@@ -72,12 +72,7 @@ function Invoke-GHGraphQLQuery {
     }
     $hasErrors = $false
     $errMsgs = @()
-    $hasErrorsProp = $false
-    try {
-        $null = $json.errors
-        $hasErrorsProp = $true
-    }
-    catch { $hasErrorsProp = $false }
+    $hasErrorsProp = $null -ne $json.PSObject.Properties['errors']
     if ($hasErrorsProp -and $null -ne $json.errors) {
         $errs = $json.errors
         if ($errs -is [array]) { $errMsgs = $errs | ForEach-Object { $_.message } }
@@ -123,7 +118,11 @@ query($owner:String!, $repo:String!, $number:Int!) {
     $vars = @{ owner = $Owner; repo = $Repo; number = $PR }
     $resp = Invoke-GHGraphQLQuery -Query $q -Vars $vars
     $threads = @()
-    if ($null -eq $resp -or $null -eq $resp.data -or $null -eq $resp.data.repository -or $null -eq $resp.data.repository.pullRequest) {
+    $hasData = $null -ne $resp -and `
+               $null -ne $resp.PSObject.Properties['data'] -and `
+               $null -ne $resp.data.PSObject.Properties['repository'] -and `
+               $null -ne $resp.data.repository.PSObject.Properties['pullRequest']
+    if (-not $hasData) {
         throw 'GraphQL response missing expected data for repository/pullRequest.'
     }
     $nodes = $resp.data.repository.pullRequest.reviewThreads.nodes
@@ -179,6 +178,9 @@ function Send-ReplyToReviewComment {
     )
     if ($VerboseLogging) { Write-Host "gh $($ghArgs -join ' ')" -ForegroundColor DarkGray }
     gh @ghArgs | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to reply to review comment $CommentId (exit $LASTEXITCODE)."
+    }
 }
 
 $threads = Get-UnresolvedReviewThreads -Owner $Owner -Repo $Repo -PR $PullRequestNumber
@@ -259,7 +261,10 @@ if ($Interactive -or (-not $AutoResolve -and $unresolvedCount -gt 1)) {
         if ($snippet.Length -gt 140) { $snippet = $snippet.Substring(0, 140) + '…' }
         Write-Host ([Environment]::NewLine + "ThreadId: $($t.ThreadId)") -ForegroundColor Cyan
         Write-Host "Path    : $($t.Path)"
-        if ($last) { Write-Host "LastBy  : $($last.author.login) @ $($last.createdAt)" }
+        if ($last) {
+            $authorLogin = if ($last.author) { $last.author.login } else { '(ghost)' }
+            Write-Host "LastBy  : $authorLogin @ $($last.createdAt)"
+        }
         if ($snippet) { Write-Host "Snippet : $snippet" }
         $ans = Read-Host 'Resolve this thread now? (y/N)'
         if ($ans -match '^(y|yes)$') {

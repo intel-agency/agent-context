@@ -109,7 +109,7 @@ if ($TitlesFile) {
 }
 
 # Normalize, remove duplicates, trim
-$allTitles = $allTitles | ForEach-Object { $_.Trim() } | Where-Object { $_ } | Select-Object -Unique
+$allTitles = $allTitles | Where-Object { $null -ne $_ } | ForEach-Object { $_.Trim() } | Where-Object { $_ } | Select-Object -Unique
 
 if (-not $allTitles -or $allTitles.Count -eq 0) {
     Write-Error 'No milestone titles were provided. Use -Titles and/or -TitlesFile.'
