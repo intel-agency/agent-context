@@ -257,7 +257,7 @@ if ($Interactive -or (-not $AutoResolve -and $unresolvedCount -gt 1)) {
         $last = Get-LastComment $t
         $snippet = if ($last) { ($last.body -replace '\r?\n', ' ') } else { '' }
         if ($snippet.Length -gt 140) { $snippet = $snippet.Substring(0, 140) + '…' }
-        Write-Host "\nThreadId: $($t.ThreadId)" -ForegroundColor Cyan
+        Write-Host ([Environment]::NewLine + "ThreadId: $($t.ThreadId)") -ForegroundColor Cyan
         Write-Host "Path    : $($t.Path)"
         if ($last) { Write-Host "LastBy  : $($last.author.login) @ $($last.createdAt)" }
         if ($snippet) { Write-Host "Snippet : $snippet" }

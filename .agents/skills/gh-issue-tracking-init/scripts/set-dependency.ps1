@@ -57,7 +57,7 @@ try {
     if ($blockers) { $already = [bool](@($blockers | Where-Object { [int]$_.number -eq $BlockedByNumber }).Count) }
 }
 catch {
-    Write-Warning "Could not list existing dependencies of #${IssueNumber}: $($_.Exception.Message)"
+    throw "Failed to list existing dependencies of #${IssueNumber} during discovery: $($_.Exception.Message)"
 }
 
 if ($already) {

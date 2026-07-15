@@ -2,13 +2,13 @@ IBus Destroy/InputContext_* exceptions are not written to the crash log.
 
 Do we have a CI/CD section?
 
-Ruls for CI/CD:
+Rules for CI/CD:
 
 Always create an automated test suite step
-Always generate coverage resuts
-COverage results >= 85%
+Always generate coverage results
+Coverage results >= 85%
 Generate HTML coverage report
 
-Always run static analysis \ and secutiry scanning
+Always run static analysis and security scanning
 
-Version Pinning- ALWAYS use very specific version pinning- no version drift or changes shoudl oiccur unless we explcitly manually change iot 
+Version Pinning- ALWAYS use very specific version pinning- no version drift or changes should occur unless we explicitly manually change it

@@ -57,7 +57,7 @@ try {
     if ($subs) { $already = [bool](@($subs | Where-Object { [int]$_.number -eq $ChildNumber }).Count) }
 }
 catch {
-    Write-Warning "Could not list existing sub-issues of #${ParentNumber}: $($_.Exception.Message)"
+    throw "Failed to list existing sub-issues of #${ParentNumber} during discovery: $($_.Exception.Message)"
 }
 
 if ($already) {

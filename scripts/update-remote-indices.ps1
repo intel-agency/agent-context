@@ -44,7 +44,7 @@ function Build-AssignmentsIndexContent {
   $lines += "Branch: $Branch"
   $lines += "Directory: $dirWithSlash"
   $lines += ''
-  $lines += 'Listed beklow are all of the active workflow assignments and their paths.'
+  $lines += 'Listed below are all of the active workflow assignments and their paths.'
   $lines += ''
   $lines += 'Agents MUST resolve workflow assignments (by shortId) from the remote canonical repository. Do not use local mirrors.'
   $lines += ''
@@ -88,7 +88,7 @@ function Build-DynamicWorkflowsIndexContent {
   $lines += "Branch: $Branch"
   $lines += "Directory: $dirWithSlash"
   $lines += ''
-  $lines += 'Listed beklow are all of the active dynamic workflows and their paths.'
+  $lines += 'Listed below are all of the active dynamic workflows and their paths.'
   $lines += ''
   $lines += 'Agents MUST resolve dynamic workflows from the remote canonical repository. Do not use local mirrors.'
   $lines += ''
@@ -120,8 +120,8 @@ function Build-DynamicWorkflowsIndexContent {
 
 # Resolve paths
 $repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path | Split-Path -Parent
-$assignmentsIndexPath = Join-Path $repoRoot 'local_ai_instruction_modules\ai-workflow-assignments.md'
-$workflowsIndexPath = Join-Path $repoRoot 'local_ai_instruction_modules\ai-dynamic-workflows.md'
+$assignmentsIndexPath = Join-Path $repoRoot 'local_ai_instruction_modules' 'ai-workflow-assignments.md'
+$workflowsIndexPath = Join-Path $repoRoot 'local_ai_instruction_modules' 'ai-dynamic-workflows.md'
 
 # Fetch remote file lists
 $assignmentsDir = 'ai_instruction_modules/ai-workflow-assignments'

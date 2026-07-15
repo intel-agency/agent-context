@@ -208,7 +208,7 @@ else {
 # Test 5: Label management (requires an existing repo)
 if ($Owner) {
     # Try to list labels on a common repository to test permissions
-    $labelTest = Test-Command "gh label list --repo $Owner/$TestRepoName 2>`$null || gh label list --repo $Owner/`$(gh repo list --limit 1 --json nameWithOwner | ConvertFrom-Json).nameWithOwner.split('/')[1]" 'Label Management'
+    $labelTest = Test-Command ('gh label list --repo ' + $Owner + '/' + $TestRepoName + ' 2>$null || gh label list --repo ' + $Owner + '/$(gh repo list --limit 1 --json name --jq ".[0].name")') 'Label Management'
     if (-not $labelTest) {
         Write-Status 'Label management test failed, possibly because the test repo was not created successfully.' 'WARNING'
     }
@@ -249,7 +249,8 @@ if ($Owner -and $repoTest) {
         Push-Location .tmp-test-repo
         
         # Create a test branch
-        $branchResult = git checkout -b "test-permissions-$(Get-Date -Format 'HHmmss')" 2>$null
+        $branchName = "test-permissions-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+        $branchResult = git checkout -b $branchName 2>$null
         if ($?) {
             Write-Status 'SUCCESS - Branch Creation' 'SUCCESS'
             
@@ -261,7 +262,7 @@ if ($Owner -and $repoTest) {
             git commit -m 'Test commit for permissions verification' 2>$null
             
             # Try to push the branch
-            $pushResult = git push origin "test-permissions-$(Get-Date -Format 'HHmmss')" 2>$null
+            $pushResult = git push origin $branchName 2>$null
             if ($?) {
                 Write-Status 'SUCCESS - Branch Push' 'SUCCESS'
             }

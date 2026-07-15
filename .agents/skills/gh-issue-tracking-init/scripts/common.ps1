@@ -90,7 +90,11 @@ function Get-IssueDbId {
         [Parameter(Mandatory = $true)][string]$Repo,
         [Parameter(Mandatory = $true)][int]$Number
     )
-    return [int](Invoke-Gh api "repos/$Repo/issues/$Number" --jq '.id')
+    $rawId = (Invoke-Gh api "repos/$Repo/issues/$Number" --jq '.id').Trim()
+    if ($rawId -notmatch '^\d+$') {
+        throw "Failed to parse numeric database ID for issue #$Number in repo '$Repo'. Raw output: $rawId"
+    }
+    return [int]$rawId
 }
 
 function Find-IssueNumberByTitle {
