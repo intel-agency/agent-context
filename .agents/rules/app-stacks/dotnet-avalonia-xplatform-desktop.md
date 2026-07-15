@@ -21,7 +21,7 @@ Avalonia Desktop App template
 
 (Optional, as needed.)
 
-- NET Community Toolkit
+- .NET Community Toolkit
 - Windows Community Toolkit
 
 ### Database

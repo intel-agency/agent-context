@@ -29,7 +29,7 @@
 
 (Optional, as needed.)
 
-- NET Community Toolkit
+- .NET Community Toolkit
 - Windows Community Toolkit
 - .NET Aspire Community Toolkit
 
