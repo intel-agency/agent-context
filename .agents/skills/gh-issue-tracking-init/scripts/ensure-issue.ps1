@@ -82,12 +82,10 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'common.ps1')
 
 if ($Body -and $BodyFile) {
-    Write-Error 'Specify only one of -Body or -BodyFile.'
-    exit 1
+    throw 'Specify only one of -Body or -BodyFile.'
 }
 if ($BodyFile -and -not (Test-Path -LiteralPath $BodyFile)) {
-    Write-Error "Body file not found: $BodyFile"
-    exit 1
+    throw "Body file not found: $BodyFile"
 }
 
 Initialize-Auth -DryRun:$DryRun
@@ -133,6 +131,10 @@ $createOut = Invoke-Gh @createArgs
 $urlLine = ($createOut | Where-Object { $_ -match '/issues/\d+' } | Select-Object -Last 1)
 if (-not $urlLine) { $urlLine = ($createOut | Select-Object -Last 1) }
 $url = ([string]$urlLine).Trim()
-$number = [int](($url -split '/')[-1])
+if ($url -match '/issues/(\d+)\s*$') {
+    $number = [int]$Matches[1]
+} else {
+    throw "Failed to parse issue number from output: $url"
+}
 Write-Ok "Created issue #$number ($url)"
 Write-Output $number

@@ -87,7 +87,7 @@ try {
     $existing = @($projects | Where-Object { $_.title -eq $Title }) | Select-Object -First 1
 }
 catch {
-    Write-Warning "Could not list existing projects: $($_.Exception.Message)"
+    throw "Could not list existing projects: $($_.Exception.Message)"
 }
 
 $projectNumber = $null
@@ -136,7 +136,7 @@ else {
         $existingFieldNames = @($fields | ForEach-Object { $_.name })
     }
     catch {
-        Write-Warning "Could not list project fields: $($_.Exception.Message)"
+        throw "Could not list project fields: $($_.Exception.Message)"
     }
 
     foreach ($f in $desiredFields) {

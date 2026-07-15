@@ -44,14 +44,12 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'common.ps1')
 
 if (-not (Test-Path -LiteralPath $LabelsFile)) {
-    Write-Error "Labels file not found: $LabelsFile"
-    exit 1
+    throw "Labels file not found: $LabelsFile"
 }
 
 $importLabels = Join-Path $PSScriptRoot 'import-labels.ps1'
 if (-not (Test-Path -LiteralPath $importLabels)) {
-    Write-Error "Required helper not found: $importLabels"
-    exit 1
+    throw "Required helper not found: $importLabels"
 }
 
 Write-Step "Ensuring canonical labels on $Repo (source: $LabelsFile)"
