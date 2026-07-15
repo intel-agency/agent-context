@@ -24,6 +24,10 @@ Rules dictate coding conventions, tools, validation, testing, source control, de
 - **Source Control**: `.agents/rules/source-control.md`
 - **Delegation**: `.agents/rules/delegation.md`
 - **Practices**: `.agents/rules/practices.md`
+- **App Stacks**: pre-defined language and tech stack profiles in `.agents/rules/app-stacks/`. Each file is a stack definition named by slug ID, referenced from app development/implementation plans to specify the language, tech stack, tools, and packages to use. Available stacks:
+  - `dotnet-aspire-aspnet-blazor` — .NET Aspire + ASP.NET Core + Blazor WASM
+  - `dotnet-avalonia-xplatform-desktop` — .NET Avalonia cross-platform desktop
+  - `python-uv-fastapi-vite` — Python (uv) + FastAPI + Vite frontend
 
 **IMPORTANT:** Check the relevant rules file before working on any file or performing implementation.
 
