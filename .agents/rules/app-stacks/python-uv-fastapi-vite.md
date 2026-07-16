@@ -1,5 +1,15 @@
 # python-uv-fastapi-vite
 
+## Platform
+
+web
+
+## OS
+
+1. Windows
+2. Linux
+3. macOS
+
 ## Language
 
 Python

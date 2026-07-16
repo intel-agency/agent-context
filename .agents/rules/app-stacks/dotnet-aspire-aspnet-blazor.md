@@ -1,5 +1,15 @@
 # dotnet-aspire-aspnet-blazor
 
+## Platform
+
+web
+
+## OS
+
+1. Windows
+2. Linux
+3. macOS
+
 ## Language
 
 .NET C#
@@ -32,6 +42,7 @@
 - .NET Community Toolkit
 - Windows Community Toolkit
 - .NET Aspire Community Toolkit
+- Entity Framework Core
 
 ### Containerization
 

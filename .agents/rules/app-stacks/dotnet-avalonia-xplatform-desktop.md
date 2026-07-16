@@ -1,5 +1,15 @@
 # dotnet-avalonia-xplatform-desktop
 
+## Platform
+
+desktop
+
+## OS
+
+1. Windows
+2. Linux
+3. macOS
+
 ## Language
 
 .NET C#
@@ -23,6 +33,7 @@ Avalonia Desktop App template
 
 - .NET Community Toolkit
 - Windows Community Toolkit
+- Entity Framework Core
 
 ### Database
 
