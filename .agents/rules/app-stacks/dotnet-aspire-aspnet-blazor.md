@@ -1,5 +1,15 @@
 # dotnet-aspire-aspnet-blazor
 
+## Platform
+
+web
+
+## OS
+
+1. Windows
+2. Linux
+3. macOS
+
 ## Language
 
 .NET C#
