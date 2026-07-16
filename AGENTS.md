@@ -46,6 +46,10 @@ When relocating content into a rules file, the AGENTS.md section that replaces i
 
 All non-trivial changes must be validated using build, scan, and test steps after making them and always before committing. Detailed validation, testing, and TDD rules live in [`.agents/rules/validation.md`](.agents/rules/validation.md). Test coverage must be maintained > 85%.
 
+## CI/CD Pipeline Requirements
+
+CI/CD pipeline requirements — mandatory test, coverage, and scanning steps plus strict version pinning — live in [`.agents/rules/ci-cd.md`](.agents/rules/ci-cd.md). Pipelines must enforce > 85% coverage and generate an HTML coverage report.
+
 ## Committing
 
 Source control rules — safe commits, workflow monitoring, branching, and pull requests — live in [`.agents/rules/source-control.md`](.agents/rules/source-control.md). Always run the `/safe-commit` skill before committing.
