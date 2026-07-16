@@ -42,6 +42,7 @@ web
 - .NET Community Toolkit
 - Windows Community Toolkit
 - .NET Aspire Community Toolkit
+- Entity Framework Core
 
 ### Containerization
 

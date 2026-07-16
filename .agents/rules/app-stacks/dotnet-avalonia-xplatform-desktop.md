@@ -33,6 +33,7 @@ Avalonia Desktop App template
 
 - .NET Community Toolkit
 - Windows Community Toolkit
+- Entity Framework Core
 
 ### Database
 
