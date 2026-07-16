@@ -155,7 +155,11 @@ if ($planned.Count -eq 0) {
 }
 
 Write-Host 'Planned actions:' -ForegroundColor Cyan
-$planned | ForEach-Object { Write-Host (' - {0}: {1}{2}' -f $_.action, $_.title, $(if ($_.reason) { " ($($_.reason))" } else { '' })) }
+$planned | ForEach-Object {
+    $reason = if ($_.ContainsKey('reason')) { $_.reason } else { '' }
+    $suffix = if ($reason) { " ($reason)" } else { '' }
+    Write-Host (' - {0}: {1}{2}' -f $_.action, $_.title, $suffix)
+}
 
 if ($DryRun) {
     Write-Host 'Dry run specified. No changes made.' -ForegroundColor Yellow
