@@ -29,6 +29,8 @@ Implemented `docs/plans/gh-issue-tracking/run-issues-review/gh-issue-tracking-fi
 
 ## Decisions
 
+- **Rules restructuring of `local_ai_instruction_modules/`** (2026-07-18): Consolidated the legacy module directory. Added `.agents/rules/scripts.md` (repo-root `scripts/` brief, built from each script's header/`param()` block — fills the long-standing stub referenced in the 2026-07-10 notes) and `.agents/rules/ai-instructions-modules.md` (pointer to the remote canonical repo `nam20485/agent-instructions`). Deleted four stale/contradictory modules — `ai-custom-agents.md` (25-subagent taxonomy, conflicts with `delegation.md`), `ai-delegation-mandate.md` (75% coverage / FORBIDDEN direct execution, conflicts with `delegation.md`), `ai-development-instructions.md` (references nonexistent `AGENTS.md mandatory_tool_protocols`, stale `mcp_*` tooling), `ai-terminal-commands.md`. Kept `ai-workflow-assignments.md` and `ai-dynamic-workflows.md` in place — their path is hard-coded by `scripts/update-remote-indices.ps1:123-124` and the `/commands` that resolve shortIds. Salvaged two valid facts: SHA-Pinned Actions rule → `ci-cd.md`; CLI error-triage pattern → `practices.md`.
+
 ## Remember To Do
 
 Things to plan, add, or change when we are done with the current activity.
