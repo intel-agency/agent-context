@@ -1,13 +1,13 @@
 # Plan — Upstream fixes in `intel-agency/agent-context`
 
-> Handoff document for an implementing agent. Source: [`gap-miner-v2-sierra46-forensic-analysis.md`](./gap-miner-v2-sierra46-forensic-analysis.md) (§9, §10). Target repo: [`intel-agency/agent-context`](https://github.com/intel-agency/agent-context) (the parent template that owns the `/gh-issue-tracking-init` skill as the canonical source of truth).
+> Handoff document for an implementing agent. Source: the forensic analysis `gap-miner-v2-sierra46-forensic-analysis.md` (§9, §10) in the [`intel-agency/gap-miner-v2-sierra46`](https://github.com/intel-agency/gap-miner-v2-sierra46) repo. Target repo: [`intel-agency/agent-context`](https://github.com/intel-agency/agent-context) (the parent template that owns the `/gh-issue-tracking-init` skill as the canonical source of truth).
 
 | | |
 |---|---|
 | **Plan** | Forensic-fixes upstream in agent-context |
 | **Target repo** | `intel-agency/agent-context` |
 | **Date drafted** | 2026-07-17 |
-| **Status** | Ready for agent execution |
+| **Status** | Implemented (W1, W2, W4); W3 (defect level) **deferred** — extracted to [`../.deferred/defect-level-plan.md`](../.deferred/defect-level-plan.md) |
 | **Skill path in target** | `.agents/skills/gh-issue-tracking-init/` |
 | **Generic scripts path** | `scripts/` (the repo-root `common-auth.ps1`, `import-labels.ps1`, `create-milestones.ps1`) |
 
@@ -24,7 +24,7 @@ A forensic analysis of the skill applied to `intel-agency/gap-miner-v2-sierra46`
 - **Target repo:** `intel-agency/agent-context` (the repo that owns the `/gh-issue-tracking-init` skill as its canonical source of truth)
 - **Skill path in target:** `.agents/skills/gh-issue-tracking-init/`
 - **Generic scripts path:** `scripts/` (the repo-root `common-auth.ps1`, `import-labels.ps1`, `create-milestones.ps1`)
-- **Evidence:** [`gap-miner-v2-sierra46-forensic-analysis.md`](./gap-miner-v2-sierra46-forensic-analysis.md) (`§9`, `§10`)
+- **Evidence:** the forensic analysis `gap-miner-v2-sierra46-forensic-analysis.md` (`§9`, `§10`) in the [`intel-agency/gap-miner-v2-sierra46`](https://github.com/intel-agency/gap-miner-v2-sierra46) repo
 - **Fixes applied upstream flow forward:** once W1–W4 merge into `agent-context`, any repo cloned from the template afterward inherits them automatically.
 
 ### In scope (work items below)
@@ -122,7 +122,9 @@ Before starting:
 
 ---
 
-### W3 — Add a `defect` level label + issue template (LOW)
+### W3 — Add a `defect` level label + issue template (LOW) — DEFERRED
+
+> **Deferred (2026-07-18).** The defect level was descoped from this plan and extracted into a standalone deferred plan: [`../.deferred/defect-level-plan.md`](../.deferred/defect-level-plan.md). `assets/labels.json` currently ships `plan / epic / story / task` (no `defect`), and no `ISSUE_TEMPLATE/` directory exists; `SKILL.md` documents defects as deferred. The original W3 spec is retained below for the historical record.
 
 - **Owner:** Implementing agent
 - **Prerequisites:** W1 + W2 complete (Pester baseline green; test harness healthy)
@@ -231,7 +233,7 @@ The plan is done when, against `intel-agency/agent-context`:
 ### Low
 
 - [ ] **F6 — Add a one-paragraph strategic summary to the plan issue (#1) body** → per-application narrative; no upstream work.
-- [x] **F7 — `defect` label + template** → resolved by **W3**.
+- [ ] **F7 — `defect` label + template** → **deferred** (was W3); see [`../.deferred/defect-level-plan.md`](../.deferred/defect-level-plan.md).
 - [x] **F8 — Subagent performance lesson (batching guidance)** → resolved by **W2**.
 
 ---

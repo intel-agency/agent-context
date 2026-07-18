@@ -40,6 +40,19 @@ Before implementing, apply these checks:
 - Do not make or report assertions without specific details, i.e. line numbers, files, log messages, etc., to back up your claims.
 - Do not determine or start implementing a solution until you have decisively found the root cause.
 
+## Handling Command Failures
+
+When a CLI command fails, before retrying:
+
+1. Read the error message and its context for hints.
+2. Verify command syntax (`--help`, `Get-Help`, or tool docs).
+3. Inspect usage examples and construct a corrected command from careful analysis.
+4. For complex commands, break them into smaller parts and test each.
+
+**Do not keep retrying the same command without understanding the issue.** Diagnose and fix the problem before retrying. If the command still fails after up to 3 informed attempts, search the web for the error message / docs before retrying again. Once a working command is found, document it where appropriate for future runs.
+
+Exit-code checks: `$?` (bash success/fail) or `$LASTEXITCODE` (pwsh / native-command exit code).
+
 ## Making Changes
 
 **Touch only what you must. Clean up only your own mess.**
