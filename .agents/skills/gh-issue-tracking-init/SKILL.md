@@ -93,7 +93,7 @@ foreach ($n in $nodes) {
     Start-Sleep -Milliseconds 500
 }
 foreach ($e in $edges) { & "$Skill/link-sub-issue.ps1"   -Repo $ghrepo -ParentNumber $map[$e.parent] -ChildNumber $map[$e.child]; Start-Sleep -Milliseconds 500 }
-foreach ($n in $nodes) { & "$Skill/set-project-fields.ps1" @($n.fields); Start-Sleep -Milliseconds 500 }
+foreach ($n in $nodes) { $ht = $n.fields; & "$Skill/set-project-fields.ps1" @ht; Start-Sleep -Milliseconds 500 }
 foreach ($d in $deps)  { & "$Skill/set-dependency.ps1"  -Repo $ghrepo -IssueNumber $map[$d.blocked] -BlockedByNumber $map[$d.blocker]; Start-Sleep -Milliseconds 500 }
 ```
 

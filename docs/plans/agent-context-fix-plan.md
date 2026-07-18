@@ -240,7 +240,7 @@ The plan is done when, against `intel-agency/agent-context`:
 
 ```text
 You are implementing a fix plan in intel-agency/agent-context. The fix plan is:
-  .agents/skills/gh-issue-tracking/agent-context-fix-plan.md
+  docs/plans/agent-context-fix-plan.md
 
 1. Orientation (steps 1–4 of the plan): clone/fetch the repo, locate the skill,
    run the existing Pester suite and confirm it is green at baseline.

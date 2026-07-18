@@ -62,6 +62,17 @@ Describe 'common.ps1 helpers' {
             Mock Invoke-GhJson { @([pscustomobject]@{ number = 6; title = 'Epic 1: Foundations (extended)' }) }
             Find-IssueNumberByTitle -Repo 'o/r' -Title 'Epic 1: Foundations' | Should -BeNullOrEmpty
         }
+        It 'ignores pull requests that share the issue title' {
+            # The REST issues endpoint returns both issues and PRs; a PR with the
+            # same title as the target issue must not be matched.
+            Mock Invoke-GhJson {
+                @(
+                    [pscustomobject]@{ number = 9; title = 'Epic 1: Foundations'; pull_request = @{ url = 'https://api.github.com/repos/o/r/pulls/9' } }
+                    [pscustomobject]@{ number = 5; title = 'Epic 1: Foundations' }
+                )
+            }
+            Find-IssueNumberByTitle -Repo 'o/r' -Title 'Epic 1: Foundations' | Should -Be 5
+        }
         It 'returns null when the search is empty' {
             Mock Invoke-GhJson { $null }
             Find-IssueNumberByTitle -Repo 'o/r' -Title 'Anything' | Should -BeNullOrEmpty
