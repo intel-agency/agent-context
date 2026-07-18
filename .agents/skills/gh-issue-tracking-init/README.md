@@ -24,33 +24,40 @@ description of the epics/stories/tasks), this skill builds out:
    `Estimate`, and an optional `Phase`) for tracking work.
 4. **The issue hierarchy itself** — one GitHub issue per plan/epic/story/task,
    created from the templates in
-   [`docs/plans/gh-issue-tracking/ISSUE_TEMPLATE/`](../../../docs/plans/gh-issue-tracking/ISSUE_TEMPLATE/),
+   [`assets/templates/`](./assets/templates/),
    with numbered titles (`Plan: <Name>`, `Epic 1: <Name>`, `Story 1.1: <Name>`,
    `Task 1.1.1: <Name>`).
 5. **Sub-issue links** connecting every parent to its children.
 6. **Blocking/blocked-by dependencies** between issues, where the plan calls for them.
 
 The full design rationale (why sub-issues instead of task lists, why phases and
-milestones are separate axes, the label taxonomy, etc.) lives in
-[`docs/plans/gh-issue-tracking/gh-issue-tracking-plan.md`](../../../docs/plans/gh-issue-tracking/gh-issue-tracking-plan.md),
-with the decision history in
-[`gh-issue-tracking-plan-feedback.md`](../../../docs/plans/gh-issue-tracking/gh-issue-tracking-plan-feedback.md).
+milestones are separate axes, the label taxonomy, etc.) lives in the skill's own
+[`references/gh-issue-tracking-plan.md`](./references/gh-issue-tracking-plan.md).
 
 ## How it works
 
 ### Architecture
 
-```
+```text
 gh-issue-tracking-init/
-├─ README.md         <- you are here (human overview)
-├─ SKILL.md           <- agent-facing trigger + orchestration contract
-└─ scripts/           <- self-contained PowerShell operation scripts
+├─ README.md           <- you are here (human overview)
+├─ SKILL.md             <- agent-facing trigger + orchestration contract
+├─ assets/              <- data + issue body templates (consumed via -BodyFile)
+│  ├─ labels.json                the canonical label taxonomy (data)
+│  └─ templates/                 issue body templates, one per hierarchy level
+│     ├─ application-plan.md        plan-level issue body
+│     ├─ epic.md                    epic-level issue body
+│     ├─ story.md                   story-level issue body
+│     ├─ task.md                    task-level issue body
+│     └─ defect.md                  defect-level issue body
+├─ references/          <- design reference loaded into context as needed
+│  └─ gh-issue-tracking-plan.md  full design plan (hierarchy model, conventions)
+└─ scripts/             <- self-contained PowerShell operation scripts
    ├─ common.ps1                 shared helpers (auth, gh wrapper, id lookups)
    ├─ common-auth.ps1            vendored: gh CLI auth bootstrap
    ├─ import-labels.ps1          vendored: generic label import/sync
    ├─ create-milestones.ps1      vendored: generic milestone creation
-   ├─ labels.json                the canonical label taxonomy (data)
-   ├─ ensure-labels.ps1          op: sync labels.json to a repo
+   ├─ ensure-labels.ps1          op: sync assets/labels.json to a repo
    ├─ ensure-project.ps1         op: create/link Project + custom fields
    ├─ ensure-issue.ps1           op: idempotent create/update one issue
    ├─ link-sub-issue.ps1         op: attach a child issue as a sub-issue
@@ -68,11 +75,14 @@ gh-issue-tracking-init/
 - **The scripts** (`scripts/`) do the actual work. There is **one script per
   discrete GitHub operation** (not one big script), so the skill composes small,
   independently-testable pieces rather than running one monolithic routine.
-- **Self-contained:** `common-auth.ps1`, `import-labels.ps1`, and
-  `create-milestones.ps1` are vendored (copied) into `scripts/` from the
-  repository-root `scripts/` directory, where general-purpose copies also live.
-  This skill has zero dependency on anything outside its own folder — you can
-  copy `gh-issue-tracking-init/` into another repo and it will work unmodified.
+- **Self-contained:** all skill content lives under this directory —
+  `common-auth.ps1`, `import-labels.ps1`, and `create-milestones.ps1` are
+  vendored (copied) into `scripts/` from the repository-root `scripts/`
+  directory (where general-purpose copies also live); the label taxonomy ships
+  as `assets/labels.json`, the issue body templates ship in
+  `assets/templates/`, and the design plan ships in `references/`. This skill
+  has zero dependency on anything outside its own folder — you can copy
+  `gh-issue-tracking-init/` into another repo and it will work unmodified.
 
 ### Design principles
 
@@ -159,7 +169,7 @@ and covers, **with no repo mutation**:
 
 - `common.ps1`'s helper functions (`Get-RepoParts`, `Find-IssueNumberByTitle`,
   `Get-IssueDbId`, `Invoke-GhJson`) with `gh` fully mocked.
-- The label taxonomy in `labels.json` (canonical labels present; workflow-state
+- The label taxonomy in `assets/labels.json` (canonical labels present; workflow-state
   labels like `in-progress`/`done` intentionally absent).
 - Every operation script's **contract**: it parses without errors, it exposes a
   `-DryRun` switch, and it rejects a malformed `-Repo`.
@@ -200,14 +210,16 @@ idempotency guarantee in action.
 
 ## Out of scope (for now)
 
-- **Defects/bugs** — no `defect` template or label yet.
 - **The issue-implementation skill** — a separate, deferred skill that would
   pick the "current" issue to work on and implement it; this skill only builds
   the hierarchy.
 
-## Related documents
+## Bundled resources
 
-- [`docs/plans/gh-issue-tracking/gh-issue-tracking-plan.md`](../../../docs/plans/gh-issue-tracking/gh-issue-tracking-plan.md) — the full design plan.
-- [`docs/plans/gh-issue-tracking/gh-issue-tracking-plan-feedback.md`](../../../docs/plans/gh-issue-tracking/gh-issue-tracking-plan-feedback.md) — the decision record behind the design.
-- [`docs/plans/gh-issue-tracking/gh-issue-tracking-post-implementation.md`](../../../docs/plans/gh-issue-tracking/gh-issue-tracking-post-implementation.md) — what was actually built, verified facts, and known limitations.
-- [`docs/plans/gh-issue-tracking/ISSUE_TEMPLATE/`](../../../docs/plans/gh-issue-tracking/ISSUE_TEMPLATE/) — the four issue body templates used by `ensure-issue.ps1`.
+- [`assets/labels.json`](./assets/labels.json) — the canonical label taxonomy
+  (level, priority, area, and status labels) consumed by `ensure-labels.ps1`.
+- [`assets/templates/`](./assets/templates/) — the five issue body templates
+  (`application-plan.md`, `epic.md`, `story.md`, `task.md`, `defect.md`) consumed
+  by `ensure-issue.ps1` via `-BodyFile`.
+- [`references/gh-issue-tracking-plan.md`](./references/gh-issue-tracking-plan.md) —
+  the full design plan (hierarchy model, conventions, label taxonomy).

@@ -78,10 +78,10 @@ Use hierarchical, numbered titles so the level and position are obvious from the
 
 | Level | Title format | Example |
 | ----- | ------------ | ------- |
-| Plan  | `Plan: <Name>` | `Plan: Support Assistant` |
-| Epic  | `Epic <N>: <Name>` | `Epic 1: Inference Engine` |
+| Plan | `Plan: <Name>` | `Plan: Support Assistant` |
+| Epic | `Epic <N>: <Name>` | `Epic 1: Inference Engine` |
 | Story | `Story <N>.<M>: <Name>` | `Story 1.2: Streaming API` |
-| Task  | `Task <N>.<M>.<K>: <Name>` | `Task 1.2.3: Add cancellation token` |
+| Task | `Task <N>.<M>.<K>: <Name>` | `Task 1.2.3: Add cancellation token` |
 
 The hierarchy-creation skill assigns and maintains this numbering **idempotently** (re-runs keep numbers stable and renumber only when the structure changes).
 
@@ -154,14 +154,14 @@ The outputs of this plan are two skills, four issue templates, and a set of scri
 
 #### Templates
 
-Issue templates for each level of the hierarchy live in [`docs/plans/gh-issue-tracking/ISSUE_TEMPLATE`](./ISSUE_TEMPLATE):
+Issue templates for each level of the hierarchy live in the skill's [`../assets/templates/`](../assets/templates) directory:
 
-- **Application Plan** ([`ISSUE_TEMPLATE/application-plan.md`](./ISSUE_TEMPLATE/application-plan.md)) — top-level plan issue: overview, goals, technology stack, features, system architecture, phased implementation plan, mandatory requirements, acceptance criteria, risks, timeline, and success metrics.
-- **Epic** ([`ISSUE_TEMPLATE/epic.md`](./ISSUE_TEMPLATE/epic.md)) — epic-level issue scoped to a single project/component: overview, goals, component-specific technology stack, epic stories, component architecture, and a story-based implementation plan.
-- **Story** ([`ISSUE_TEMPLATE/story.md`](./ISSUE_TEMPLATE/story.md)) — story-level issue: objective, in/out of scope, task plan, acceptance criteria, validation commands, dependencies, risks & mitigations, test strategy, and rollback steps.
-- **Task** ([`ISSUE_TEMPLATE/task.md`](./ISSUE_TEMPLATE/task.md)) — task-level issue: description, acceptance criteria, validation commands, dependencies, risks & mitigations, test strategy, and rollback steps.
+- **Application Plan** ([`../assets/templates/application-plan.md`](../assets/templates/application-plan.md)) — top-level plan issue: overview, goals, technology stack, features, system architecture, phased implementation plan, mandatory requirements, acceptance criteria, risks, timeline, and success metrics.
+- **Epic** ([`../assets/templates/epic.md`](../assets/templates/epic.md)) — epic-level issue scoped to a single project/component: overview, goals, component-specific technology stack, epic stories, component architecture, and a story-based implementation plan.
+- **Story** ([`../assets/templates/story.md`](../assets/templates/story.md)) — story-level issue: objective, in/out of scope, task plan, acceptance criteria, validation commands, dependencies, risks & mitigations, test strategy, and rollback steps.
+- **Task** ([`../assets/templates/task.md`](../assets/templates/task.md)) — task-level issue: description, acceptance criteria, validation commands, dependencies, risks & mitigations, test strategy, and rollback steps.
 
-These templates are **consumed programmatically by the skills only**. They are intentionally kept nested under `docs/plans/gh-issue-tracking/ISSUE_TEMPLATE/` — **not** in `.github/ISSUE_TEMPLATE/`, root `ISSUE_TEMPLATE/`, or `docs/ISSUE_TEMPLATE/` — so GitHub's UI does **not** surface them in the "New issue" template chooser.
+These templates are **consumed programmatically by the skill only** (passed to `ensure-issue.ps1 -BodyFile`). They ship inside the skill's `assets/templates/` directory — **not** in `.github/ISSUE_TEMPLATE/` or any repo-root `ISSUE_TEMPLATE/` — so GitHub's UI does **not** surface them in the "New issue" template chooser; they are fill-in bodies for the hierarchy the skill builds, not interactive issue forms.
 
 When creating the hierarchy, use the application-plan template for the plan issue, the epic template for each epic sub-issue, the story template for each story sub-issue, and the task template for each task sub-issue.
 
@@ -205,4 +205,4 @@ For the deliverables of this plan (the skills and scripts):
 
 ---
 
-*Decision record for this plan: [`gh-issue-tracking-plan-feedback.md`](./gh-issue-tracking-plan-feedback.md).*
+*Decision record for this plan: [`gh-issue-tracking-plan-feedback.md`](../../../../docs/plans/gh-issue-tracking/gh-issue-tracking-plan-feedback.md) (kept with the repo's plans, outside the skill, as build history).*

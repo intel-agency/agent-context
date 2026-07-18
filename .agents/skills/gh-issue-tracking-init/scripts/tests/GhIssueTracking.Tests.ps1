@@ -30,6 +30,8 @@ $repoValidationCases = @(
 
 BeforeAll {
     $script:GhitDir = Split-Path -Parent $PSScriptRoot
+    # skill root = parent of scripts/ (holds assets/, references/, ...)
+    $script:SkillDir = Split-Path -Parent $script:GhitDir
     . (Join-Path $script:GhitDir 'common.ps1')
 }
 
@@ -67,11 +69,20 @@ Describe 'common.ps1 helpers' {
     }
 
     Context 'Get-IssueDbId' {
-        It 'returns the numeric database id as an int' {
+        It 'returns the numeric database id as a long' {
             Mock Invoke-Gh { '246813' }
             $id = Get-IssueDbId -Repo 'o/r' -Number 7
             $id | Should -Be 246813
-            $id | Should -BeOfType [int]
+            $id | Should -BeOfType [long]
+        }
+        It 'returns a long when gh reports an id greater than Int32.MaxValue' {
+            # GitHub global issue database IDs now exceed Int32.MaxValue (2,147,483,647);
+            # a naive [int] cast throws "Value was either too large or too small for an Int32".
+            Mock Invoke-Gh { '4916360172' }
+            { Get-IssueDbId -Repo 'o/r' -Number 7 } | Should -Not -Throw
+            $id = Get-IssueDbId -Repo 'o/r' -Number 7
+            $id | Should -Be 4916360172
+            $id | Should -BeOfType [long]
         }
     }
 
@@ -85,17 +96,35 @@ Describe 'common.ps1 helpers' {
 
 Describe 'label taxonomy (labels.json)' {
     It 'is valid JSON and contains the canonical taxonomy' {
-        $labels = Get-Content (Join-Path $GhitDir 'labels.json') -Raw | ConvertFrom-Json
+        $labels = Get-Content (Join-Path $SkillDir 'assets/labels.json') -Raw | ConvertFrom-Json
         $names = @($labels.name)
-        foreach ($expected in @('plan', 'epic', 'story', 'task', 'P0', 'P1', 'P2', 'P3', 'blocked', 'needs-review', 'wontfix')) {
+        foreach ($expected in @('plan', 'epic', 'story', 'task', 'defect', 'P0', 'P1', 'P2', 'P3', 'blocked', 'needs-review', 'wontfix')) {
             $names | Should -Contain $expected
         }
     }
     It 'does not include workflow-state labels (those live in the Project Status field)' {
-        $labels = Get-Content (Join-Path $GhitDir 'labels.json') -Raw | ConvertFrom-Json
+        $labels = Get-Content (Join-Path $SkillDir 'assets/labels.json') -Raw | ConvertFrom-Json
         $names = @($labels.name)
         $names | Should -Not -Contain 'in-progress'
         $names | Should -Not -Contain 'done'
+    }
+}
+
+Describe 'defect level (label + template)' {
+    It 'labels.json declares the defect label' {
+        $labels = Get-Content (Join-Path $SkillDir 'assets/labels.json') -Raw | ConvertFrom-Json
+        $defect = @($labels | Where-Object { $_.name -eq 'defect' })
+        $defect.Count | Should -Be 1
+        $defect[0].color | Should -Not -BeNullOrEmpty
+        $defect[0].description | Should -Not -BeNullOrEmpty
+    }
+    It 'ships a defect.md issue template with matching front-matter' {
+        $template = Join-Path $SkillDir 'assets/templates/defect.md'
+        Test-Path -LiteralPath $template | Should -BeTrue
+        $content = Get-Content $template -Raw
+        # YAML front-matter values must match the defect label and a Defect name.
+        $content | Should -Match "(?m)^name:\s*Defect\b"
+        $content | Should -Match "labels:\s*\[?(?:'defect'|`"defect`")"
     }
 }
 
