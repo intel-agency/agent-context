@@ -113,12 +113,19 @@ function Find-IssueNumberByTitle {
     while ($true) {
         $batch = Invoke-GhJson api "repos/$Repo/issues?state=all&per_page=100&page=$page"
         if (-not $batch) { break }
-        # Exclude pull requests: the REST issues endpoint returns both issues and PRs,
-        # and a PR sharing an issue's title would otherwise be matched incorrectly.
-        # Under Set-StrictMode -Version Latest, accessing a non-existent `pull_request`
-        # property on a plain issue throws PropertyNotFoundException, so check via
-        # PSObject.Properties instead.
-        $match = @($batch | Where-Object { $_.title -eq $Title -and $null -eq $_.PSObject.Properties['pull_request'] }) | Select-Object -First 1
+        # Match by exact title, excluding pull requests (the REST issues endpoint
+        # returns both issues and PRs, and a PR sharing an issue's title would
+        # otherwise shadow it).
+        # Under Set-StrictMode -Version Latest, accessing a non-existent property
+        # (e.g. `title` or `pull_request`) throws PropertyNotFoundException, so
+        # guard against null elements and verify property existence via the
+        # PSObject.Properties collection before reading the value.
+        $match = @($batch | Where-Object {
+                $null -ne $_ `
+                -and $null -ne $_.PSObject.Properties['title'] `
+                -and $_.PSObject.Properties['title'].Value -eq $Title `
+                -and $null -eq $_.PSObject.Properties['pull_request']
+            }) | Select-Object -First 1
         if ($match) { return [int]$match.number }
         if (@($batch).Count -lt 100) { break }
         $page++

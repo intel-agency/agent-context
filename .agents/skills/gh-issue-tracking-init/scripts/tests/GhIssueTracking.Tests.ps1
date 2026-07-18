@@ -73,6 +73,18 @@ Describe 'common.ps1 helpers' {
             }
             Find-IssueNumberByTitle -Repo 'o/r' -Title 'Epic 1: Foundations' | Should -Be 5
         }
+        It 'does not crash on malformed elements missing the title property' {
+            # Under Set-StrictMode -Version Latest, a malformed API element lacking
+            # `title` must be skipped, not crash the lookup.
+            Mock Invoke-GhJson {
+                @(
+                    [pscustomobject]@{ number = 11 },
+                    $null,
+                    [pscustomobject]@{ number = 5; title = 'Epic 1: Foundations' }
+                )
+            }
+            Find-IssueNumberByTitle -Repo 'o/r' -Title 'Epic 1: Foundations' | Should -Be 5
+        }
         It 'returns null when the search is empty' {
             Mock Invoke-GhJson { $null }
             Find-IssueNumberByTitle -Repo 'o/r' -Title 'Anything' | Should -BeNullOrEmpty
