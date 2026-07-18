@@ -23,7 +23,7 @@ Built from each script's header comments and `param()` block. **Read the file he
 `import-labels.ps1` consumes a JSON file produced by:
 
 ```bash
-gh api repos/<owner>/<repo>/labels --paginate > .labels.json
+gh api repos/{owner}/{repo}/labels --paginate > .labels.json
 ```
 
 ## Common conventions
