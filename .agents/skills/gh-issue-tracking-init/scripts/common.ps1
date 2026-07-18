@@ -96,7 +96,9 @@ function Get-IssueDbId {
     } else {
         throw "Failed to parse numeric database ID for issue #$Number in repo '$Repo'. Raw output: '$rawOutput'"
     }
-    return [int]$rawId
+    # [long], not [int]: GitHub global issue database IDs now exceed Int32.MaxValue (2,147,483,647).
+    # Casting to [int] throws "Value was either too large or too small for an Int32" on modern repos.
+    return [long]$rawId
 }
 
 function Find-IssueNumberByTitle {
@@ -105,10 +107,17 @@ function Find-IssueNumberByTitle {
         [Parameter(Mandatory = $true)][string]$Repo,
         [Parameter(Mandatory = $true)][string]$Title
     )
-    $items = Invoke-GhJson issue list --repo $Repo --state all --search "in:title `"$Title`"" --json 'number,title' --limit 200
-    if (-not $items) { return $null }
-    $match = @($items | Where-Object { $_.title -eq $Title }) | Select-Object -First 1
-    if ($match) { return [int]$match.number }
+    # Resolve via the REST issues endpoint (paginated) rather than `gh issue list --search`,
+    # which routes through the GraphQL Search API and is far more susceptible to rate limiting.
+    $page = 1
+    while ($true) {
+        $batch = Invoke-GhJson api "repos/$Repo/issues?state=all&per_page=100&page=$page"
+        if (-not $batch) { break }
+        $match = @($batch | Where-Object { $_.title -eq $Title }) | Select-Object -First 1
+        if ($match) { return [int]$match.number }
+        if (@($batch).Count -lt 100) { break }
+        $page++
+    }
     return $null
 }
 

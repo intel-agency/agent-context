@@ -10,6 +10,15 @@ Current project and its sub-work items that we are working on actively. This sec
 
 ## Completed Work Items
 
+### Project: gh-issue-tracking-init driver fixes + Gap Mining hierarchy recovery (2026-07-16)
+
+Implemented `docs/plans/gh-issue-tracking/run-issues-review/gh-issue-tracking-fix-trace.md` against `intel-agency/gap-miner-v2-oscar32` (Project #88). Driver: `/tmp/kilo/gh-init-driver.ps1`.
+
+- **Driver fixes (all tasks T1–T8):** trace logging (`Trace-Write`/`Invoke-ScriptWithTrace`, per-run file `gh-init-trace-*.log`); renamed `$num`/`$Num` → `$issueNum`/`$NumberByKey` (case-collision root cause); normalized all epics to `Parent='P'` and every story to `Level='story'`; pre-flight schema check (Level/Title/Parent/AC); DryRun body-generation parity; post-run verification block. Added `-ProjectNumber` and `-SkipFields` recovery switches.
+- **Skill fixes discovered in-run** (`.agents/skills/gh-issue-tracking-init/scripts/common.ps1`): (1) `Get-IssueDbId` cast changed `[int]`→`[long]` — GitHub issue DB IDs now exceed Int32.MaxValue, breaking sub-issue linking + dependencies; (2) `Find-IssueNumberByTitle` rewritten to use the REST issues endpoint (paginated) instead of `gh issue list --search`, which routes through the GraphQL Search API and fails under its separate rate limit.
+- **Result:** hierarchy complete and verified in a clean trace (0 ERR): 30 issues, Plan #1 → 7 epic sub-issues, each epic → its stories (22 total), board = 30 items, 32 dependency edges. `ALL COUNTS MATCH`.
+- **Operational note:** heavy GraphQL usage (Projects v2 field stage) exhausts the 5000-point/hour GraphQL budget separately from the REST core limit; recovery switches let re-runs proceed REST-only while GraphQL resets.
+
 ### Project: Rules and Memory Consolidation
 
 - **App Stacks section added** (2026-07-15): Added an `App Stacks` entry to the AGENTS.md Rules list, referencing `.agents/rules/app-stacks/` as the home for pre-defined language/tech stack profiles named by slug ID. All 3 existing stacks listed inline. Fixed pre-existing issues: renamed `dotnet-avalonia-xplatform-desktop` to add `.md` extension, corrected wrong H1 (`# python-uv-fastapi-vite` → `# dotnet-aspire-aspnet-blazor`) in the Aspire stack file. Decided against a separate `app-stacks.md` rules file — the directory is self-describing.
