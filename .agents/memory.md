@@ -4,7 +4,10 @@
 
 Current project and its sub-work items that we are working on actively. This section is a placeholder for the current project and its work items, which will be updated as we progress. Once completed, the work items will be moved to the "Completed Work Items" section below.
 
-### Project
+### Project: Template-repo content strategy
+
+- **`gh-issue-tracking-init` no-arg defaults** (2026-07-18): Made defaults explicit in the skill — `$ghrepo` defaults to the current repo (`gh repo view --json nameWithOwner`); plan source defaults to all docs under `plan_docs/`. Updated `SKILL.md` (Inputs + orchestration preface) and `README.md`. Defaults are Class 1 (context-neutral) — see plan below.
+- **Template vs. clone content strategy** (2026-07-18): Authored [`docs/plans/template-content-strategy.md`](../docs/plans/template-content-strategy.md) — two-class model (Class 1 reusable infra travels; Class 2 template-self-referential state must be reset on clone / filtered on back-flow). Three work items: W1 post-clone reset step in the project-creation flow, W2 back-flow discipline (port Class 1 only), W3 marker convention. Not yet implemented; `run-issues-review/` Gap Mining doc flagged as existing Class-2 contamination. Added a *GitHub template-repo capabilities* section (researched vs. official docs): no exclusion mechanism, no post-clone hook, only the file tree copies (no labels/issues/Projects) → reset must be our own seeding workflow; only platform-native alternative is storing Class-2 off the default branch.
 
 #### Work Items
 
