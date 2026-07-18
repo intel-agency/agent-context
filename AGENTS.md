@@ -25,6 +25,8 @@ Rules dictate coding conventions, tools, validation, testing, source control, de
 - **Delegation**: `.agents/rules/delegation.md`
 - **Practices**: `.agents/rules/practices.md`
 - **Coding Style**: `.agents/rules/coding-style.md`
+- **Scripts**: [`.agents/rules/scripts.md`](.agents/rules/scripts.md) — repo-root `scripts/` inventory (auth helpers, `import-labels.ps1` for label sync, `query.ps1` as the canonical PR review-thread manager, dispatch-issue creator, permission verifier, remote-index regenerator). Read each script's header + `param()` block for authoritative docs.
+- **Agent-Instructions Modules**: [`.agents/rules/ai-instructions-modules.md`](.agents/rules/ai-instructions-modules.md) — lookup tables for `nam20485/agent-instructions` workflow assignments and dynamic workflows, stored at `local_ai_instruction_modules/` (hard-coded path; refreshed by `scripts/update-remote-indices.ps1`).
 - **App Stacks**: pre-defined language and tech stack profiles in `.agents/rules/app-stacks/`. Each file is a stack definition named by slug ID, referenced from app development/implementation plans to specify the language, tech stack, tools, and packages to use. Available stacks:
   - `dotnet-aspire-aspnet-blazor` — .NET Aspire + ASP.NET Core + Blazor WASM
   - `dotnet-avalonia-xplatform-desktop` — .NET Avalonia cross-platform desktop
