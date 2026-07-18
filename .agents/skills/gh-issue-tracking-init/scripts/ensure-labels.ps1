@@ -17,7 +17,7 @@
     Target repository in 'owner/repo' form.
 
 .PARAMETER LabelsFile
-    Path to the labels JSON (default: labels.json beside this script).
+    Path to the labels JSON (default: assets/labels.json at the skill root).
 
 .PARAMETER DryRun
     Show planned changes without applying them.
@@ -35,7 +35,7 @@ param(
     [string]$Repo,
 
     [Parameter()]
-    [string]$LabelsFile = (Join-Path $PSScriptRoot 'labels.json'),
+    [string]$LabelsFile = (Join-Path (Split-Path -Parent $PSScriptRoot) 'assets/labels.json'),
 
     [switch]$DryRun
 )

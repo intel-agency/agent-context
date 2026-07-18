@@ -30,6 +30,8 @@ $repoValidationCases = @(
 
 BeforeAll {
     $script:GhitDir = Split-Path -Parent $PSScriptRoot
+    # skill root = parent of scripts/ (holds assets/, references/, ...)
+    $script:SkillDir = Split-Path -Parent $script:GhitDir
     . (Join-Path $script:GhitDir 'common.ps1')
 }
 
@@ -60,6 +62,29 @@ Describe 'common.ps1 helpers' {
             Mock Invoke-GhJson { @([pscustomobject]@{ number = 6; title = 'Epic 1: Foundations (extended)' }) }
             Find-IssueNumberByTitle -Repo 'o/r' -Title 'Epic 1: Foundations' | Should -BeNullOrEmpty
         }
+        It 'ignores pull requests that share the issue title' {
+            # The REST issues endpoint returns both issues and PRs; a PR with the
+            # same title as the target issue must not be matched.
+            Mock Invoke-GhJson {
+                @(
+                    [pscustomobject]@{ number = 9; title = 'Epic 1: Foundations'; pull_request = @{ url = 'https://api.github.com/repos/o/r/pulls/9' } }
+                    [pscustomobject]@{ number = 5; title = 'Epic 1: Foundations' }
+                )
+            }
+            Find-IssueNumberByTitle -Repo 'o/r' -Title 'Epic 1: Foundations' | Should -Be 5
+        }
+        It 'does not crash on malformed elements missing the title property' {
+            # Under Set-StrictMode -Version Latest, a malformed API element lacking
+            # `title` must be skipped, not crash the lookup.
+            Mock Invoke-GhJson {
+                @(
+                    [pscustomobject]@{ number = 11 },
+                    $null,
+                    [pscustomobject]@{ number = 5; title = 'Epic 1: Foundations' }
+                )
+            }
+            Find-IssueNumberByTitle -Repo 'o/r' -Title 'Epic 1: Foundations' | Should -Be 5
+        }
         It 'returns null when the search is empty' {
             Mock Invoke-GhJson { $null }
             Find-IssueNumberByTitle -Repo 'o/r' -Title 'Anything' | Should -BeNullOrEmpty
@@ -67,11 +92,20 @@ Describe 'common.ps1 helpers' {
     }
 
     Context 'Get-IssueDbId' {
-        It 'returns the numeric database id as an int' {
+        It 'returns the numeric database id as a long' {
             Mock Invoke-Gh { '246813' }
             $id = Get-IssueDbId -Repo 'o/r' -Number 7
             $id | Should -Be 246813
-            $id | Should -BeOfType [int]
+            $id | Should -BeOfType [long]
+        }
+        It 'returns a long when gh reports an id greater than Int32.MaxValue' {
+            # GitHub global issue database IDs now exceed Int32.MaxValue (2,147,483,647);
+            # a naive [int] cast throws "Value was either too large or too small for an Int32".
+            Mock Invoke-Gh { '4916360172' }
+            { Get-IssueDbId -Repo 'o/r' -Number 7 } | Should -Not -Throw
+            $id = Get-IssueDbId -Repo 'o/r' -Number 7
+            $id | Should -Be 4916360172
+            $id | Should -BeOfType [long]
         }
     }
 
@@ -85,14 +119,14 @@ Describe 'common.ps1 helpers' {
 
 Describe 'label taxonomy (labels.json)' {
     It 'is valid JSON and contains the canonical taxonomy' {
-        $labels = Get-Content (Join-Path $GhitDir 'labels.json') -Raw | ConvertFrom-Json
+        $labels = Get-Content (Join-Path $SkillDir 'assets/labels.json') -Raw | ConvertFrom-Json
         $names = @($labels.name)
         foreach ($expected in @('plan', 'epic', 'story', 'task', 'P0', 'P1', 'P2', 'P3', 'blocked', 'needs-review', 'wontfix')) {
             $names | Should -Contain $expected
         }
     }
     It 'does not include workflow-state labels (those live in the Project Status field)' {
-        $labels = Get-Content (Join-Path $GhitDir 'labels.json') -Raw | ConvertFrom-Json
+        $labels = Get-Content (Join-Path $SkillDir 'assets/labels.json') -Raw | ConvertFrom-Json
         $names = @($labels.name)
         $names | Should -Not -Contain 'in-progress'
         $names | Should -Not -Contain 'done'

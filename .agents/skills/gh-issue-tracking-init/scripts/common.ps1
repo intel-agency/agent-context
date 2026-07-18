@@ -96,7 +96,9 @@ function Get-IssueDbId {
     } else {
         throw "Failed to parse numeric database ID for issue #$Number in repo '$Repo'. Raw output: '$rawOutput'"
     }
-    return [int]$rawId
+    # [long], not [int]: GitHub global issue database IDs now exceed Int32.MaxValue (2,147,483,647).
+    # Casting to [int] throws "Value was either too large or too small for an Int32" on modern repos.
+    return [long]$rawId
 }
 
 function Find-IssueNumberByTitle {
@@ -105,10 +107,29 @@ function Find-IssueNumberByTitle {
         [Parameter(Mandatory = $true)][string]$Repo,
         [Parameter(Mandatory = $true)][string]$Title
     )
-    $items = Invoke-GhJson issue list --repo $Repo --state all --search "in:title `"$Title`"" --json 'number,title' --limit 200
-    if (-not $items) { return $null }
-    $match = @($items | Where-Object { $_.title -eq $Title }) | Select-Object -First 1
-    if ($match) { return [int]$match.number }
+    # Resolve via the REST issues endpoint (paginated) rather than `gh issue list --search`,
+    # which routes through the GraphQL Search API and is far more susceptible to rate limiting.
+    $page = 1
+    while ($true) {
+        $batch = Invoke-GhJson api "repos/$Repo/issues?state=all&per_page=100&page=$page"
+        if (-not $batch) { break }
+        # Match by exact title, excluding pull requests (the REST issues endpoint
+        # returns both issues and PRs, and a PR sharing an issue's title would
+        # otherwise shadow it).
+        # Under Set-StrictMode -Version Latest, accessing a non-existent property
+        # (e.g. `title` or `pull_request`) throws PropertyNotFoundException, so
+        # guard against null elements and verify property existence via the
+        # PSObject.Properties collection before reading the value.
+        $match = @($batch | Where-Object {
+                $null -ne $_ `
+                -and $null -ne $_.PSObject.Properties['title'] `
+                -and $_.PSObject.Properties['title'].Value -eq $Title `
+                -and $null -eq $_.PSObject.Properties['pull_request']
+            }) | Select-Object -First 1
+        if ($match) { return [int]$match.number }
+        if (@($batch).Count -lt 100) { break }
+        $page++
+    }
     return $null
 }
 

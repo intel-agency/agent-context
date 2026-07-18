@@ -1,6 +1,6 @@
 # gh-issue-tracking-init scripts
 
-PowerShell 7 operation scripts that the **`gh-issue-tracking-init`** skill composes to build a `plan → epic → story → task` issue hierarchy on GitHub (Issues + Projects v2), per [`docs/plans/gh-issue-tracking/gh-issue-tracking-plan.md`](../../../../docs/plans/gh-issue-tracking/gh-issue-tracking-plan.md).
+PowerShell 7 operation scripts that the **`gh-issue-tracking-init`** skill composes to build a `plan → epic → story → task` issue hierarchy on GitHub (Issues + Projects v2), per [`../references/gh-issue-tracking-plan.md`](../references/gh-issue-tracking-plan.md).
 
 There is **one script per operation**; the skill orchestrates them. Every script is **idempotent** and supports **`-DryRun`**.
 
@@ -16,7 +16,7 @@ This directory is **self-contained**: `common-auth.ps1`, `import-labels.ps1`, an
 
 | Script | Purpose | Key parameters |
 | ------ | ------- | -------------- |
-| `ensure-labels.ps1` | Create/update the canonical label taxonomy from `labels.json` (delegates to the vendored `import-labels.ps1`) | `-Repo` |
+| `ensure-labels.ps1` | Create/update the canonical label taxonomy from `../assets/labels.json` (delegates to the vendored `import-labels.ps1`) | `-Repo [-LabelsFile]` |
 | `ensure-project.ps1` | Create/link the Project and its custom fields (`Level`, `Priority`, `Estimate`, optional `Phase`) | `-Owner -Repo [-Title] [-Phases]` |
 | `ensure-issue.ps1` | Create **or** update one issue from a filled template body; prints the issue **number** to stdout | `-Repo -Title (-BodyFile\|-Body) [-Labels -Milestone -Assignee -UpdateBody]` |
 | `link-sub-issue.ps1` | Attach a child issue as a sub-issue of a parent | `-Repo -ParentNumber -ChildNumber` |
@@ -33,8 +33,9 @@ Re-runs are safe. Labels, milestones, project fields, sub-issue links, and depen
 
 ## Known limitations (surfaced honestly)
 
-- **Project views are not automatable.** GitHub's CLI/API has no supported "create view" operation, so `ensure-project.ps1` prints the four views to add once in the Project UI (By Phase, By Status, By Epic, Current work).
-- **Built-in Status options.** `gh` (2.46) cannot add options to an existing single-select field, so the extra `Status` options (`In Review`, `Blocked`) may need to be added once in the UI.
+- **Project views are not automatable.** GitHub's CLI/API has no supported "create view" operation, so `ensure-project.ps1` prints the four views to add once in the Project UI: **By Phase, By Status, By Epic, Current work**.
+- **Built-in `Status` options are limited.** `gh` cannot add options to an existing single-select field, so the initial set is `Todo / In Progress / Done`. If your workflow needs `In Review` or `Blocked`, add those once in the Project UI.
+- **GitHub database IDs exceed Int32.** Global issue DB IDs now exceed `Int32.MaxValue` (2,147,483,647); `Get-IssueDbId` casts to `[long]`, which is why `link-sub-issue.ps1` and `set-dependency.ps1` work against modern repos (fixed in this release).
 
 ## Tests
 
