@@ -208,3 +208,77 @@ Describe 'ensure-project.ps1 stdout contract (F1: project number on success stre
         $out | Should -BeNullOrEmpty
     }
 }
+
+# Script-scope test data for the Get-JsonProp -ForEach block below. Must be defined BEFORE the
+# Describe that consumes it, because Pester 5 evaluates -ForEach data at discovery time (which
+# runs top-to-bottom through the file), before any BeforeAll runs.
+$getJsonPropSources = @('ensure-project.ps1', 'set-project-fields.ps1')
+
+Describe 'Get-JsonProp edge cases (null-value guard + empty-array preservation)' {
+    # Get-JsonProp is defined identically in ensure-project.ps1 and set-project-fields.ps1.
+    # We extract the real function body via the PowerShell AST and invoke it directly so the
+    # tests exercise production code, not a copy.
+    # NOTE: $getJsonPropSources is defined at script scope (below) because Pester 5 evaluates
+    # -ForEach data at discovery time, before BeforeAll runs.
+    BeforeAll {
+        function script:Get-FunctionScriptBlock {
+            param([string]$FileName, [string]$FunctionName)
+            $path = Join-Path $GhitDir $FileName
+            $tokens = $null
+            $errors = $null
+            $ast = [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors)
+            $fn = $ast.FindAll({
+                param($node)
+                $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+                $node.Name -eq $FunctionName
+            }, $true) | Select-Object -First 1
+            return $fn.Body.GetScriptBlock()
+        }
+    }
+
+    It 'returns scalar null (not a 1-element null array) when the JSON value is null: <_>' -ForEach $getJsonPropSources {
+        $sb = Get-FunctionScriptBlock -FileName $_ -FunctionName 'Get-JsonProp'
+        # Get-JsonProp consumes ConvertFrom-Json output (PSCustomObject), not Hashtable.
+        $obj = [pscustomobject]@{ present = $null }
+        $val = & $sb $obj 'present'
+        # Discriminator: for scalar $null, `$null -eq $val` is $true; for a 1-element array
+        # wrapping $null (the old `, $prop.Value` behavior), it is $false.
+        $null -eq $val | Should -BeTrue
+    }
+
+    It 'preserves an empty array instead of unrolling it to null: <_>' -ForEach $getJsonPropSources {
+        $sb = Get-FunctionScriptBlock -FileName $_ -FunctionName 'Get-JsonProp'
+        $obj = [pscustomobject]@{ items = @() }
+        $val = & $sb $obj 'items'
+        $val.Count | Should -Be 0
+        # An empty array is NOT scalar null.
+        $null -eq $val | Should -BeFalse
+    }
+
+    It 'returns null when the object is null: <_>' -ForEach $getJsonPropSources {
+        $sb = Get-FunctionScriptBlock -FileName $_ -FunctionName 'Get-JsonProp'
+        $val = & $sb $null 'anything'
+        $null -eq $val | Should -BeTrue
+    }
+
+    It 'returns null when the property is absent: <_>' -ForEach $getJsonPropSources {
+        $sb = Get-FunctionScriptBlock -FileName $_ -FunctionName 'Get-JsonProp'
+        $obj = [pscustomobject]@{ other = 1 }
+        $val = & $sb $obj 'missing'
+        $null -eq $val | Should -BeTrue
+    }
+
+    It 'returns a scalar value intact: <_>' -ForEach $getJsonPropSources {
+        $sb = Get-FunctionScriptBlock -FileName $_ -FunctionName 'Get-JsonProp'
+        $obj = [pscustomobject]@{ n = 42 }
+        $val = & $sb $obj 'n'
+        $val | Should -Be 42
+    }
+
+    It 'returns a non-empty array intact: <_>' -ForEach $getJsonPropSources {
+        $sb = Get-FunctionScriptBlock -FileName $_ -FunctionName 'Get-JsonProp'
+        $obj = [pscustomobject]@{ arr = @(1, 2, 3) }
+        $val = & $sb $obj 'arr'
+        $val.Count | Should -Be 3
+    }
+}

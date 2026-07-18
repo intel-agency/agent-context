@@ -71,7 +71,12 @@ function Get-JsonProp {
     if ($null -eq $Object) { return $null }
     $prop = $Object.PSObject.Properties[$Name]
     # Leading comma prevents PowerShell from unrolling an empty array to $null in the pipeline.
-    if ($prop) { return , $prop.Value }
+    # An explicit $null guard avoids returning a 1-element array wrapping $null (which would
+    # break $null -eq $val checks at call sites).
+    if ($prop) {
+        if ($null -eq $prop.Value) { return $null }
+        return , $prop.Value
+    }
     return $null
 }
 

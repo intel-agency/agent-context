@@ -158,7 +158,7 @@ $b.Count               # -> 11
 > - `Labels`, `Milestone`, `Priority`, `Phase` (if used),
 > - `BodyFile` (after rendering), `Prereqs` (array of sibling keys, story/task level).
 
-**2. Mandagate a DryRun self-check** — add to the batching section:
+**2. Mandate a DryRun self-check** — add to the batching section:
 
 > ### DryRun must assert completeness
 > Before printing the preview, assert every node renders a non-empty title and (for epics/stories)
