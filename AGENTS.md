@@ -24,6 +24,7 @@ Rules dictate coding conventions, tools, validation, testing, source control, de
 - **Source Control**: `.agents/rules/source-control.md`
 - **Delegation**: `.agents/rules/delegation.md`
 - **Practices**: `.agents/rules/practices.md`
+- **Coding Style**: `.agents/rules/coding-style.md`
 - **App Stacks**: pre-defined language and tech stack profiles in `.agents/rules/app-stacks/`. Each file is a stack definition named by slug ID, referenced from app development/implementation plans to specify the language, tech stack, tools, and packages to use. Available stacks:
   - `dotnet-aspire-aspnet-blazor` — .NET Aspire + ASP.NET Core + Blazor WASM
   - `dotnet-avalonia-xplatform-desktop` — .NET Avalonia cross-platform desktop
@@ -65,6 +66,10 @@ Always orient to the project's history and current state before starting any wor
 ## Planning, Investigation & Making Changes
 
 Always plan non-trivial tasks before starting, investigate root causes using first-hand sources, and make the smallest surgical changes possible. Detailed rules for the full lifecycle live in [`.agents/rules/practices.md`](.agents/rules/practices.md).
+
+## Coding Style Discipline
+
+**ALWAYS load and apply these guidelines whenever making or planning code changes.** Write minimum code that solves the problem (no speculative features or unnecessary abstractions), define verifiable success criteria before implementing, and loop until verified. Detailed rules live in [`.agents/rules/coding-style.md`](.agents/rules/coding-style.md).
 
 ## Tool Usage
 
