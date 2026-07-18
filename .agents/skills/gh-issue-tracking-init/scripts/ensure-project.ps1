@@ -160,6 +160,13 @@ else {
     Write-Skip "Note: ensure the built-in 'Status' field has options: Todo, In Progress, In Review, Blocked, Done (add any missing ones in the UI)."
 }
 
+# --- Emit project number on stdout so composing drivers can capture it via $() ---
+# (Host-stream Write-* above are human-readable status; this is the machine-readable contract,
+#  matching ensure-issue.ps1 which Write-Outputs its issue number.)
+if ($null -ne $projectNumber) {
+    Write-Output $projectNumber
+}
+
 # --- Views (not automatable) ------------------------------------------------
 Write-Host ''
 Write-Step 'Views to create manually in the Project UI (not creatable via gh/API):'

@@ -160,3 +160,51 @@ Describe 'self-containment' {
         }
     }
 }
+
+Describe 'ensure-project.ps1 stdout contract (F1: project number on success stream)' {
+    # ensure-project.ps1 must Write-Output its project number so composing drivers can
+    # capture it via $(). The script re-dot-sources common.ps1 in its own scope when
+    # invoked, which would shadow Pester Mocks on the wrapper functions — but the script
+    # never defines its own `gh` function, so a caller-scope `function gh` intercepts the
+    # underlying `& gh` calls via PowerShell dynamic scoping. We stub `gh` that way.
+
+    BeforeAll {
+        $script:ProjectScriptPath = Join-Path $GhitDir 'ensure-project.ps1'
+    }
+
+    It 'emits the project number to the success stream when the project already exists' {
+        function gh {
+            param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Arguments)
+            $global:LASTEXITCODE = 0
+            if ($null -eq $Arguments -or $Arguments.Count -eq 0) { return }
+            $cmd = $Arguments[0]
+            $sub = if ($Arguments.Count -gt 1) { $Arguments[1] } else { '' }
+            if ($cmd -eq 'auth' -and $sub -eq 'status') { return }
+            if ($cmd -eq 'project' -and $sub -eq 'list') { return '{"projects":[{"number":5,"title":"Test"}]}' }
+            # Real projects always have built-in fields (Title, Status); return a realistic field-list.
+            if ($cmd -eq 'project' -and $sub -eq 'field-list') { return '{"fields":[{"name":"Title"},{"name":"Status"}]}' }
+            return
+        }
+        $global:LASTEXITCODE = 0
+        # Capture ONLY the success stream (Write-Output); Write-Host status goes to console.
+        $out = & $script:ProjectScriptPath -Owner 'o' -Repo 'o/r' -Title 'Test' -DryRun
+        $out | Should -Be 5
+    }
+
+    It 'emits nothing to the success stream in DryRun when the project does not yet exist' {
+        function gh {
+            param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Arguments)
+            $global:LASTEXITCODE = 0
+            if ($null -eq $Arguments -or $Arguments.Count -eq 0) { return }
+            $cmd = $Arguments[0]
+            $sub = if ($Arguments.Count -gt 1) { $Arguments[1] } else { '' }
+            if ($cmd -eq 'auth' -and $sub -eq 'status') { return }
+            # Another project exists with a different title, so the target is "not found".
+            if ($cmd -eq 'project' -and $sub -eq 'list') { return '{"projects":[{"number":99,"title":"SomeOther"}]}' }
+            return
+        }
+        $global:LASTEXITCODE = 0
+        $out = & $script:ProjectScriptPath -Owner 'o' -Repo 'o/r' -Title 'Test' -DryRun
+        $out | Should -BeNullOrEmpty
+    }
+}
