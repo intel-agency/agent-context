@@ -202,7 +202,3 @@ For the deliverables of this plan (the skills and scripts):
 
 - **Defects/bugs** — no defect template or `defect` label is created yet; defect handling is deferred to a later version.
 - **Issue-implementation skill** — the current-issue selection algorithm and intra-level ordering are deferred to a later phase; this plan focuses on the hierarchy-creation skill first.
-
----
-
-*Decision record for this plan: [`gh-issue-tracking-plan-feedback.md`](../../../../docs/plans/gh-issue-tracking/gh-issue-tracking-plan-feedback.md) (kept with the repo's plans, outside the skill, as build history).*

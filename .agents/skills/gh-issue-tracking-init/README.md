@@ -48,8 +48,7 @@ gh-issue-tracking-init/
 │     ├─ application-plan.md        plan-level issue body
 │     ├─ epic.md                    epic-level issue body
 │     ├─ story.md                   story-level issue body
-│     ├─ task.md                    task-level issue body
-│     └─ defect.md                  defect-level issue body
+│     └─ task.md                    task-level issue body
 ├─ references/          <- design reference loaded into context as needed
 │  └─ gh-issue-tracking-plan.md  full design plan (hierarchy model, conventions)
 └─ scripts/             <- self-contained PowerShell operation scripts
@@ -213,13 +212,18 @@ idempotency guarantee in action.
 - **The issue-implementation skill** — a separate, deferred skill that would
   pick the "current" issue to work on and implement it; this skill only builds
   the hierarchy.
+- **Defects/bugs** — no `defect` level, label, or template. Adding `defect` as a
+  board `Level` would require extending the Project single-select *after* field
+  creation, which `gh`/API cannot do (options are only settable at creation);
+  shipping it half-working would force a manual UI step on every re-run, so it
+  is deferred until that can be fully automated.
 
 ## Bundled resources
 
 - [`assets/labels.json`](./assets/labels.json) — the canonical label taxonomy
   (level, priority, area, and status labels) consumed by `ensure-labels.ps1`.
-- [`assets/templates/`](./assets/templates/) — the five issue body templates
-  (`application-plan.md`, `epic.md`, `story.md`, `task.md`, `defect.md`) consumed
+- [`assets/templates/`](./assets/templates/) — the four issue body templates
+  (`application-plan.md`, `epic.md`, `story.md`, `task.md`) consumed
   by `ensure-issue.ps1` via `-BodyFile`.
 - [`references/gh-issue-tracking-plan.md`](./references/gh-issue-tracking-plan.md) —
   the full design plan (hierarchy model, conventions, label taxonomy).

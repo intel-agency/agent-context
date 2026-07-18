@@ -3,7 +3,6 @@
   { "name": "epic", "color": "1d76db", "description": "Level: epic (project/component)" },
   { "name": "story", "color": "0e8a16", "description": "Level: story" },
   { "name": "task", "color": "fbca04", "description": "Level: atomic task" },
-  { "name": "defect", "color": "b60205", "description": "Level: defect / bug-fix task" },
   { "name": "P0", "color": "b60205", "description": "Priority: critical" },
   { "name": "P1", "color": "d93f0b", "description": "Priority: high" },
   { "name": "P2", "color": "fbca04", "description": "Priority: medium" },

@@ -40,14 +40,14 @@ dependency on anything outside its own directory — copy
   acceptance criteria / sub-steps only.
 - **Numbered titles:** `Plan: <Name>`, `Epic <N>: <Name>`, `Story <N>.<M>: <Name>`,
   `Task <N>.<M>.<K>: <Name>`. Keep numbering stable across re-runs.
-- **Level labels:** `plan` / `epic` / `story` / `task` / `defect`; plus `P0..P3`, `area/*`.
+- **Level labels:** `plan` / `epic` / `story` / `task`; plus `P0..P3`, `area/*`.
   Workflow state lives in the Project **Status** field, not labels.
 - **Milestones** = conceptual work groups (e.g. `POC`, `MVP`, `UI`, `Server`),
   assigned to the epic **and all its descendants**.
 - **Phases** are optional; only create the Phase field/values if the plan uses them.
 - Bodies come from the templates in
   [`assets/templates/`](./assets/templates/)
-  (`application-plan.md`, `epic.md`, `story.md`, `task.md`, `defect.md`) — fill placeholders, then
+  (`application-plan.md`, `epic.md`, `story.md`, `task.md`) — fill placeholders, then
   pass the result to `ensure-issue.ps1` via `-BodyFile`.
 
 ## Orchestration steps
@@ -65,8 +65,6 @@ All scripts below live in this skill's `scripts/` directory.
 5. **Create issues** (top-down) with `ensure-issue.ps1`, filling the matching template
    into a temp file and passing `-BodyFile`. Capture each printed issue **number**:
    - plan → epics → stories → tasks; apply the level label and (for epics + descendants) the milestone.
-   - **Defects:** use the `defect.md` template, apply the `defect` label
-     (`-Labels defect`), and set the board `Level` to `defect` in step 7.
 6. **Link sub-issues** with `link-sub-issue.ps1 -ParentNumber <parent> -ChildNumber <child>`
    for every parent/child edge.
 7. **Set board fields** with `set-project-fields.ps1` for each issue: `-Level`,
@@ -126,9 +124,12 @@ Project **Status** field for in-flight state. In-issue checklists are informatio
 
 ## Out of scope
 
-The separate issue-implementation skill (current-issue selection / ordering) is deferred —
-see the plan's "Out of Scope". **Defects are now supported** via the `defect` level
-(the `defect` label + `assets/templates/defect.md`).
+The separate issue-implementation skill (current-issue selection / ordering) is
+deferred — see the plan's "Out of Scope". **Defects/bugs** are also deferred:
+adding a `defect` level would require extending the Project `Level` single-select
+*after* field creation, which `gh`/API cannot do (options are only settable at
+field creation); shipping it half-working would force a manual UI step on every
+re-run, so it is intentionally omitted until that can be fully automated.
 
 ## Known limitations
 

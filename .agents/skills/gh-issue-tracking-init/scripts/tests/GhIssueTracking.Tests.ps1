@@ -98,7 +98,7 @@ Describe 'label taxonomy (labels.json)' {
     It 'is valid JSON and contains the canonical taxonomy' {
         $labels = Get-Content (Join-Path $SkillDir 'assets/labels.json') -Raw | ConvertFrom-Json
         $names = @($labels.name)
-        foreach ($expected in @('plan', 'epic', 'story', 'task', 'defect', 'P0', 'P1', 'P2', 'P3', 'blocked', 'needs-review', 'wontfix')) {
+        foreach ($expected in @('plan', 'epic', 'story', 'task', 'P0', 'P1', 'P2', 'P3', 'blocked', 'needs-review', 'wontfix')) {
             $names | Should -Contain $expected
         }
     }
@@ -107,24 +107,6 @@ Describe 'label taxonomy (labels.json)' {
         $names = @($labels.name)
         $names | Should -Not -Contain 'in-progress'
         $names | Should -Not -Contain 'done'
-    }
-}
-
-Describe 'defect level (label + template)' {
-    It 'labels.json declares the defect label' {
-        $labels = Get-Content (Join-Path $SkillDir 'assets/labels.json') -Raw | ConvertFrom-Json
-        $defect = @($labels | Where-Object { $_.name -eq 'defect' })
-        $defect.Count | Should -Be 1
-        $defect[0].color | Should -Not -BeNullOrEmpty
-        $defect[0].description | Should -Not -BeNullOrEmpty
-    }
-    It 'ships a defect.md issue template with matching front-matter' {
-        $template = Join-Path $SkillDir 'assets/templates/defect.md'
-        Test-Path -LiteralPath $template | Should -BeTrue
-        $content = Get-Content $template -Raw
-        # YAML front-matter values must match the defect label and a Defect name.
-        $content | Should -Match "(?m)^name:\s*Defect\b"
-        $content | Should -Match "labels:\s*\[?(?:'defect'|`"defect`")"
     }
 }
 
