@@ -17,7 +17,7 @@ This directory is **self-contained**: `common-auth.ps1`, `import-labels.ps1`, an
 | Script | Purpose | Key parameters |
 | ------ | ------- | -------------- |
 | `ensure-labels.ps1` | Create/update the canonical label taxonomy from `../assets/labels.json` (delegates to the vendored `import-labels.ps1`) | `-Repo [-LabelsFile]` |
-| `ensure-project.ps1` | Create/link the Project and its custom fields (`Level`, `Priority`, `Estimate`, optional `Phase`) | `-Owner -Repo [-Title] [-Phases]` |
+| `ensure-project.ps1` | Create/link the Project and its custom fields (`Level`, `Priority`, `Estimate`, optional `Phase`); **prints the project number to stdout** (machine-readable, capture via `$()`) | `-Owner -Repo [-Title] [-Phases]` |
 | `ensure-issue.ps1` | Create **or** update one issue from a filled template body; prints the issue **number** to stdout | `-Repo -Title (-BodyFile\|-Body) [-Labels -Milestone -Assignee -UpdateBody]` |
 | `link-sub-issue.ps1` | Attach a child issue as a sub-issue of a parent | `-Repo -ParentNumber -ChildNumber` |
 | `set-project-fields.ps1` | Add an issue to the board and set `Level/Priority/Phase/Status/Estimate` | `-Owner -ProjectNumber -Repo -IssueNumber [...]` |
@@ -61,7 +61,7 @@ $Owner = 'you'
 
 # 2. Apply base scaffolding
 & "$Skill/ensure-labels.ps1"  -Repo $Repo
-& "$Skill/ensure-project.ps1" -Owner $Owner -Repo $Repo   # note the project number (e.g. 3)
+$Proj = & "$Skill/ensure-project.ps1" -Owner $Owner -Repo $Repo   # captures the project number from stdout (e.g. 3)
 & "$Skill/create-milestones.ps1" -Repo $Repo -Titles 'MVP'
 
 # 3. Build a tiny plan -> epic -> story -> task tree (capture the printed numbers)
@@ -75,9 +75,9 @@ $task  = & "$Skill/ensure-issue.ps1" -Repo $Repo -Title 'Task 1.1.1: Init'     -
 & "$Skill/link-sub-issue.ps1" -Repo $Repo -ParentNumber $epic  -ChildNumber $story
 & "$Skill/link-sub-issue.ps1" -Repo $Repo -ParentNumber $story -ChildNumber $task
 
-# 5. Set board fields (use the project number from step 2)
-& "$Skill/set-project-fields.ps1" -Owner $Owner -ProjectNumber 3 -Repo $Repo -IssueNumber $epic -Level epic -Priority P1 -Status 'Todo'
-& "$Skill/set-project-fields.ps1" -Owner $Owner -ProjectNumber 3 -Repo $Repo -IssueNumber $task -Level task -Priority P2 -Status 'Todo'
+# 5. Set board fields (use the project number captured in step 2)
+& "$Skill/set-project-fields.ps1" -Owner $Owner -ProjectNumber $Proj -Repo $Repo -IssueNumber $epic -Level epic -Priority P1 -Status 'Todo'
+& "$Skill/set-project-fields.ps1" -Owner $Owner -ProjectNumber $Proj -Repo $Repo -IssueNumber $task -Level task -Priority P2 -Status 'Todo'
 
 # 6. Dependencies (optional)
 & "$Skill/set-dependency.ps1" -Repo $Repo -IssueNumber $task -BlockedByNumber $story

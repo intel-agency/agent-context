@@ -70,7 +70,13 @@ function Get-JsonProp {
     param($Object, [string]$Name)
     if ($null -eq $Object) { return $null }
     $prop = $Object.PSObject.Properties[$Name]
-    if ($prop) { return $prop.Value }
+    # Leading comma prevents PowerShell from unrolling an empty array to $null in the pipeline.
+    # An explicit $null guard avoids returning a 1-element array wrapping $null (which would
+    # break $null -eq $val checks at call sites).
+    if ($prop) {
+        if ($null -eq $prop.Value) { return $null }
+        return , $prop.Value
+    }
     return $null
 }
 
@@ -157,6 +163,13 @@ else {
 
     # The built-in Status field cannot have options edited via gh 2.46; note desired options.
     Write-Skip "Note: ensure the built-in 'Status' field has options: Todo, In Progress, In Review, Blocked, Done (add any missing ones in the UI)."
+}
+
+# --- Emit project number on stdout so composing drivers can capture it via $() ---
+# (Host-stream Write-* above are human-readable status; this is the machine-readable contract,
+#  matching ensure-issue.ps1 which Write-Outputs its issue number.)
+if ($null -ne $projectNumber) {
+    Write-Output $projectNumber
 }
 
 # --- Views (not automatable) ------------------------------------------------

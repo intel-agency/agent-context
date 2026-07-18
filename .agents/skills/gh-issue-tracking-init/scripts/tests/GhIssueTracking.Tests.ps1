@@ -160,3 +160,125 @@ Describe 'self-containment' {
         }
     }
 }
+
+Describe 'ensure-project.ps1 stdout contract (F1: project number on success stream)' {
+    # ensure-project.ps1 must Write-Output its project number so composing drivers can
+    # capture it via $(). The script re-dot-sources common.ps1 in its own scope when
+    # invoked, which would shadow Pester Mocks on the wrapper functions — but the script
+    # never defines its own `gh` function, so a caller-scope `function gh` intercepts the
+    # underlying `& gh` calls via PowerShell dynamic scoping. We stub `gh` that way.
+
+    BeforeAll {
+        $script:ProjectScriptPath = Join-Path $GhitDir 'ensure-project.ps1'
+    }
+
+    It 'emits the project number to the success stream when the project already exists' {
+        function gh {
+            param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Arguments)
+            $global:LASTEXITCODE = 0
+            if ($null -eq $Arguments -or $Arguments.Count -eq 0) { return }
+            $cmd = $Arguments[0]
+            $sub = if ($Arguments.Count -gt 1) { $Arguments[1] } else { '' }
+            if ($cmd -eq 'auth' -and $sub -eq 'status') { return }
+            if ($cmd -eq 'project' -and $sub -eq 'list') { return '{"projects":[{"number":5,"title":"Test"}]}' }
+            # Real projects always have built-in fields (Title, Status); return a realistic field-list.
+            if ($cmd -eq 'project' -and $sub -eq 'field-list') { return '{"fields":[{"name":"Title"},{"name":"Status"}]}' }
+            return
+        }
+        $global:LASTEXITCODE = 0
+        # Capture ONLY the success stream (Write-Output); Write-Host status goes to console.
+        $out = & $script:ProjectScriptPath -Owner 'o' -Repo 'o/r' -Title 'Test' -DryRun
+        $out | Should -Be 5
+    }
+
+    It 'emits nothing to the success stream in DryRun when the project does not yet exist' {
+        function gh {
+            param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Arguments)
+            $global:LASTEXITCODE = 0
+            if ($null -eq $Arguments -or $Arguments.Count -eq 0) { return }
+            $cmd = $Arguments[0]
+            $sub = if ($Arguments.Count -gt 1) { $Arguments[1] } else { '' }
+            if ($cmd -eq 'auth' -and $sub -eq 'status') { return }
+            # Another project exists with a different title, so the target is "not found".
+            if ($cmd -eq 'project' -and $sub -eq 'list') { return '{"projects":[{"number":99,"title":"SomeOther"}]}' }
+            return
+        }
+        $global:LASTEXITCODE = 0
+        $out = & $script:ProjectScriptPath -Owner 'o' -Repo 'o/r' -Title 'Test' -DryRun
+        $out | Should -BeNullOrEmpty
+    }
+}
+
+# Script-scope test data for the Get-JsonProp -ForEach block below. Must be defined BEFORE the
+# Describe that consumes it, because Pester 5 evaluates -ForEach data at discovery time (which
+# runs top-to-bottom through the file), before any BeforeAll runs.
+$getJsonPropSources = @('ensure-project.ps1', 'set-project-fields.ps1')
+
+Describe 'Get-JsonProp edge cases (null-value guard + empty-array preservation)' {
+    # Get-JsonProp is defined identically in ensure-project.ps1 and set-project-fields.ps1.
+    # We extract the real function body via the PowerShell AST and invoke it directly so the
+    # tests exercise production code, not a copy.
+    # NOTE: $getJsonPropSources is defined at script scope (below) because Pester 5 evaluates
+    # -ForEach data at discovery time, before BeforeAll runs.
+    BeforeAll {
+        function script:Get-FunctionScriptBlock {
+            param([string]$FileName, [string]$FunctionName)
+            $path = Join-Path $GhitDir $FileName
+            $tokens = $null
+            $errors = $null
+            $ast = [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors)
+            $fn = $ast.FindAll({
+                param($node)
+                $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+                $node.Name -eq $FunctionName
+            }, $true) | Select-Object -First 1
+            return $fn.Body.GetScriptBlock()
+        }
+    }
+
+    It 'returns scalar null (not a 1-element null array) when the JSON value is null: <_>' -ForEach $getJsonPropSources {
+        $sb = Get-FunctionScriptBlock -FileName $_ -FunctionName 'Get-JsonProp'
+        # Get-JsonProp consumes ConvertFrom-Json output (PSCustomObject), not Hashtable.
+        $obj = [pscustomobject]@{ present = $null }
+        $val = & $sb $obj 'present'
+        # Discriminator: for scalar $null, `$null -eq $val` is $true; for a 1-element array
+        # wrapping $null (the old `, $prop.Value` behavior), it is $false.
+        $null -eq $val | Should -BeTrue
+    }
+
+    It 'preserves an empty array instead of unrolling it to null: <_>' -ForEach $getJsonPropSources {
+        $sb = Get-FunctionScriptBlock -FileName $_ -FunctionName 'Get-JsonProp'
+        $obj = [pscustomobject]@{ items = @() }
+        $val = & $sb $obj 'items'
+        $val.Count | Should -Be 0
+        # An empty array is NOT scalar null.
+        $null -eq $val | Should -BeFalse
+    }
+
+    It 'returns null when the object is null: <_>' -ForEach $getJsonPropSources {
+        $sb = Get-FunctionScriptBlock -FileName $_ -FunctionName 'Get-JsonProp'
+        $val = & $sb $null 'anything'
+        $null -eq $val | Should -BeTrue
+    }
+
+    It 'returns null when the property is absent: <_>' -ForEach $getJsonPropSources {
+        $sb = Get-FunctionScriptBlock -FileName $_ -FunctionName 'Get-JsonProp'
+        $obj = [pscustomobject]@{ other = 1 }
+        $val = & $sb $obj 'missing'
+        $null -eq $val | Should -BeTrue
+    }
+
+    It 'returns a scalar value intact: <_>' -ForEach $getJsonPropSources {
+        $sb = Get-FunctionScriptBlock -FileName $_ -FunctionName 'Get-JsonProp'
+        $obj = [pscustomobject]@{ n = 42 }
+        $val = & $sb $obj 'n'
+        $val | Should -Be 42
+    }
+
+    It 'returns a non-empty array intact: <_>' -ForEach $getJsonPropSources {
+        $sb = Get-FunctionScriptBlock -FileName $_ -FunctionName 'Get-JsonProp'
+        $obj = [pscustomobject]@{ arr = @(1, 2, 3) }
+        $val = & $sb $obj 'arr'
+        $val.Count | Should -Be 3
+    }
+}

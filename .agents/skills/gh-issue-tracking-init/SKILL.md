@@ -24,9 +24,21 @@ dependency on anything outside its own directory — copy
 
 ## Inputs
 
+Both inputs have defaults and may be omitted — the skill then runs against the repo
+it is invoked from.
+
 - `$ghrepo` — target repository as `owner/repo` (or a URL you normalize to that).
-- A **plan source** describing the epics/stories/tasks (a filled plan doc, or the
-  user's description). You map it onto the four levels and the numbering scheme.
+  **Default when omitted:** the repository the skill is running from — the GitHub
+  repo of the current working directory, resolved with
+  `gh repo view --json nameWithOwner -q .nameWithOwner` (equivalently, the `origin`
+  remote of the enclosing git repo). Use this default unless the user names a
+  different repo.
+- **Plan source** — a description of the epics/stories/tasks (a filled plan doc, or
+  the user's description) that you map onto the four levels and the numbering scheme.
+  **Default when omitted:** all plan/app-plan documents under `plan_docs/` in the
+  workspace root (`glob plan_docs/**/*.md`). If `plan_docs/` is missing or empty, the
+  user must supply a plan source explicitly. When multiple files are found, confirm
+  the selection (or merge them in filename order) with the user before proceeding.
 
 ## Prerequisites
 
@@ -55,13 +67,27 @@ dependency on anything outside its own directory — copy
 Work top-down. Always do a `-DryRun` pass first, show the plan, then apply.
 All scripts below live in this skill's `scripts/` directory.
 
+**Resolve inputs first.** If `$ghrepo` is not given, derive it from the current
+repo (see [Inputs](#inputs)). If no plan source is named, read every doc under
+`plan_docs/`. Only proceed once both are known — if either can't be resolved and
+the user hasn't supplied it, ask before doing anything.
+
 1. **Parse the plan** into a tree of nodes (plan, epics, stories, tasks) with the
    numbered titles above, plus per-node labels, milestone, phase, priority, estimate,
    and any blocking dependencies.
+
+   **Canonical node schema** (assert presence before rendering — an omitted field
+   produces empty titles/milestones silently otherwise):
+   - `Level` (`plan`/`epic`/`story`/`task`)
+   - `Title` (the full numbered title, e.g. `Story 1.1: Bootstrap`) **or** the parts to
+     build it (`N`/`M`/`K`, `Name`)
+   - `Labels`, `Milestone`, `Priority`, `Phase` (if used)
+   - `BodyFile` (after rendering), `Prereqs` (array of sibling keys, story/task level)
 2. **Labels:** `ensure-labels.ps1 -Repo $ghrepo`.
 3. **Milestones:** for each conceptual group, `create-milestones.ps1 -Repo $ghrepo -Titles <name> -SkipExisting`.
 4. **Project + fields:** `ensure-project.ps1 -Owner <owner> -Repo $ghrepo [-Phases <p1,p2>]`.
-   Record the printed **project number**.
+   Capture the **project number** from stdout (`$Proj = & ensure-project.ps1 ...`); in
+   `-DryRun` it is `$null` (the project is not created, so nothing is emitted).
 5. **Create issues** (top-down) with `ensure-issue.ps1`, filling the matching template
    into a temp file and passing `-BodyFile`. Capture each printed issue **number**:
    - plan → epics → stories → tasks; apply the level label and (for epics + descendants) the milestone.
@@ -110,6 +136,41 @@ $ht = @{ Owner=$Owner; ProjectNumber=$Proj; Repo=$ghrepo; IssueNumber=$n.number;
 **Important:** array splatting (`@a` of a `string[]`) is **positional** and will misbind
 parameter names — this was the one call-site bug observed in the forensic run. Always
 splat a hashtable for this script.
+
+### Avoid integer-keyed lookup dictionaries in the driver
+
+PowerShell integer-keyed `[ordered]@{}` / `@{}` indexing is **unreliable for some keys**
+(silent empty returns; reproduced on PS 7.6 — keys 1–6 resolve while key 7 returns empty
+even though `.Keys` and `.Values` confirm it is present). When composing a driver, **do
+not** build milestone/phase lookup maps as integer-keyed dictionaries. Prefer, in order:
+
+1. a `switch` function (single source of truth, fails loudly on unknown keys), or
+2. a `[string]`-keyed `@{}` accessed via `$map["7"]`.
+
+```pwsh
+function Milestone-For {
+    param([int]$N)
+    switch ($N) {
+        1 { 'Gate 1: Foundation' }
+        2 { 'Gate 1: Foundation' }
+        3 { 'Gate 2: Pipelines' }
+        default { throw "Unknown epic number for milestone: $N" }
+    }
+}
+```
+
+### DryRun must assert completeness
+
+Before printing the DryRun preview, assert every node renders a non-empty title and (for
+epics/stories) a non-empty milestone. Throw on the first empty value so omissions fail
+loudly in preview rather than creating empty-titled issues on apply:
+
+```pwsh
+foreach ($n in $nodes) {
+    if ([string]::IsNullOrWhiteSpace($n.Title)) { throw "Node missing title: $($n | ConvertTo-Json -Compress -Depth 2)" }
+    if ($n.Level -in 'epic','story' -and [string]::IsNullOrWhiteSpace($n.Milestone)) { throw "Node $($n.Title) missing milestone" }
+}
+```
 
 ## Idempotency & re-runs
 
