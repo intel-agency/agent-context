@@ -233,6 +233,8 @@ idempotency guarantee in action.
   (level, priority, area, and status labels) consumed by `ensure-labels.ps1`.
 - [`assets/templates/`](./assets/templates/) — the four issue body templates
   (`application-plan.md`, `epic.md`, `story.md`, `task.md`) consumed
-  by `ensure-issue.ps1` via `-BodyFile`.
+  by `ensure-issue.ps1` via `-BodyFile`. The application-plan and epic
+  templates include epic-grouped implementation plan subsections and
+  infrastructure hardening notes.
 - [`references/gh-issue-tracking-plan.md`](./references/gh-issue-tracking-plan.md) —
   the full design plan (hierarchy model, conventions, label taxonomy).

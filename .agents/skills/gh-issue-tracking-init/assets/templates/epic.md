@@ -25,7 +25,7 @@ Component the epic lives in.
 
 *(Technology specific to this epic and its component.)*
 
-- Language: [e.g., C# .NET 10.0]
+- Language: [e.g., C# .NET 9.0]
 - UI Framework: [e.g., Avalonia/Blazor/etc.]
 - AI/Runtime: [e.g., ONNX Runtime / Azure OpenAI / etc.]
 - Architecture: [e.g., RAG / MCP / Microservices]
@@ -83,6 +83,7 @@ Component the epic lives in.
 - [ ] 2.2. Implement core module/service B
 
 ### Story 3: UI/UX & Integration
+
 - [ ] 3.1. UI foundation and navigation
 - [ ] 3.2. ViewModels/State management
 - [ ] 3.3. Primary user flows (chat/task/…)
@@ -90,23 +91,33 @@ Component the epic lives in.
 - [ ] 3.5. Settings/configuration
 
 ### Story 4: Advanced Capabilities & Security
+
 - [ ] 4.1. Tooling/Function calling/Agentic features (if applicable)
 - [ ] 4.2. Human-in-the-loop approval and auditing
 - [ ] 4.3. Performance optimizations and caching
 - [ ] 4.4. Observability and dashboards
 
 ### Story 5: Testing, Docs, Packaging & Deployment
+
 - [ ] 5.1. Test suites (unit/integration/e2e/perf)
 - [ ] 5.2. API/Developer documentation
 - [ ] 5.3. Containerization/installer packaging
 - [ ] 5.4. IaC/Environments/CI-CD pipelines
 - [ ] 5.5. Final hardening and release checklist
 
+## Validation Plan
+
+[How the epic's stories and overall component behavior will be validated: integration test scope, acceptance verification, and definition of done for the epic.]
+
+- [ ] Validation task
+- [ ] Validation task
+
 ---
 
 ## Mandatory Requirements Implementation
 
 ### Testing & Quality Assurance
+
 - [ ] Unit tests — coverage target: [e.g., 80%+]
 - [ ] Integration tests
 - [ ] E2E tests
@@ -114,6 +125,7 @@ Component the epic lives in.
 - [ ] Automated tests in CI
 
 ### Documentation & UX
+
 - [ ] Comprehensive README
 - [ ] User manual and feature docs
 - [ ] XML/API docs (public APIs)
@@ -121,12 +133,14 @@ Component the epic lives in.
 - [ ] In-app help (if applicable)
 
 ### Build & Distribution
+
 - [ ] Build scripts
 - [ ] Containerization support (if relevant)
 - [ ] Installer packaging (if desktop)
 - [ ] Release pipeline
 
 ### Infrastructure & DevOps
+
 - [ ] CI/CD workflows (build/test/scan/publish)
 - [ ] Static analysis and security scanning
 - [ ] Performance benchmarking/monitoring
@@ -134,6 +148,7 @@ Component the epic lives in.
 ---
 
 ## Acceptance Criteria
+
 - [ ] Core architecture implemented and components communicate as designed
 - [ ] Key features/functionality work end-to-end
 - [ ] Observability/logging in place with actionable signals

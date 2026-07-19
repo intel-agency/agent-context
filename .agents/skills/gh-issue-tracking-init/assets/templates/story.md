@@ -1,4 +1,3 @@
-
 ---
 name: Story
 about: Create a detailed story for implementation
@@ -37,6 +36,13 @@ assignees: []
 - [ ] Criterion 1: Specific, measurable condition that must be met
 - [ ] Criterion 2: Another specific, measurable condition
 - [ ] Criterion 3: Additional criteria as needed
+
+## Validation Plan
+
+[How the story's deliverables will be verified: which tests must pass, manual checks, and commands to run.]
+
+- [ ] Validation task
+- [ ] Validation task
 
 ## Validation Commands
 
