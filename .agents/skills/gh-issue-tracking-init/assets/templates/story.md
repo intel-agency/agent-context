@@ -26,10 +26,12 @@ assignees: []
 
 ## Plan
 
-- [ ] Task 1: Description of first task
-- [ ] Task 2: Description of second task
-- [ ] Task 3: Description of third task
-- [ ] Task 4: Additional tasks as needed
+<!-- REQUIRED: when a plan entry corresponds to a child issue (a Task), it MUST carry its numeric triple-octet identifier verbatim — Task <N>.<M>.<K>: <Name>. Pure implementation sub-steps that are NOT separate issues may use plain bullets. -->
+
+- [ ] Task <N>.<M>.<K>: Description of first task
+- [ ] Task <N>.<M>.<K>: Description of second task
+- [ ] Task <N>.<M>.<K>: Description of third task
+- [ ] Task <N>.<M>.<K>: Additional tasks as needed
 
 ## Acceptance Criteria
 

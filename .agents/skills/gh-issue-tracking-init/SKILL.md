@@ -71,6 +71,17 @@ it is invoked from.
   acceptance criteria / sub-steps only.
 - **Numbered titles:** `Plan: <Name>`, `Epic <N>: <Name>`, `Story <N>.<M>: <Name>`,
   `Task <N>.<M>.<K>: <Name>`. Keep numbering stable across re-runs.
+- **Child-issue list identifiers (mandatory).** When rendering a parent-issue body
+  (Plan → epics, Epic → stories, Story → tasks), **every** entry in **any** list
+  that enumerates child issues must carry its numeric identifier verbatim:
+  `Epic <N>:`, `Story <N>.<M>:`, or `Task <N>.<M>.<K>:`. Plain-text bullets without
+  identifiers are **never acceptable** in child-issue lists — this applies to the
+  Plan body's *Implementation Plan* section (epics + their stories), the Epic body's
+  *Epic Stories* and *Implementation Plan* sections (stories + their tasks), and the
+  Story body's *Plan* section (tasks). Acceptance-criteria, validation, and plain
+  step checklists *within a single issue* are exempt — those describe steps, not
+  child issues. The templates carry `<!-- REQUIRED ... -->` reminders in each such
+  section; honor them.
 - **Level labels:** `plan` / `epic` / `story` / `task`; plus `P0..P3`, `area/*`.
   Workflow state lives in the Project **Status** field, not labels.
 - **Milestones** = conceptual work groups (e.g. `POC`, `MVP`, `UI`, `Server`),
@@ -93,6 +104,25 @@ use the primary plan as the node source, and fold the rest into the Plan body as
 supporting context. The only hard stop is an empty/missing `plan_docs/` with no plan
 supplied; everything else resolves automatically. **Do not prompt the user to choose
 between plan docs.**
+
+**Initialize the forensic logfile first.** At the very top of the composed driver
+script — before any GitHub call — initialize the per-run logfile so every subsequent
+operation (every `Invoke-Gh`, every `Write-Step`/`Write-Ok`/`Write-Skip`/`Write-DryRun`,
+across every dot-sourced op script) is mirrored into it for post-execution forensics:
+
+```pwsh
+. (Join-Path $Skill 'common.ps1')
+$slug = ($ghrepo -split '/')[-1]   # e.g. 'gap-miner-v2-delta12'
+$logPath = Initialize-LogFile -RepoSlug $slug -RepoRoot (Get-Location) -Repo $ghrepo
+Write-Step "Logging to: $logPath"
+```
+
+`Initialize-LogFile` writes a header block recording the repository identity, the
+absolute working-copy path, the checked-out git rev + ref, the script directory, and
+the OS/PowerShell version. The path is carried in `$env:GHIT_LOG_FILE`, so every op
+script (each with its own `$script:` scope) writes to the same file without needing
+the path passed in. The file lands at `<repo-root>/gh-init-<slug>-<UTC-timestamp>.log`
+and is covered by `.gitignore` (`gh-init-*.log`).
 
 1. **Parse the plan** into a tree of nodes (plan, epics, stories, tasks) with the
    numbered titles above, plus per-node labels, milestone, phase, priority, estimate,
@@ -131,9 +161,13 @@ A composed `gh-issue-tracking-init` run writes several artifacts: a PowerShell d
 /tmp/kilo/<repo-slug>/
   ├─ driver.ps1   # the composed orchestration script (this section's output)
   ├─ bodies/      # rendered issue bodies, passed to ensure-issue.ps1 -BodyFile
-  ├─ logs/        # trace / run logs
   └─ diag/        # throwaway diagnostic / experiment scripts
 ```
+
+The **canonical forensic run log** is NOT here — `Initialize-LogFile` writes it to
+`<repo-root>/gh-init-<slug>-<UTC-timestamp>.log` (see *Initialize the forensic logfile
+first* above), where it survives for post-execution forensics. Keep scratch-workspace
+`diag/` scripts for one-off experiments only.
 
 This is repo-wide hygiene, not optional: a prior forensic run (`gap-miner-v2-charlie53`) left a stale, repo-hardcoded `gapminer-gh-init-driver.ps1` loose in `/tmp/kilo/`, which a later run could have mistaken for reusable and pointed at the wrong repo. **Create on demand** (`mkdir -p` / `New-Item -ItemType Directory -Force`), and before reusing anything under `/tmp/kilo/`, confirm the slug matches the current repo.
 

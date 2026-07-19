@@ -39,9 +39,11 @@ Component the epic lives in.
 
 ## Epic Stories
 
-- [Story 1]
-- [Story 2]
-- [Story 3]
+<!-- REQUIRED: every entry below MUST carry its numeric identifier verbatim — Story <N>.<M>: <Name> — never a plain-text bullet. These list the epic's child issues. -->
+
+- [ ] Story <N>.<M>: <Story Name>
+- [ ] Story <N>.<M>: <Story Name>
+- [ ] Story <N>.<M>: <Story Name>
 
 ## Component Architecture
 
@@ -76,6 +78,8 @@ Component the epic lives in.
 ---
 
 ## Implementation Plan
+
+<!-- REQUIRED: every story/task entry below MUST carry its numeric triple-octet identifier verbatim (Story <N>.<M>:, Task <N>.<M>.<K>:). Use this epic's actual number for <N>. Plain-text bullets without identifiers are never acceptable. -->
 
 ### Story 1: Foundation & Setup
 

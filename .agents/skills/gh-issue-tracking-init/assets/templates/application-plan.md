@@ -65,6 +65,8 @@ Provide a concise summary of the application, the problem it solves, the desired
 
 ## Implementation Plan
 
+<!-- REQUIRED: every story/task entry below MUST carry its numeric triple-octet identifier verbatim (Epic <N>:, Story <N>.<M>:, Task <N>.<M>.<K>:). Plain-text bullets without identifiers are never acceptable in child-issue lists. -->
+
 ### Epic 1: Foundation & Setup
 
 - [ ] Story 1.1: Repository and solution bootstrap
