@@ -2,6 +2,14 @@
 
 **ALWAYS load and apply these guidelines whenever making or planning code changes.**
 
+## Default scripting language: cross-platform PowerShell
+
+**Write all scripts in cross-platform PowerShell (PowerShell 7+, `pwsh`) unless a specific task requires otherwise.**
+
+Cross-platform PowerShell runs identically on Linux, macOS, and Windows, so a single script works across every contributor's machine and every CI target. This is the default for repo-root scripts, CI/CD steps, and skill scripts alike. Reach for another language only when the task demands it (e.g. a tool's only SDK is Python/Node, or a skill's `compatibility` frontmatter already pins a different runtime) — and note the exception where the script lives.
+
+This pairs with the repo's existing PowerShell conventions: `throw` for fatal errors (not `Write-Error` + `exit 1`, since scripts set `$ErrorActionPreference = 'Stop'`), comma-guard (`return ,$value`) when returning arrays, and `PSObject.Properties` null-guards under `Set-StrictMode`.
+
 ## Simplicity First
 
 **Minimum code that solves the problem. Nothing speculative.**

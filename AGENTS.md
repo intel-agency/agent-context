@@ -28,7 +28,8 @@ Rules dictate coding conventions, tools, validation, testing, source control, de
 - **Source Control**: `.agents/rules/source-control.md`
 - **Delegation**: `.agents/rules/delegation.md`
 - **Practices**: `.agents/rules/practices.md`
-- **Coding Style**: `.agents/rules/coding-style.md`
+- **Coding Style**: [`.agents/rules/coding-style.md`](.agents/rules/coding-style.md) — coding conventions including Simplicity First and Goal-Driven Execution. Core rule: write all scripts in cross-platform PowerShell (`pwsh`) unless a task specifically requires another language.
+- **Skills**: [`.agents/rules/skills.md`](.agents/rules/skills.md) — skill creation conventions. Core rules: all skills must be strictly compliant with the [Agent Skills spec](https://agentskills.io/specification) — always review the current spec before creating or modifying any skill; and prefer scripts under `scripts/` over prose steps for any repeatable operation so the skill produces deterministic output across runs.
 - **Scripts**: [`.agents/rules/scripts.md`](.agents/rules/scripts.md) — repo-root `scripts/` inventory (auth helpers, `import-labels.ps1` for label sync, `query.ps1` as the canonical PR review-thread manager, dispatch-issue creator, permission verifier, remote-index regenerator). Read each script's header + `param()` block for authoritative docs.
 - **Agent-Instructions Modules**: [`.agents/rules/ai-instructions-modules.md`](.agents/rules/ai-instructions-modules.md) — lookup tables for `nam20485/agent-instructions` workflow assignments and dynamic workflows, stored at `local_ai_instruction_modules/` (hard-coded path; refreshed by `scripts/update-remote-indices.ps1`).
 - **App Stacks**: pre-defined language and tech stack profiles in `.agents/rules/app-stacks/`. Each file is a stack definition named by slug ID, referenced from app development/implementation plans to specify the language, tech stack, tools, and packages to use. Available stacks:
