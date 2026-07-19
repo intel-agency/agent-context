@@ -17,7 +17,10 @@ description of the epics/stories/tasks), this skill builds out:
 
 > **Both inputs are optional.** With no arguments, `$ghrepo` defaults to the repo
 > the skill is running from (`gh repo view --json nameWithOwner`), and the plan
-> source defaults to every document under `plan_docs/` in the workspace root.
+> source is resolved **non-interactively** from `plan_docs/` — the primary
+> development plan (e.g. `development-plan.md`) drives the issue tree, while
+> architecture/reference docs (e.g. `architecture-guide`, strategic context) are
+> folded into the Plan issue body as supporting context.
 > See [Inputs](./SKILL.md#inputs) in `SKILL.md`.
 
 1. **A canonical label taxonomy** — level labels (`plan`, `epic`, `story`, `task`),
