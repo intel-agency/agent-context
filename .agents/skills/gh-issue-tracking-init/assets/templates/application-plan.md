@@ -46,7 +46,7 @@ Provide a concise summary of the application, the problem it solves, the desired
 
 ## Project Structure
 
-```
+```text
 [ProjectName]/
 ├─ src/
 │  ├─ [Project].Core/
@@ -178,10 +178,6 @@ Provide a concise summary of the application, the problem it solves, the desired
 - [Metric 1]
 - [Metric 2]
 - [Metric 3]
-
-## Repository Branch
-
-Target branch for implementation: [e.g., copilot/[project-slug]]
 
 ## Implementation Notes
 
