@@ -115,6 +115,121 @@ Describe 'common.ps1 helpers' {
             (Invoke-GhJson api 'repos/o/r/issues/42').number | Should -Be 42
         }
     }
+
+    Context 'Initialize-LogFile + Write-Log' {
+        # These tests create real files under a per-test temp dir and must isolate
+        # $env:GHIT_LOG_FILE so they never affect the other Contexts (which rely on
+        # Write-Log being a silent no-op).
+        BeforeEach {
+            $script:SavedLogFile = $env:GHIT_LOG_FILE
+            $env:GHIT_LOG_FILE = $null
+            $script:TempLogDir = Join-Path ([System.IO.Path]::GetTempPath()) ("ghit-test-" + [guid]::NewGuid().ToString('N'))
+            New-Item -ItemType Directory -Path $script:TempLogDir -Force | Out-Null
+        }
+        AfterEach {
+            $env:GHIT_LOG_FILE = $script:SavedLogFile
+            if (Test-Path -LiteralPath $script:TempLogDir) {
+                Remove-Item -LiteralPath $script:TempLogDir -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        }
+
+        It 'creates a timestamped logfile under the given repo root' {
+            $path = Initialize-LogFile -RepoSlug 'my-repo' -RepoRoot $script:TempLogDir -Repo 'o/my-repo'
+            $path | Should -Not -BeNullOrEmpty
+            Test-Path -LiteralPath $path | Should -BeTrue
+            (Split-Path -Leaf $path) | Should -Match '^gh-init-my-repo-\d{8}T\d{6}Z\.log$'
+        }
+
+        It 'sets $env:GHIT_LOG_FILE to the created path' {
+            $path = Initialize-LogFile -RepoSlug 'my-repo' -RepoRoot $script:TempLogDir -Repo 'o/my-repo'
+            $env:GHIT_LOG_FILE | Should -Be $path
+        }
+
+        It 'writes a metadata header recording repo, local path, rev, and ref' {
+            $path = Initialize-LogFile -RepoSlug 'my-repo' -RepoRoot $script:TempLogDir -Repo 'o/my-repo'
+            $content = Get-Content -LiteralPath $path -Raw
+            $content | Should -Match '# Repository : o/my-repo'
+            $content | Should -Match ('# Local path : ' + [regex]::Escape((Resolve-Path $script:TempLogDir).Path))
+            $content | Should -Match '# Git rev    :'
+            $content | Should -Match '# Git ref    :'
+            $content | Should -Match '# OS/PS      :'
+        }
+
+        It 'records (unknown) rev/ref when the repo root is not a git repo' {
+            # A fresh temp dir is not a git repo, so rev/ref must fall back gracefully.
+            $path = Initialize-LogFile -RepoSlug 'my-repo' -RepoRoot $script:TempLogDir -Repo 'o/my-repo'
+            $content = Get-Content -LiteralPath $path -Raw
+            # Either the real rev (if git somehow resolves) or (unknown); both are valid
+            # outcomes. We assert the line exists and is non-empty.
+            $content | Should -Match '# Git rev    : .+'
+        }
+
+        It 'uses (unspecified) for the repository label when -Repo is omitted' {
+            $path = Initialize-LogFile -RepoSlug 'my-repo' -RepoRoot $script:TempLogDir
+            $content = Get-Content -LiteralPath $path -Raw
+            $content | Should -Match '# Repository : \(unspecified\)'
+        }
+
+        It 'throws when the repo root does not exist' {
+            { Initialize-LogFile -RepoSlug 'x' -RepoRoot (Join-Path $script:TempLogDir 'does-not-exist') } | Should -Throw
+        }
+
+        It 'sanitizes the slug for filename safety' {
+            $path = Initialize-LogFile -RepoSlug 'bad/slug with spaces!' -RepoRoot $script:TempLogDir -Repo 'o/r'
+            (Split-Path -Leaf $path) | Should -Match '^gh-init-bad-slug-with-spaces--\d{8}T\d{6}Z\.log$'
+        }
+
+        It 'Write-Log is a silent no-op when no log file is initialized' {
+            $env:GHIT_LOG_FILE = $null
+            { Write-Log -Message 'should not throw' } | Should -Not -Throw
+        }
+
+        It 'Write-Log appends a timestamped, op-tagged line when initialized' {
+            $path = Initialize-LogFile -RepoSlug 'my-repo' -RepoRoot $script:TempLogDir -Repo 'o/my-repo'
+            Write-Log -Op 'TEST' -Message 'hello world'
+            $lines = Get-Content -LiteralPath $path
+            # Header is 8 lines (7 metadata + 1 blank); the appended line follows.
+            # Force an array with @() so .Count is safe under Set-StrictMode.
+            $matched = @($lines | Where-Object { $_ -match '^\d{2}:\d{2}:\d{2}\.\d{3}Z \[TEST\] hello world$' })
+            $matched.Count | Should -Be 1
+        }
+
+        It 'Write-Step / Write-Ok / Write-Skip / Write-DryRun mirror to the log' {
+            $path = Initialize-LogFile -RepoSlug 'my-repo' -RepoRoot $script:TempLogDir -Repo 'o/my-repo'
+            Write-Step 'step message'
+            Write-Ok 'ok message'
+            Write-Skip 'skip message'
+            Write-DryRun 'dryrun message'
+            $content = Get-Content -LiteralPath $path -Raw
+            $content | Should -Match '\[STEP\] step message'
+            $content | Should -Match '\[OK\] ok message'
+            $content | Should -Match '\[SKIP\] skip message'
+            $content | Should -Match '\[DRYRUN\] dryrun message'
+        }
+
+        It 'Invoke-Gh logs the command and exit code on success' {
+            # Stub the underlying gh so Invoke-Gh (real) succeeds and logs.
+            function global:gh { $global:LASTEXITCODE = 0; return 'ok-output' }
+            $global:LASTEXITCODE = 0
+            $path = Initialize-LogFile -RepoSlug 'my-repo' -RepoRoot $script:TempLogDir -Repo 'o/my-repo'
+            $out = Invoke-Gh api 'repos/o/r'
+            $out | Should -Be 'ok-output'
+            $content = Get-Content -LiteralPath $path -Raw
+            $content | Should -Match '\[gh\] INVOKING: gh api repos/o/r'
+            $content | Should -Match '\[gh\] OK \(exit 0\): gh api repos/o/r'
+            Remove-Item Function:\global:gh -ErrorAction SilentlyContinue
+        }
+
+        It 'Invoke-Gh logs the failure and rethrows on non-zero exit' {
+            function global:gh { $global:LASTEXITCODE = 2; return $null }
+            $global:LASTEXITCODE = 2
+            $path = Initialize-LogFile -RepoSlug 'my-repo' -RepoRoot $script:TempLogDir -Repo 'o/my-repo'
+            { Invoke-Gh api 'fail' } | Should -Throw
+            $content = Get-Content -LiteralPath $path -Raw
+            $content | Should -Match '\[gh\] FAILED \(exit 2\): gh api fail'
+            Remove-Item Function:\global:gh -ErrorAction SilentlyContinue
+        }
+    }
 }
 
 Describe 'label taxonomy (labels.json)' {

@@ -52,16 +52,126 @@ function Initialize-Auth {
     }
 }
 
+function Initialize-LogFile {
+    <#
+    .SYNOPSIS
+        Create the per-run forensic logfile and record a repo-metadata header.
+
+    .DESCRIPTION
+        Call once at the very start of a composed orchestration run. The logfile
+        path is stored in $env:GHIT_LOG_FILE so every subsequently dot-sourced op
+        script (each with its own $script: scope) writes to the same file via
+        Write-Log. The file is created under $RepoRoot with a name of the form
+
+            gh-init-<slug>-<UTC-timestamp>.log
+
+        and begins with a metadata header recording the repository identity, the
+        working-copy location, the checked-out git rev and ref, the skill's own
+        directory, and the OS/PowerShell version — everything needed for
+        post-execution forensics.
+
+        Re-initializing in the same process starts a new timestamped file and
+        re-points $env:GHIT_LOG_FILE at it.
+
+        When $RepoRoot does not exist, throws. When git is unavailable or the
+        directory is not a git repo, the rev/ref lines are recorded as '(unknown)'.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)][string]$RepoSlug,
+        [Parameter(Mandatory = $true)][string]$RepoRoot,
+        [string]$Repo
+    )
+    if (-not (Test-Path -LiteralPath $RepoRoot -PathType Container)) {
+        throw "RepoRoot does not exist or is not a directory: $RepoRoot"
+    }
+    $stamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
+    # Sanitize the slug for filename safety (allow A–Z a–z 0–9 . _ -; replace the rest).
+    $safeSlug = $RepoSlug -replace '[^A-Za-z0-9._-]', '-'
+    $fileName = "gh-init-$safeSlug-$stamp.log"
+    $absRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+    $path = Join-Path $absRoot $fileName
+
+    # Gather git metadata defensively — never let a missing git or non-repo abort the run.
+    $rev = '(unknown)'
+    $ref = '(unknown)'
+    if (Get-Command git -ErrorAction SilentlyContinue) {
+        try {
+            $r = & git -C $absRoot rev-parse --short HEAD 2>$null
+            if ($LASTEXITCODE -eq 0 -and $r) { $rev = ($r | Out-String).Trim() }
+        } catch { }
+        try {
+            $f = & git -C $absRoot symbolic-ref --short HEAD 2>$null
+            if ($LASTEXITCODE -eq 0 -and $f) { $ref = ($f | Out-String).Trim() }
+        } catch { }
+    }
+
+    $repoLabel = if ($Repo) { $Repo } else { '(unspecified)' }
+    # $PSVersionTable is a hashtable, so PSObject.Properties doesn't see its keys;
+    # read defensively under Set-StrictMode via try/catch.
+    $os = '(unknown)'
+    try { if ($PSVersionTable.OS) { $os = [string]$PSVersionTable.OS } } catch { }
+    $psVer = '(unknown)'
+    try { if ($PSVersionTable.PSVersion) { $psVer = $PSVersionTable.PSVersion.ToString() } } catch { }
+
+    $header = @(
+        "# gh-issue-tracking-init run: $stamp (UTC)",
+        "# Repository : $repoLabel",
+        "# Local path : $absRoot",
+        "# Git rev    : $rev",
+        "# Git ref    : $ref",
+        "# Script dir : $PSScriptRoot",
+        "# OS/PS      : $os / PowerShell $psVer",
+        ''
+    )
+    $header | Set-Content -LiteralPath $path -Encoding UTF8
+
+    $env:GHIT_LOG_FILE = $path
+    return $path
+}
+
+function Write-Log {
+    <#
+    .SYNOPSIS
+        Append one timestamped, operation-tagged line to the forensic logfile.
+
+    .DESCRIPTION
+        Silent no-op when Initialize-LogFile has not run (no $env:GHIT_LOG_FILE),
+        so op scripts and helpers can call it unconditionally without checking.
+        Each line: "<HH:mm:ss.fffZ> [<Op>] <Message>".
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string]$Message,
+        [string]$Op = 'general'
+    )
+    $path = $env:GHIT_LOG_FILE
+    if (-not $path) { return }
+    $ts = (Get-Date).ToUniversalTime().ToString('HH:mm:ss.fffZ')
+    $line = "$ts [$Op] $Message"
+    # Add-Content is atomic enough for append-from-a-single-process forensics;
+    # use a try/catch so a transiently-unwritable path never aborts the run.
+    try {
+        Add-Content -LiteralPath $path -Value $line -Encoding UTF8 -ErrorAction Stop
+    } catch {
+        # Intentionally swallowed: logging must never break the actual work.
+    }
+}
+
 function Invoke-Gh {
     <#.SYNOPSIS Central wrapper around `gh` so every call is mockable in tests. Throws on non-zero exit.#>
     [CmdletBinding()]
     param([Parameter(ValueFromRemainingArguments = $true)][string[]]$GhArgs)
     # stdout is captured for the caller; stderr flows to the console so it is not
     # merged into (and corrupting) JSON output.
+    $cmd = if ($GhArgs) { $GhArgs -join ' ' } else { '' }
+    Write-Log -Op 'gh' -Message "INVOKING: gh $cmd"
     $output = & gh @GhArgs
-    if ($LASTEXITCODE -ne 0) {
-        throw "gh $($GhArgs -join ' ') failed (exit $LASTEXITCODE). See gh output above."
+    $code = $LASTEXITCODE
+    if ($code -ne 0) {
+        Write-Log -Op 'gh' -Message "FAILED (exit $code): gh $cmd"
+        throw "gh $cmd failed (exit $code). See gh output above."
     }
+    Write-Log -Op 'gh' -Message "OK (exit 0): gh $cmd"
     return $output
 }
 
@@ -133,7 +243,7 @@ function Find-IssueNumberByTitle {
     return $null
 }
 
-function Write-Step { param([string]$Message) Write-Host $Message -ForegroundColor Cyan }
-function Write-DryRun { param([string]$Message) Write-Host "[dry-run] $Message" -ForegroundColor Yellow }
-function Write-Ok { param([string]$Message) Write-Host $Message -ForegroundColor Green }
-function Write-Skip { param([string]$Message) Write-Host $Message -ForegroundColor DarkGray }
+function Write-Step { param([string]$Message) Write-Host $Message -ForegroundColor Cyan; Write-Log -Op 'STEP' -Message $Message }
+function Write-DryRun { param([string]$Message) Write-Host "[dry-run] $Message" -ForegroundColor Yellow; Write-Log -Op 'DRYRUN' -Message $Message }
+function Write-Ok { param([string]$Message) Write-Host $Message -ForegroundColor Green; Write-Log -Op 'OK' -Message $Message }
+function Write-Skip { param([string]$Message) Write-Host $Message -ForegroundColor DarkGray; Write-Log -Op 'SKIP' -Message $Message }
