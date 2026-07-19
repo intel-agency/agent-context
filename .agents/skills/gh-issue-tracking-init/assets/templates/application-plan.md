@@ -174,12 +174,15 @@ Provide a concise summary of the application, the problem it solves, the desired
 - Total: [x–y] weeks
 
 ## Success Metrics
+
 - [Metric 1]
 - [Metric 2]
 - [Metric 3]
 
 ## Repository Branch
+
 Target branch for implementation: [e.g., copilot/[project-slug]]
 
 ## Implementation Notes
+
 Key assumptions, adaptations, and references to technical docs or ADRs.
