@@ -130,3 +130,21 @@ The **remote** Exa MCP server authenticates via `exaApiKey={env:EXA_API_KEY}` an
 - **`crawling_exa`** — Crawl multiple pages of a site; collect a doc subsite in one call.
 
 Prefer Z.AI `webSearchPrime`/`webReader` as the default for single-shot lookups; reach for Exa when its neural search, code-context, or crawling fits better.
+
+## Scratch Workspaces (per-run temp state)
+
+Per-run scratch — composed drivers, rendered bodies, trace logs, throwaway diagnostics — lives namespaced **by repo slug** under `/tmp/kilo/<repo-slug>/`, **not** loose in a flat `/tmp/kilo/`. This isolates one repo's run from another's (a stale driver on disk hardcodes a specific repo + node set, so silent cross-run mis-targeting of a GitHub-mutating run is the risk) and makes cleanup a single `rm -rf /tmp/kilo/<repo-slug>`.
+
+Standard layout:
+
+```text
+/tmp/kilo/<repo-slug>/
+  ├─ driver.<ext>   # composed orchestration script for this run
+  ├─ bodies/        # rendered file bodies passed to tools (e.g. issue -BodyFile)
+  ├─ logs/          # trace / run logs
+  └─ diag/          # throwaway diagnostic / experiment scripts
+```
+
+- **Root is `/tmp/kilo/`** — the bash tool's pre-approved external-work directory. Scratch goes **under** it (not directly under `/tmp/<slug>/`), so there is no external-dir approval prompt and no collision with the OS `/tmp`.
+- **Create on demand** (`mkdir -p` / `New-Item -ItemType Directory -Force`). Never assume a previous run's scratch belongs to the current one — before reusing anything under `/tmp/kilo/`, confirm the slug matches the current repo.
+- **Durable artifacts are not scratch.** Trace logs worth keeping, fix write-ups, and decision records go under `docs/plans/`, not `/tmp/kilo/`.

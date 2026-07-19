@@ -1,5 +1,9 @@
 # AGENTS.md
 
+## Repository identity
+
+This repository — **`intel-agency/agent-context`** — is the **upstream GitHub template**: it is cloned to seed each downstream instance that houses a unique app plan and develops it. Any other repo name is a **clone instance** of this template, so when the user refers to "a downstream clone", "an instance", "the template", or names a different repo, treat it as a clone seeded from this one.
+
 ## Memory and Rules
 
 This project uses a dynamic memory and rules system under the `.agents/` directory — the **single source of truth** for project-specific decisions, conventions, and history.

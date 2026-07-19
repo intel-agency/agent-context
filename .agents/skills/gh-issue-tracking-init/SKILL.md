@@ -35,10 +35,29 @@ it is invoked from.
   different repo.
 - **Plan source** — a description of the epics/stories/tasks (a filled plan doc, or
   the user's description) that you map onto the four levels and the numbering scheme.
-  **Default when omitted:** all plan/app-plan documents under `plan_docs/` in the
-  workspace root (`glob plan_docs/**/*.md`). If `plan_docs/` is missing or empty, the
-  user must supply a plan source explicitly. When multiple files are found, confirm
-  the selection (or merge them in filename order) with the user before proceeding.
+  **Default when omitted:** resolve `plan_docs/**/*.md` non-interactively using
+  filename role classification (match any slug, word-boundary, case-insensitive):
+
+  - **Primary plan** → issue tree. Slugs: `development-plan`, `development plan`,
+    `app-plan`, `application-plan`, `implementation`, `implementation-spec`,
+    `implementation plan`, `specification`. Parse into plan→epic→story→task nodes.
+  - **Architecture** → context. Slugs: `architecture`, `architecture-guide`,
+    `architecture-plan`, `architecture overview`. Reference in the Plan body and
+    relevant epic bodies.
+  - **Reference / background** → context. Everything else (`strategic`,
+    `feasibility`, `vision`, `context`, `research`, …). Reference in the Plan body
+    only.
+
+  > Bare `plan` is NOT a primary slug — words like "execution plan" or "strategic plan" contain "plan" but are not development plans.
+
+  Resolution rules (deterministic; log the choice; never block except rule 5):
+  1. Exactly one primary plan → use it. Fold architecture + reference docs into the Plan body as supporting context.
+  2. No primary plan, one doc total → use that doc as the primary plan.
+  3. No primary plan, multiple docs → pick the doc with strongest task structure (count headings matching `^#+\s*(T-?\d+[-.]?\d*|Task\s|Phase\s|Story\s|Epic\s)`); tie-break by filename order.
+  4. Multiple primary plans → use the first in filename order; log rationale (never prompt).
+  5. Zero docs (`plan_docs/` missing or empty) → hard stop: require the user to supply a plan source explicitly.
+
+  The only case that prompts is an empty/missing `plan_docs/` with no plan supplied.
 
 ## Prerequisites
 
@@ -68,9 +87,12 @@ Work top-down. Always do a `-DryRun` pass first, show the plan, then apply.
 All scripts below live in this skill's `scripts/` directory.
 
 **Resolve inputs first.** If `$ghrepo` is not given, derive it from the current
-repo (see [Inputs](#inputs)). If no plan source is named, read every doc under
-`plan_docs/`. Only proceed once both are known — if either can't be resolved and
-the user hasn't supplied it, ask before doing anything.
+repo (see [Inputs](#inputs)). If no plan source is named, resolve it non-interactively
+from `plan_docs/` per the plan-doc set convention above — classify by filename role,
+use the primary plan as the node source, and fold the rest into the Plan body as
+supporting context. The only hard stop is an empty/missing `plan_docs/` with no plan
+supplied; everything else resolves automatically. **Do not prompt the user to choose
+between plan docs.**
 
 1. **Parse the plan** into a tree of nodes (plan, epics, stories, tasks) with the
    numbered titles above, plus per-node labels, milestone, phase, priority, estimate,
@@ -100,6 +122,22 @@ the user hasn't supplied it, ask before doing anything.
    (not automatable). Relay that to the user.
 
 ## Delegation performance (batching)
+
+### Scratch workspace — isolate the run under `/tmp/kilo/<repo-slug>/`
+
+A composed `gh-issue-tracking-init` run writes several artifacts: a PowerShell driver, rendered issue bodies, trace logs, and diagnostic scripts. Put them all under the per-repo scratch namespace from [`.agents/rules/tools.md`](../../rules/tools.md) — `/tmp/kilo/<repo-slug>/` — **not** loose in a flat `/tmp/kilo/`:
+
+```text
+/tmp/kilo/<repo-slug>/
+  ├─ driver.ps1   # the composed orchestration script (this section's output)
+  ├─ bodies/      # rendered issue bodies, passed to ensure-issue.ps1 -BodyFile
+  ├─ logs/        # trace / run logs
+  └─ diag/        # throwaway diagnostic / experiment scripts
+```
+
+This is repo-wide hygiene, not optional: a prior forensic run (`gap-miner-v2-charlie53`) left a stale, repo-hardcoded `gapminer-gh-init-driver.ps1` loose in `/tmp/kilo/`, which a later run could have mistaken for reusable and pointed at the wrong repo. **Create on demand** (`mkdir -p` / `New-Item -ItemType Directory -Force`), and before reusing anything under `/tmp/kilo/`, confirm the slug matches the current repo.
+
+### Compose a single orchestration script (never one op per LLM turn)
 
 When composing these scripts, do **not** invoke each op script as its own LLM turn
 (one script per reasoning step). That pattern has been **measured at ~77 minutes** for

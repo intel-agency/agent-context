@@ -1,12 +1,13 @@
+
 ---
 name: Story
 about: Create a detailed story for implementation
-title: 'Story <N>.<M>: '
-labels: ['story']
+title: 'Story: '
+labels: ['story', 'enhancement']
 assignees: []
 ---
 
-# Story <N>.<M>: [Story Name]
+# Story: [Story Name]
 
 ## Objective
 
@@ -36,13 +37,6 @@ assignees: []
 - [ ] Criterion 1: Specific, measurable condition that must be met
 - [ ] Criterion 2: Another specific, measurable condition
 - [ ] Criterion 3: Additional criteria as needed
-
-## Validation Plan
-
-[How the story's deliverables will be verified: which tests must pass, manual checks, and commands to run.]
-
-- [ ] Validation task
-- [ ] Validation task
 
 ## Validation Commands
 

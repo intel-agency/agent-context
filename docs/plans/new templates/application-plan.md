@@ -1,25 +1,22 @@
----
-name: Application Plan
-about: Top-level plan issue for a complete application
-title: 'Plan: '
-labels: ['plan']
-assignees: []
+>Title: [ProjectName] – Complete Implementation (Application Plan)
+
+>Labels: plan, design, architecture
+
+>Assignees: [owner]
+
 ---
 
-# Plan: [ProjectName] – Complete Implementation
+# [ProjectName] – Complete Implementation
 
 ## Overview
-
 Provide a concise summary of the application, the problem it solves, the desired outcomes, and links to the filled-out template (docs/ai-new-app-template.md) and any supporting docs.
 
 ## Goals
-
 - [Goal 1]
 - [Goal 2]
 
 ## Technology Stack
-
-- Language: [e.g., C# .NET 10.0]
+- Language: [e.g., C# .NET 9.0]
 - UI Framework: [e.g., Avalonia/Blazor/etc.]
 - AI/Runtime: [e.g., ONNX Runtime / Azure OpenAI / etc.]
 - Architecture: [e.g., RAG / MCP / Microservices]
@@ -28,7 +25,6 @@ Provide a concise summary of the application, the problem it solves, the desired
 - Containerization/Infra: [e.g., Docker, Compose, Terraform]
 
 ## Application Features
-
 - [Feature 1]
 - [Feature 2]
 - [Feature 3]
@@ -36,16 +32,13 @@ Provide a concise summary of the application, the problem it solves, the desired
 ## System Architecture
 
 ### Core Services (if applicable)
-
 1. [ServiceName] — responsibility summary
 2. [ServiceName] — responsibility summary
 
 ### Key Features (system-level)
-
 - [Key feature/capability]
 
 ## Project Structure
-
 ```
 [ProjectName]/
 ├─ src/
@@ -65,59 +58,59 @@ Provide a concise summary of the application, the problem it solves, the desired
 
 ## Implementation Plan
 
-### Epic 1: Foundation & Setup
+### Phase 1: Foundation & Setup
+- [ ] 1.1. Repository and solution bootstrap
+- [ ] 1.2. Core dependencies and configuration
+- [ ] 1.3. Runtime/Model initialization (if AI)
+- [ ] 1.4. Data/Knowledge base foundation (if RAG)
+- [ ] 1.5. Basic content processing/indexing (if applicable)
 
-- [ ] Story 1.1: Repository and solution bootstrap
-- [ ] Story 1.2: Core dependencies and configuration
-- [ ] Story 1.3: Runtime/Model initialization (if AI)
-- [ ] Story 1.4: Data/Knowledge base foundation (if RAG)
-- [ ] Story 1.5: Basic content processing/indexing (if applicable)
+### Phase 2: Core Services / Core Engine
 
-### Epic 2: Core Services / Core Engine
+#### Epic 2.1: Core Module/Service A
 
-#### Story 2.1: Core Module/Service A
+- [ ] 2.1. Implement core module/service A
+   - [ ] 2.1.1. Sub-task A
+   - [ ] 2.1.2. Sub-task B
 
-- [ ] Task 2.1.1: Sub-task A
-- [ ] Task 2.1.2: Sub-task B
+#### Epic 2.2: Core Module/Service B
 
-#### Story 2.2: Core Module/Service B
+- [ ] 2.2. Implement core module/service B
 
-### Epic 3: UI/UX & Integration
+### Phase 3: UI/UX & Integration
 
-- [ ] Story 3.1: UI foundation and navigation
-- [ ] Story 3.2: ViewModels/State management
-- [ ] Story 3.3: Primary user flows (chat/task/…)
-- [ ] Story 3.4: Async ops, cancellation, error handling
-- [ ] Story 3.5: Settings/configuration
+#### Epic 3.1: UI Foundation
 
-### Epic 4: Advanced Capabilities & Security
+- [ ] 3.1. UI foundation and navigation
+- [ ] 3.2. ViewModels/State management
+- [ ] 3.3. Primary user flows (chat/task/…)
+- [ ] 3.4. Async ops, cancellation, error handling
+- [ ] 3.5. Settings/configuration
 
-- [ ] Story 4.1: Tooling/Function calling/Agentic features (if applicable)
-- [ ] Story 4.2: Human-in-the-loop approval and auditing
-- [ ] Story 4.3: Performance optimizations and caching
-- [ ] Story 4.4: Observability and dashboards
+### Phase 4: Advanced Capabilities & Security
 
-### Epic 5: Testing, Docs, Packaging & Deployment
+#### Epic 4.1: Tooling & Agentic Features
 
-- [ ] Story 5.1: Test suites (unit/integration/e2e/perf)
-- [ ] Story 5.2: API/Developer documentation
-- [ ] Story 5.3: Containerization/installer packaging
-- [ ] Story 5.4: IaC/Environments/CI-CD pipelines
-- [ ] Story 5.5: Final hardening and release checklist
+- [ ] 4.1. Tooling/Function calling/Agentic features (if applicable)
+- [ ] 4.2. Human-in-the-loop approval and auditing
+- [ ] 4.3. Performance optimizations and caching
+- [ ] 4.4. Observability and dashboards
 
-## Validation Plan
+### Phase 5: Testing, Docs, Packaging & Deployment
 
-[Overall validation strategy for the application: how each epic and its stories will be verified, including test pyramid coverage, integration points, and release-gating criteria.]
+#### Epic 5.1: Testing & Quality Assurance
 
-- [ ] Validation task
-- [ ] Validation task
+- [ ] 5.1. Test suites (unit/integration/e2e/perf)
+- [ ] 5.2. API/Developer documentation
+- [ ] 5.3. Containerization/installer packaging
+- [ ] 5.4. IaC/Environments/CI-CD pipelines
+- [ ] 5.5. Final hardening and release checklist
 
 ---
 
 ## Mandatory Requirements Implementation
 
 ### Testing & Quality Assurance
-
 - [ ] Unit tests — coverage target: [e.g., 80%+]
 - [ ] Integration tests
 - [ ] E2E tests
@@ -125,7 +118,6 @@ Provide a concise summary of the application, the problem it solves, the desired
 - [ ] Automated tests in CI
 
 ### Documentation & UX
-
 - [ ] Comprehensive README
 - [ ] User manual and feature docs
 - [ ] XML/API docs (public APIs)
@@ -133,7 +125,6 @@ Provide a concise summary of the application, the problem it solves, the desired
 - [ ] In-app help (if applicable)
 
 ### Build & Distribution
-
 - [ ] Build scripts
 - [ ] Containerization support (if relevant)
 - [ ] Installer packaging (if desktop)
@@ -148,7 +139,6 @@ Provide a concise summary of the application, the problem it solves, the desired
 ---
 
 ## Acceptance Criteria
-
 - [ ] Core architecture implemented and components communicate as designed
 - [ ] Key features/functionality work end-to-end
 - [ ] Observability/logging in place with actionable signals
@@ -158,19 +148,17 @@ Provide a concise summary of the application, the problem it solves, the desired
 - [ ] Documentation complete and accurate
 
 ## Risk Mitigation Strategies
-
 | Risk | Mitigation |
 |------|------------|
 | [Risk 1] | [Mitigation 1] |
 | [Risk 2] | [Mitigation 2] |
 
 ## Timeline Estimate
-
-- Epic 1: [x–y] weeks
-- Epic 2: [x–y] weeks
-- Epic 3: [x–y] weeks
-- Epic 4: [x–y] weeks
-- Epic 5: [x–y] weeks
+- Phase 1: [x–y] weeks
+- Phase 2: [x–y] weeks
+- Phase 3: [x–y] weeks
+- Phase 4: [x–y] weeks
+- Phase 5: [x–y] weeks
 - Total: [x–y] weeks
 
 ## Success Metrics
