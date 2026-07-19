@@ -6,12 +6,16 @@ Current project and its sub-work items that we are working on actively. This sec
 
 ### Project: Template-repo content strategy
 
-- **`gh-issue-tracking-init` no-arg defaults** (2026-07-18): Made defaults explicit in the skill — `$ghrepo` defaults to the current repo (`gh repo view --json nameWithOwner`); plan source defaults to all docs under `plan_docs/`. Updated `SKILL.md` (Inputs + orchestration preface) and `README.md`. Defaults are Class 1 (context-neutral) — see plan below.
+- **`gh-issue-tracking-init` no-arg defaults** (2026-07-18): Made defaults explicit in the skill — `$ghrepo` defaults to the current repo (`gh repo view --json nameWithOwner`); plan source resolves **non-interactively** from `plan_docs/` by filename role (primary/architecture/reference), with an empty/missing `plan_docs/` as the only hard stop. Updated `SKILL.md` (Inputs + orchestration preface) and `README.md`. The earlier "defaults to all docs / confirm with user" wording was a defect (prompted interactively in downstream test); replaced by the deterministic resolver — see completed item below.
 - **Template vs. clone content strategy** (2026-07-18): Authored [`docs/plans/template-content-strategy.md`](../docs/plans/template-content-strategy.md) — two-class model (Class 1 reusable infra travels; Class 2 template-self-referential state must be reset on clone / filtered on back-flow). Three work items: W1 post-clone reset step in the project-creation flow, W2 back-flow discipline (port Class 1 only), W3 marker convention. Not yet implemented; `run-issues-review/` Gap Mining doc flagged as existing Class-2 contamination. Added a *GitHub template-repo capabilities* section (researched vs. official docs): no exclusion mechanism, no post-clone hook, only the file tree copies (no labels/issues/Projects) → reset must be our own seeding workflow; only platform-native alternative is storing Class-2 off the default branch.
 
 #### Work Items
 
 ## Completed Work Items
+
+### Project: gh-issue-tracking-init plan-source auto-resolution (2026-07-18)
+
+Applied the plan documented in [`docs/plans/.completed/gh-issue-tracking-plan-source-resolution.md`](../docs/plans/.completed/gh-issue-tracking-plan-source-resolution.md). Downstream template-clone test revealed the skill was stopping to ask "which plan doc?" between a development plan and a reference doc — a defect for a non-interactive skill. Fix (commits `9a0cf01` + `1e516a8`): replaced the "confirm the selection (or merge) with the user" default in `SKILL.md` Inputs and the "ask before doing anything" orchestration preface with a deterministic filename-role resolver (primary → issue tree; architecture/reference → Plan-body context; empty `plan_docs/` is the only hard stop). Mirrored in `README.md`. Prose-only; Pester 46/46 green; both edited files markdownlint-clean.
 
 ### Project: gh-issue-tracking-init driver fixes + Gap Mining hierarchy recovery (2026-07-16)
 
