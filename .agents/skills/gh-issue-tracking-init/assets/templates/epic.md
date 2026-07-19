@@ -9,15 +9,19 @@ assignees: []
 # Epic <N>: [Epic Name]
 
 ## Overview
+
 Provide a concise summary of the epic, the problem it solves, the component it lives in, and the desired outcomes.
 
 ## Project
+
 Project containing the component.
 
 ## Component
+
 Component the epic lives in.
 
 ## Goals
+
 - [Goal 1]
 - [Goal 2]
 
@@ -34,16 +38,20 @@ Component the epic lives in.
 - Containerization/Infra: [e.g., Docker, Compose, Terraform]
 
 ## Epic Stories
+
 - [Story 1]
 - [Story 2]
 - [Story 3]
 
 ## Component Architecture
+
 ### Core Services (if applicable)
+
 1. [ServiceName] — responsibility summary
 2. [ServiceName] — responsibility summary
 
 ### Key Tasks (system-level)
+
 - [Key task/capability]
 
 ## Project Structure Area
@@ -70,6 +78,7 @@ Component the epic lives in.
 ## Implementation Plan
 
 ### Story 1: Foundation & Setup
+
 - [ ] 1.1. Repository and solution bootstrap
 - [ ] 1.2. Core dependencies and configuration
 - [ ] 1.3. Runtime/Model initialization (if AI)
@@ -77,6 +86,7 @@ Component the epic lives in.
 - [ ] 1.5. Basic content processing/indexing (if applicable)
 
 ### Story 2: Core Services / Core Engine
+
 - [ ] 2.1. Implement core module/service A
   - [ ] 2.1.1. Sub-task A
   - [ ] 2.1.2. Sub-task B
@@ -165,6 +175,7 @@ Component the epic lives in.
 | [Risk 2] | [Mitigation 2] |
 
 ## Timeline Estimate
+
 - Story 1: [x–y] weeks
 - Story 2: [x–y] weeks
 - Story 3: [x–y] weeks
@@ -173,12 +184,15 @@ Component the epic lives in.
 - Total: [x–y] weeks
 
 ## Success Metrics
+
 - [Metric 1]
 - [Metric 2]
 - [Metric 3]
 
 ## Repository Branch
+
 Target branch for implementation: [e.g., copilot/[project-slug]]
 
 ## Implementation Notes
+
 Key assumptions, adaptations, and references to technical docs or ADRs.

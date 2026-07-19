@@ -46,8 +46,6 @@ assignees: []
 
 ## Validation Commands
 
-
-
 ## Dependencies
 
 ### Related Issues
