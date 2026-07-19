@@ -123,6 +123,22 @@ between plan docs.**
 
 ## Delegation performance (batching)
 
+### Scratch workspace — isolate the run under `/tmp/kilo/<repo-slug>/`
+
+A composed `gh-issue-tracking-init` run writes several artifacts: a PowerShell driver, rendered issue bodies, trace logs, and diagnostic scripts. Put them all under the per-repo scratch namespace from [`.agents/rules/tools.md`](../../rules/tools.md) — `/tmp/kilo/<repo-slug>/` — **not** loose in a flat `/tmp/kilo/`:
+
+```text
+/tmp/kilo/<repo-slug>/
+  ├─ driver.ps1   # the composed orchestration script (this section's output)
+  ├─ bodies/      # rendered issue bodies, passed to ensure-issue.ps1 -BodyFile
+  ├─ logs/        # trace / run logs
+  └─ diag/        # throwaway diagnostic / experiment scripts
+```
+
+This is repo-wide hygiene, not optional: a prior forensic run (`gap-miner-v2-charlie53`) left a stale, repo-hardcoded `gapminer-gh-init-driver.ps1` loose in `/tmp/kilo/`, which a later run could have mistaken for reusable and pointed at the wrong repo. **Create on demand** (`mkdir -p` / `New-Item -ItemType Directory -Force`), and before reusing anything under `/tmp/kilo/`, confirm the slug matches the current repo.
+
+### Compose a single orchestration script (never one op per LLM turn)
+
 When composing these scripts, do **not** invoke each op script as its own LLM turn
 (one script per reasoning step). That pattern has been **measured at ~77 minutes** for
 roughly the first 40% of a 30-issue hierarchy — the per-turn overhead dominates the
