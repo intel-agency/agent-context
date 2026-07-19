@@ -46,7 +46,7 @@ Provide a concise summary of the application, the problem it solves, the desired
 
 ## Project Structure
 
-```
+```text
 [ProjectName]/
 ├─ src/
 │  ├─ [Project].Core/
@@ -64,6 +64,8 @@ Provide a concise summary of the application, the problem it solves, the desired
 ---
 
 ## Implementation Plan
+
+<!-- REQUIRED: every story/task entry below MUST carry its numeric triple-octet identifier verbatim (Epic <N>:, Story <N>.<M>:, Task <N>.<M>.<K>:). Plain-text bullets without identifiers are never acceptable in child-issue lists. -->
 
 ### Epic 1: Foundation & Setup
 
@@ -174,12 +176,11 @@ Provide a concise summary of the application, the problem it solves, the desired
 - Total: [x–y] weeks
 
 ## Success Metrics
+
 - [Metric 1]
 - [Metric 2]
 - [Metric 3]
 
-## Repository Branch
-Target branch for implementation: [e.g., copilot/[project-slug]]
-
 ## Implementation Notes
+
 Key assumptions, adaptations, and references to technical docs or ADRs.

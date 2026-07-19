@@ -20,6 +20,8 @@
 
 - Create a pull request for each branch.
 - Use a descriptive title and description that reflects the work being done.
+- **Always set a milestone** when creating a pull request.
+- **Always set the project** (assign to the active Projects v2 board) when creating a pull request.
 - Request a review from the appropriate team member before merging.
 - Once reviews have left comments, address all comments before merging.
 - For each comment that is addressed, leave a comment explaining the resolution and mark the thread as RESOLVED state.
