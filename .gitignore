@@ -1,2 +1,5 @@
 # Kilo agent session state
 .kilo/
+
+# gh-issue-tracking-init forensic run logs (one timestamped file per run)
+gh-init-*.log
