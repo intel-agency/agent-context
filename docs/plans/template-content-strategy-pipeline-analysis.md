@@ -19,15 +19,18 @@ cloning pipeline already does. I examined:
 
 ### Key findings
 
-1. **W1 steps 4–5 are already handled**, directly contradicting the "Current state"
-   section's claim that "no reset/cleanup step exists in the project-creation flow
-   today":
+1. **W1 step 4 is already handled; W1 step 5 is broken.**
    - **Step 4 (seed plan docs):** `Copy-PlanDocs` in the main script copies
-     `plan_docs/<slug>/*` into `plan_docs/` on the clone.
-   - **Step 5 (build hierarchy):** triggerable via `-TriggerProjectSetup $True`
-     (default), which creates a dispatch issue invoking
-     `/orchestrate-dynamic-workflow $workflow_name = project-setup`, which runs
-     `gh-issue-tracking-init`.
+     `plan_docs/<slug>/*` into `plan_docs/` on the clone. ✅
+   - **Step 5 (build hierarchy):** the `-TriggerProjectSetup $True` path (default)
+     currently calls `trigger-project-setup.ps1`, which dispatches
+     `/orchestrate-dynamic-workflow $workflow_name = project-setup` — an
+     orchestrator workflow ported from a prior template that is largely
+     incompatible with `agent-context`'s new structure. The user passes
+     `-TriggerProjectSetup $False` to bypass it entirely. **Needs replacement:**
+     the trigger should invoke `/gh-issue-tracking-init` directly (no args — its
+     defaults resolve to the current repo + seeded `plan_docs/`, exactly the
+     post-clone state).
 
 2. **W1 steps 1–3 are NOT handled** — verified in gap-miner-v2-delta12:
    - `.agents/memory.md` carries the template's entire `Current Activity` block
@@ -56,12 +59,12 @@ cloning pipeline already does. I examined:
    - It already owns placeholder replacement and the (partially-broken) AGENTS.md
      rewrite — same kind of "post-clone cleanup" operation.
    - It has full local filesystem access to the clone before the first commit.
-   - It runs before the project-setup orchestrator (which needs labels/issues to
-     exist), so cleanup must precede seeding.
-   - The project-setup orchestrator then sees a clean instance and focuses on
-     hierarchy + label bootstrap.
-   Adding the reset in the orchestrator would be late (it operates via GitHub
-   Issues/PRs on a repo that has already been pushed with Class-2 content).
+   - It runs before any follow-up orchestrator/skill trigger, so cleanup must
+     precede seeding and hierarchy-building.
+   - The `gh-issue-tracking-init` skill then sees a clean instance with
+     `plan_docs/` already seeded and builds the hierarchy.
+   Adding the reset in the post-creation trigger would be late (it operates via
+   GitHub Issues/PRs on a repo that has already been pushed with Class-2 content).
 
 5. **W3 marker convention resolved.** Well-known paths suffice —
    `.agents/memory.md`, `docs/plans/.completed/`, `docs/plans/.deferred/`, and a
@@ -96,22 +99,30 @@ matters: delete first, then replace):
     `docs/plans/.completed/run-issues-review/` subtree (or, more generally, any
     subdirectory under `.completed/` whose name ends in `-review/`).
   - **W1.4 (already done):** `Copy-PlanDocs` — keep as-is.
-  - **W1.5 (already done externally):** project-setup orchestration trigger —
-    keep as-is.
+- **W1.5 (BROKEN — needs replacement):** `-TriggerProjectSetup $True` currently
+    dispatches `/orchestrate-dynamic-workflow $workflow_name = project-setup` via
+    `trigger-project-setup.ps1`. This orchestrator was ported from a prior
+    template and is incompatible with `agent-context`'s new structure (the user
+    already bypasses it with `-TriggerProjectSetup $False`). Replace the trigger
+    body so it creates a dispatch issue invoking `/gh-issue-tracking-init`
+    directly (no args — its defaults resolve to the current repo + seeded
+    `plan_docs/`). The `$TriggerProjectSetup` parameter name becomes stale and
+    should be renamed (e.g. `$TriggerHierarchyInit` or `$TriggerTrackingInit`)
+    to reflect the new target.
 
 **In `nam20485/workflow-launch2/scripts/create-repo-with-plan-docs.ps1`** — fix
 the AGENTS.md rewrite anchor:
 
-  - Change `$oldLabel = '**GitHub template repo**'` → the text that actually
+- Change `$oldLabel = '**GitHub template repo**'` → the text that actually
     appears in the template AGENTS.md, or (more durable) anchor on the full first
     paragraph and rewrite it with clone-aware wording.
 
 **In this template repo (`intel-agency/agent-context`):**
 
-  - Update `docs/plans/.deferred/template-content-strategy.md` with the new
+- Update `docs/plans/.deferred/template-content-strategy.md` with the new
     *Cloning pipeline capabilities* and revised *Current state* sections (text
     provided below under "Implementation tasks").
-  - Update the template AGENTS.md first-paragraph wording so the script's anchor
+- Update the template AGENTS.md first-paragraph wording so the script's anchor
     matches deterministically (preferred), **or** update the script's `$oldLabel`
     literal to match the current AGENTS.md wording (cheaper but fragile).
 
@@ -132,32 +143,59 @@ the AGENTS.md rewrite anchor:
    W1.2 (template plans) → W1.1 (memory reset), all BEFORE `Copy-PlanDocs` and
    placeholder replacement, so replacement doesn't touch files we're about to
    delete.
-3. **Update the deferred strategy doc** — replace the *Current state* section and
+3. **Fix the AGENTS.md rewrite anchor (W1.4)** — apply the strategy chosen in
+   step 1.
+4. **Replace the broken post-creation trigger (W1.5):**
+   - In `trigger-project-setup.ps1` (or a replacement script), change the
+     dispatch-issue body from:
+
+     ```
+     /orchestrate-dynamic-workflow
+     $workflow_name = project-setup
+     ```
+
+     to:
+
+     ```
+     /gh-issue-tracking-init
+     ```
+
+     (no args — defaults resolve to the clone + `plan_docs/`).
+   - Rename the caller's parameter from `$TriggerProjectSetup` to something that
+     matches the new target (e.g. `$TriggerHierarchyInit`).
+   - Update `create-repo-with-plan-docs.ps1` to use the new parameter name and
+     call the updated trigger script.
+   - The bootstrap-labels path (`Ensure-DispatchBootstrapLabel` using
+     `orchestration:dispatch` label) can stay — it's the dispatch mechanism, not
+     the target.
+5. **Update the deferred strategy doc** — replace the *Current state* section and
    add a *Cloning pipeline capabilities* section (full text below).
-4. **Write a dry-run/throwaway-clone test plan** — once script changes land,
+6. **Write a dry-run/throwaway-clone test plan** — once script changes land,
    verify step-by-step against a throwaway clone that memory is blank,
    `docs/plans/.completed/` and `.deferred/` are empty (dirs preserved),
    `run-issues-review/` is gone, AGENTS.md first paragraph correctly says
-   "project instance" not "upstream GitHub template".
-5. **Document back-flow discipline (W2)** — optionally extract into a rules file
+   "project instance" not "upstream GitHub template", **and** that the dispatch
+   issue created by the trigger targets `/gh-issue-tracking-init` (not
+   `/orchestrate-dynamic-workflow`).
+7. **Document back-flow discipline (W2)** — optionally extract into a rules file
    (e.g. `.agents/rules/source-control.md` addendum) so the discipline is
    referenced where it's applied. Not blocking for W1.
 
 ### Risk / open question
 
-- **What if the orchestrator flow (`project-setup`) changes?** W1 cleanup is
-  now in the creation script, so the orchestrator can evolve independently. This
-  is actually safer than having the orchestrator do cleanup, because the
-  orchestrator depends on issues/labels already existing.
-- **What if a future clone invocation uses `-TriggerProjectSetup $False`**
-  (as in the user's example invocation)? The cleanup still runs (it's in the
-  script, not the orchestrator), so the clone is in a clean state regardless —
-  just without the issue hierarchy built yet. That's correct behavior.
+- **What about a future clone invocation that passes `-TriggerHierarchyInit $False`** (or whatever the renamed parameter becomes)? The cleanup still runs (it's in the script, not the trigger), so the clone is in a clean state — just without the issue hierarchy built yet. That's correct behavior.
 - **What about clones created via "Use this template" directly in GitHub UI,
   bypassing the script entirely?** Those would still carry Class-2 content.
   Mitigation: document in AGENTS.md that instances seeded via the UI must run
   a manual reset step, and point to the creation script as the canonical
   seeding path. (Open question: add this note?)
+- **`trigger-project-setup.ps1` — delete or rename?** After step 4 of the task
+  list, the existing `trigger-project-setup.ps1` is dead code (it only knew how
+  to dispatch the old orchestrator). Two choices: (a) rewrite its body in-place
+  with the new `/gh-issue-tracking-init` dispatch, or (b) delete it and create a
+  new `trigger-gh-issue-tracking-init.ps1` with a clean name. Recommend **(b)**
+  — the old name is misleading and the old parameter `$TriggerProjectSetup` is
+  stale; starting fresh avoids ambiguity.
 
 ---
 
@@ -211,7 +249,7 @@ Typical invocation:
 | **Name placeholder replace** | `Update-TemplatePlaceholders` replaces every occurrence of the template repo name and owner in file contents *and* filenames; asserts zero remaining matches |
 | **AGENTS.md semantic rewrite** | Targets `**GitHub template repo**` and replaces with `**project instance** cloned from ... template` (**see bug noted under W1 — anchor literal currently mismatches**) |
 | Commit + push | Single seed commit; handles template-race rebase by re-running all of the above after `pull --rebase` |
-| Trigger project-setup | When `-TriggerProjectSetup $True` (default), creates an `orchestration:dispatch` issue invoking `/orchestrate-dynamic-workflow $workflow_name = project-setup`, which runs `gh-issue-tracking-init` (**W1 step 5**, external) |
+| **Trigger follow-up workflow (W1.5) — BROKEN** | When `-TriggerProjectSetup $True` (default), the script calls `trigger-project-setup.ps1` which creates an `orchestration:dispatch` issue invoking `/orchestrate-dynamic-workflow $workflow_name = project-setup`. **Problem:** this orchestrator was ported from a different template and is largely incompatible with `agent-context`'s new structure. The user's example invocation explicitly passes `-TriggerProjectSetup $False` to bypass it. Needs to be replaced with a dispatch that invokes `/gh-issue-tracking-init` directly (no args — its defaults resolve to the current repo + seeded `plan_docs/`). |
 
 **Verified against a real cloned instance**
 ([`intel-agency/gap-miner-v2-delta12`](https://github.com/intel-agency/gap-miner-v2-delta12),
@@ -224,9 +262,17 @@ but Class-2 material described in W1 steps 1–3 survives verbatim.
 ````markdown
 ## Current state (verified 2026-07-19)
 
-- **W1 step 4 (seed plan docs) and step 5 (build hierarchy) are handled** — by
-  `Copy-PlanDocs` in the creation script and by `gh-issue-tracking-init` in the
-  orchestration workflow respectively.
+- **W1 step 4 (seed plan docs) is handled** by `Copy-PlanDocs` in the creation
+  script.
+- **W1 step 5 (build hierarchy) trigger is broken.** `-TriggerProjectSetup $True`
+  dispatches `/orchestrate-dynamic-workflow $workflow_name = project-setup` — a
+  project-setup orchestrator ported from a prior template that is largely
+  incompatible with `agent-context`'s new structure. The user already bypasses
+  this with `-TriggerProjectSetup $False`. Needs to be replaced with a dispatch
+  that invokes `/gh-issue-tracking-init` directly (no args — its defaults
+  resolve to the current repo + seeded `plan_docs/`, exactly the post-clone
+  state). The `$TriggerProjectSetup` parameter name is also stale and should be
+  renamed.
 - **W1 steps 1–3 are NOT handled** — verified in
   `intel-agency/gap-miner-v2-delta12`:
   - `.agents/memory.md` carries the full template `Current Activity` (including
@@ -261,9 +307,9 @@ but Class-2 material described in W1 steps 1–3 survives verbatim.
 ### W1 — Post-clone reset step (additions to the creation script)
 
 The creation script (`create-repo-with-plan-docs.ps1`) already handles W1 step
-4 (seed plan docs via `Copy-PlanDocs`) and triggers W1 step 5 (build hierarchy
-via the project-setup orchestrator + `gh-issue-tracking-init`). The remaining
-cleanup work — Class-2 removal — belongs in the same script, ordered BEFORE
+4 (seed plan docs via `Copy-PlanDocs`). Step 5 (build hierarchy) currently
+dispatches an incompatible orchestrator and needs replacement. The remaining
+cleanup work — Class-2 removal — also belongs in the same script, ordered BEFORE
 `Copy-PlanDocs` and placeholder replacement (so replacement doesn't waste cycles
 on files we're about to delete).
 
@@ -290,7 +336,21 @@ Add the following steps to `create-repo-with-plan-docs.ps1`:
    The rewrite must land so cloned-instance AGENTS.md no longer claims to be the
    upstream template.
 
-Open: decide the anchor strategy (a vs. b) before implementing W1.4.
+**Replace the broken post-creation trigger (W1.5):**
+
+5. **W1.5 Replace hierarchy-init trigger** — `-TriggerProjectSetup $True`
+   currently dispatches `/orchestrate-dynamic-workflow $workflow_name = project-setup`
+   via `trigger-project-setup.ps1`. That orchestrator was ported from a prior
+   template and is incompatible with `agent-context`'s new structure (the user
+   already bypasses it with `-TriggerProjectSetup $False`). Replace the trigger
+   body so the dispatch issue invokes `/gh-issue-tracking-init` directly (no
+   args — its no-arg defaults resolve to the current repo + seeded `plan_docs/`).
+   Rename the caller's parameter from `$TriggerProjectSetup` to something that
+   matches the new target (e.g. `$TriggerHierarchyInit`). Delete the stale
+   `trigger-project-setup.ps1` and create a fresh
+   `trigger-gh-issue-tracking-init.ps1` with a clean name.
+
+Open: decide the anchor strategy (a vs. b) for W1.4 before implementing.
 ````
 
 ### Recommended resolution for W3
@@ -336,6 +396,11 @@ Replace the existing list with:
   instance created via "Use this template" directly in the GitHub UI — i.e.
   bypassing the creation script entirely? Not strictly required by W1 but the
   gap is real.
+- **Hierarchy-init trigger parameter name**: the existing `-TriggerProjectSetup`
+  parameter is stale (the "project-setup" orchestrator it dispatches is dead
+  code). The new trigger targets `/gh-issue-tracking-init` directly. Candidate
+  names: `-TriggerHierarchyInit`, `-TriggerTrackingInit`, `-TriggerGhInit`.
+  Pick before implementing W1.5.
 ````
 
 ---
@@ -343,7 +408,7 @@ Replace the existing list with:
 ## Validation
 
 - Run `npx --no-install markdownlint-cli2` on the updated strategy doc.
-- Once W1.1–W1.4 land in the creation script, verify against a throwaway clone
+- Once W1.1–W1.5 land in the creation script, verify against a throwaway clone
   that:
   - `memory.md` is a blank skeleton (only section headers; no Current Activity
     items).
@@ -352,5 +417,7 @@ Replace the existing list with:
   - `run-issues-review/` is gone.
   - Cloned AGENTS.md first paragraph correctly says "project instance" (not
     "upstream GitHub template") and names the new repo.
+  - With the new trigger on, a dispatch issue is created with body
+    `/gh-issue-tracking-init` (not `/orchestrate-dynamic-workflow`).
   - `gh-issue-tracking-init` with no args resolves to the clone + its seeded
     `plan_docs/` (no regression from adding cleanup earlier in the pipeline).
