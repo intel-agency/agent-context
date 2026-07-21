@@ -278,7 +278,7 @@ and invoking the existing wrapper:
 
 ```pwsh
 ./scripts/create-repo-from-slug.ps1 `
-    -Slug "<legacy-slug>" -TemplateRepoName "ai-new-workflow-app-template" `
+    -Slug "{legacy-slug}" -TemplateRepoName "ai-new-workflow-app-template" `
     -Yes
 ```
 
