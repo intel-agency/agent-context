@@ -6,3 +6,9 @@ gh-init-*.log
 
 # Local-only GPG signing notes (contains workflow/secrets guidance, not for commit)
 docs/gpg-non-interactive-signing.md
+
+# Test result artifacts
+testResults.xml
+
+# Scratch / temporary issue-body files
+scripts/tmp-*.txt
