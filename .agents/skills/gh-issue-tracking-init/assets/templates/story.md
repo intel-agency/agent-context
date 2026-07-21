@@ -21,12 +21,27 @@ assignees: []
 
 ### Out of Scope
 
-- [What is explicitly excluded from this story]
-- [Features deferred to other stories]
+<!-- List only out-of-scope items SPECIFIC to this story. If there are none specific to this story (the common case), OMIT this "### Out of Scope" sub-heading entirely rather than inserting the phrase "Features deferred to other stories" or any other generic placeholder. -->
+
+- [Out-of-scope item specific to THIS story, or omit the sub-heading entirely]
 
 ## Plan
 
 <!-- REQUIRED: when a plan entry corresponds to a child issue (a Task), it MUST carry its numeric triple-octet identifier verbatim — Task <N>.<M>.<K>: <Name>. Pure implementation sub-steps that are NOT separate issues may use plain bullets. -->
+
+### Implementation approach
+
+<!-- If the plan provides an inline code/config snippet for this task (a `Reference:` block, or equivalent), reproduce it VERBATIM in a fenced code block with the matching language tag (```xml, ```csharp, ```sql, etc.) under a `#### Reference (from plan T-x.y)` sub-heading. Then list only concrete, task-specific implementation steps derived from this task's acceptance criteria. Omit this subsection entirely if the plan provides neither a snippet nor task-specific steps for this story — do not fill it with generic "Implement / Add tests / Verify" boilerplate. -->
+
+#### Reference (from plan T-x.y)
+
+<!-- Verbatim snippet in a fenced block with the correct language tag. Omit this sub-heading if the task has no plan-provided snippet. -->
+
+```text
+[verbatim code/config snippet from the plan, or omit this sub-heading]
+```
+
+### Tasks
 
 - [ ] Task <N>.<M>.<K>: Description of first task
 - [ ] Task <N>.<M>.<K>: Description of second task
@@ -47,6 +62,8 @@ assignees: []
 - [ ] Validation task
 
 ## Validation Commands
+
+<!-- Only include commands that are actually runnable for THIS story in its current state (e.g. `dotnet build src/MyProject.Domain` for a domain-layer story). Omit this section entirely if no story-specific command yet exists (e.g. bootstrap stories with no test project). Do not insert `dotnet build` / `dotnet test` generically — that is filler that misleads when the project does not yet exist. -->
 
 ## Dependencies
 
@@ -108,7 +125,9 @@ assignees: []
 
 ## Implementation Notes
 
-[Space for additional technical details, constraints, design decisions, or considerations that will guide implementation]
+<!-- Task-specific technical notes, constraints, or design decisions only. Omit this section entirely if there are none — do not append generic global-policy boilerplate (Conventional Commits, CancellationToken rules, no-hardcoded-secrets). Those belong on the Plan body's Development Standards section, not on each story. -->
+
+[Task-specific technical details, or omit this section entirely]
 
 ## Related Documentation
 
