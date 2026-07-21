@@ -353,7 +353,7 @@ any `gh` create call):
 # Group by Level so siblings are only compared to siblings (stories vs. stories, epics vs. epics).
 $byLevel = $bodies | Group-Object Level
 foreach ($group in $byLevel) {
-    $sectionHashes = @{}   # key = "depth|bodyHash" -> @{ Heading = ...; Titles = ... }
+    $sectionHashes = @{}   # key = "depth|heading|bodyHash" -> @{ Heading = ...; Titles = ... }
     $hasher = [System.Security.Cryptography.SHA256]::Create()
     # Defined once per group: PowerShell resolves $b, $currentHeading, etc. via dynamic
     # scoping at call time, so the script block is independent of where it is defined.
@@ -363,14 +363,16 @@ foreach ($group in $byLevel) {
             if (-not [string]::IsNullOrWhiteSpace($bodyText)) {
                 $sha = $hasher.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($bodyText))
                 $hash = [System.BitConverter]::ToString($sha).Replace('-','').Substring(0,16)
-                $key  = "$currentDepth|$hash"
+                $key  = "$currentDepth|$currentHeading|$hash"
                 if (-not $sectionHashes.ContainsKey($key)) {
                     $sectionHashes[$key] = [pscustomobject]@{
                         Heading = $currentHeading
                         Titles  = New-Object System.Collections.Generic.List[string]
                     }
                 }
-                [void]$sectionHashes[$key].Titles.Add($b.Title)
+                if (-not $sectionHashes[$key].Titles.Contains($b.Title)) {
+                    [void]$sectionHashes[$key].Titles.Add($b.Title)
+                }
             }
         }
     }
