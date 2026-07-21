@@ -89,11 +89,15 @@ function Get-JsonProp {
 Initialize-Auth -DryRun:$DryRun
 
 # Collect requested single-select assignments (only those actually supplied).
+# Use $PSBoundParameters.ContainsKey(...) rather than `$null -ne $X` guards:
+# an unbound [string] parameter defaults to an empty string, not $null, so the
+# $null -ne guard passes spuriously and emits spurious "Field 'X' not found"
+# warnings (the Phase/Priority/Status/Level bug reported from the india89 run).
 $singleSelect = [ordered]@{}
-if ($null -ne $Level) { $singleSelect['Level'] = $Level }
-if ($null -ne $Priority) { $singleSelect['Priority'] = $Priority }
-if ($null -ne $Phase) { $singleSelect['Phase'] = $Phase }
-if ($null -ne $Status) { $singleSelect['Status'] = $Status }
+if ($PSBoundParameters.ContainsKey('Level'))    { $singleSelect['Level'] = $Level }
+if ($PSBoundParameters.ContainsKey('Priority')) { $singleSelect['Priority'] = $Priority }
+if ($PSBoundParameters.ContainsKey('Phase'))    { $singleSelect['Phase'] = $Phase }
+if ($PSBoundParameters.ContainsKey('Status'))   { $singleSelect['Status'] = $Status }
 $hasEstimate = $PSBoundParameters.ContainsKey('Estimate')
 
 $issueUrl = "https://github.com/$Repo/issues/$IssueNumber"

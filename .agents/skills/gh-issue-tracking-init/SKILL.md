@@ -59,6 +59,36 @@ it is invoked from.
 
   The only case that prompts is an empty/missing `plan_docs/` with no plan supplied.
 
+  ## Mapping the plan onto the hierarchy
+
+Plan docs rarely use the words "epic"/"story"/"task" verbatim — they organize work
+under their own top-level groupings. Mapping those groupings onto the four levels is
+the single most load-bearing decision in the run; apply it deliberately:
+
+- **Whole plan → Plan** (one issue).
+- **The plan's top-level work groups → Epics.** These are frequently titled
+  **"Phases"** (Phase 0, Phase 1, …), but the same role is played by "Sprints",
+  "Stages", "Groups", "Pillars", or numbered milestone sections. **A plan whose top
+  layer is "Phases" MUST be treated as: each Phase = one Epic** — this is mandatory,
+  not a guess.
+- **The plan's leaf work items → Stories.** These are the atomic, independently-
+  completable units the plan numbers as tasks (e.g. `T-x.y`, "Task 3.1"). Each
+  becomes one Story.
+- **Introduce Tasks (the 4th level) only when the plan itself nests a sub-tier
+  beneath those leaf items.** A plan structured as Group → Item has no task level;
+  its Stories are leaves — that is correct, not a gap.
+
+> **Terminology collision — read carefully.** A plan's **"Phase"** (a top-level work
+> group → becomes an Epic) is **NOT** this skill's optional **`Phase` Project field**
+> (a cross-cutting single-select board field; see *Conventions*). Same word, different
+> meaning. Do **not** create the Phase field just because the plan says "phase" — the
+> plan's phases have already become Epics, and adding the field would duplicate that.
+>
+> **Plan-task id traceability.** When the plan keys its dependency / parallel-execution
+> graph by an id (e.g. a *Parallel Execution Map* referencing `T-x.y`), surface that id
+> on the corresponding issue so the plan↔issue mapping is self-documenting — e.g. a
+> parenthetical suffix in the title (`Story 2.3: Repository Layer (T-1.3)`).
+
 ## Prerequisites
 
 - `pwsh` 7+ and `gh` authenticated with the `project` scope (`$GITHUB_TOKEN` is honored).

@@ -6,7 +6,7 @@
 | **Target repo** | `intel-agency/agent-context` (a GitHub **template** repo) |
 | **Status** | Active |
 | **Date** | 2026-07-18 |
-| **Related** | [`gh-issue-tracking-init`](../../.agents/skills/gh-issue-tracking-init/SKILL.md) skill (no-arg defaults); `orchestrate-new-project` / `orchestrate-project-setup` skills (seeding flow) |
+| **Related** | [`gh-issue-tracking-init`](../../.agents/skills/gh-issue-tracking-init/SKILL.md) skill (no-arg defaults); [`nam20485/workflow-launch2`](https://github.com/nam20485/workflow-launch2) creation scripts (`create-repo-with-plan-docs.ps1`, `trigger-project-setup.ps1`) — the external seeding pipeline; [`../workflow-launch2-clone-pipeline-class2-cleanup.md`](../workflow-launch2-clone-pipeline-class2-cleanup.md) — implementation plan for the new parallel-seeding scripts in `workflow-launch2` |
 
 ---
 
@@ -132,19 +132,83 @@ keeping Class-2 out of clones has only two paths:
   planning/memory to a separate branch (excluded unless "Include all branches" is
   checked) or a separate repo. This is the *only* path the platform helps with.
 - **(b) Delete it in our own seeding workflow** (W1). The platform provides nothing
-  here — it is entirely on us.
+  here — it is entirely on us. The actual workflow that implements this — the
+  external `workflow-launch2` creation scripts — is described in the *Cloning
+  pipeline capabilities* section below.
 
-## Current state (verified 2026-07-18)
+## Cloning pipeline capabilities (verified 2026-07-19)
 
-- No reset/cleanup step exists in the project-creation flow today; a clone inherits
-  the template's full `memory.md` and `docs/plans/` as-is.
+Repo creation is driven by the external launcher repo
+[`nam20485/workflow-launch2`](https://github.com/nam20485/workflow-launch2),
+entry-point
+[`scripts/create-repo-from-slug.ps1`](https://github.com/nam20485/workflow-launch2/blob/main/scripts/create-repo-from-slug.ps1),
+which delegates to
+[`scripts/create-repo-with-plan-docs.ps1`](https://github.com/nam20485/workflow-launch2/blob/main/scripts/create-repo-with-plan-docs.ps1).
+Typical invocation (the one we actually use):
+
+```pwsh
+./scripts/create-repo-from-slug.ps1 `
+  -Slug "gap-miner-v2" -TemplateRepoName "agent-context" `
+  -TriggerProjectSetup $False -Yes
+```
+
+**What the script currently does post-clone:**
+
+| Step | Description |
+| --- | --- |
+| Create repo | `gh repo create --template intel-agency/agent-context` |
+| Poll readiness | `Wait-TemplateReady` polls commits endpoint until the template initial commit lands |
+| Provision secrets/vars | `GEMINI_API_KEY` (from env), `VERSION_PREFIX='0.0.1'` |
+| Clone locally | `git clone` to `../dynamic_workflows/<full-repo-name>` |
+| **Seed plan docs** | `Copy-PlanDocs` copies `plan_docs/<slug>/*` into the clone's `plan_docs/` (**W1 step 4 — handled**) |
+| **Name placeholder replace** | `Update-TemplatePlaceholders` replaces every occurrence of the template repo name and owner in file contents *and* filenames; asserts zero remaining matches |
+| **AGENTS.md semantic rewrite** | Targets `**GitHub template repo**` and replaces with `**project instance** cloned from ... template`. **Fixed 2026-07-19 (W1.4 option a):** the template AGENTS.md first sentence was reworded so the anchor now matches; apposition reads correctly in both template and clone contexts. |
+| Commit + push | Single seed commit; handles template-race rebase by re-running all of the above after `pull --rebase` |
+| **Trigger follow-up workflow (W1.5)** | When `-TriggerProjectSetup $True` (default), `trigger-project-setup.ps1` creates an `orchestration:dispatch` issue invoking `/orchestrate-dynamic-workflow $workflow_name = project-setup`. **Broken for agent-context clones** (the project-setup orchestrator is from a legacy template); bypassed by always passing `-TriggerProjectSetup $False`. Replacement: new `trigger-gh-issue-tracking-init.ps1` (parallel script, does not modify the existing one) dispatches `/gh-issue-tracking-init` directly. |
+
+**Verified against a real cloned instance**
+([`intel-agency/gap-miner-v2-delta12`](https://github.com/intel-agency/gap-miner-v2-delta12),
+created 2026-07-19 with `-TriggerProjectSetup $False`): plan-doc seeding and
+placeholder replacement are working, but Class-2 material described in W1 steps
+1–3 survives verbatim (before the W1.1–W1.3 scripts below are wired in).
+
+## Current state (verified 2026-07-19)
+
+- **W1 step 4 (seed plan docs) is handled** by `Copy-PlanDocs` in
+  `create-repo-with-plan-docs.ps1`.
+- **W1 step 5 (build hierarchy) is handled by a new parallel trigger** —
+  `trigger-gh-issue-tracking-init.ps1` dispatches `/gh-issue-tracking-init`
+  directly (no args; its defaults resolve to the clone + seeded `plan_docs/`).
+  The legacy `trigger-project-setup.ps1` is preserved and untouched for other
+  templates that still use it. The orchestrator wrapper
+  `create-repo-agent-context.ps1` hard-codes `-SkipProjectSetup` on the legacy
+  call and invokes the new trigger itself.
+- **W1 steps 1–3 (Class-2 cleanup) are implemented by a new parallel script** —
+  `cleanup-template-state.ps1` runs after clone + placeholder replace and before
+  `Copy-PlanDocs`, deleting `.agents/memory.md` + emitting an inline blank
+  skeleton, clearing `docs/plans/.completed/*.md` and
+  `docs/plans/.deferred/*.md`, and deleting the
+  `docs/plans/.completed/run-issues-review/` subtree.
+- **W1.4 (AGENTS.md rewrite anchor) is DONE in this template
+  (2026-07-19, option a):** `AGENTS.md` first sentence reworded so the stable
+  anchor `**GitHub template repo**` is present and the post-colon apposition
+  reads correctly in both template and clone contexts. No script change needed
+  for this — the existing `$oldLabel` literal now matches.
+- **W3 (marker convention) is RESOLVED** (2026-07-19): well-known paths; no
+  per-file markers. See work item W3 below.
+- **W2 (back-flow discipline)** is unchanged — remains an organisational
+  discipline. The `run-issues-review/` Gap Mining doc is the cautionary example;
+  W1.1–W1.3's script-side removal of `.completed/run-issues-review/` closes the
+  concrete leakage vector, but future back-flows still need the discipline.
 - `.agents/rules/practices.md:15` already orients the agent to glob `plan_docs/`,
   `docs/plans/`, and `docs/` — so the seeding convention (`plan_docs/` first) is
-  consistent with existing orientation.
-- `gh-issue-tracking-init` no-arg defaults were made explicit on 2026-07-18 and are
-  Class 1 (context-neutral).
-- The `run-issues-review` foreign artifact (above) is a documented instance of
-  Class-2 contamination already present in the template.
+  consistent with the existing orientation.
+- `gh-issue-tracking-init` no-arg defaults are Class 1 (context-neutral).
+- **Related fix (§B of the implementation plan):** `set-project-fields.ps1`
+  single-select guards switched from `$null -ne $X` to
+  `$PSBoundParameters.ContainsKey(...)` for Level / Priority / Phase / Status,
+  eliminating the spurious "`Field 'Phase' not found`" warning reported in the
+  india89 handoff. Pester regression tests added.
 
 ## Work items
 

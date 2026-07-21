@@ -2,7 +2,7 @@
 
 ## Repository identity
 
-This repository — **`intel-agency/agent-context`** — is the **upstream GitHub template**: it is cloned to seed each downstream instance that houses a unique app plan and develops it. Any other repo name is a **clone instance** of this template, so when the user refers to "a downstream clone", "an instance", "the template", or names a different repo, treat it as a clone seeded from this one.
+This repository — **`intel-agency/agent-context`** — is the **GitHub template repo**: the substrate from which each downstream instance is cloned to house a unique app plan and develop it. Any other repo name is a **clone instance** of this template, so when the user refers to "a downstream clone", "an instance", "the template", or names a different repo, treat it as a clone seeded from this one.
 
 ## Memory and Rules
 
@@ -39,7 +39,8 @@ Rules dictate coding conventions, tools, validation, testing, source control, de
 
 **IMPORTANT:** Check the relevant rules file before working on any file or performing implementation.
 
-When relocating content into a rules file, the AGENTS.md section that replaces it should become a two-part brief: a title describing the type of content the linked file holds (not just its subject name), and a summary previewing the 1–2 most important actual items from the file, abbreviated in-context.
+When relocating content into a rules file, the AGENTS.md section that replaces it should become a two-part brief: 1. **Title**: a title describing the type of content the linked file holds (not just its subject name)
+2. **Summary**: a summary previewing the 1–2 most important actual items from the file, abbreviated in-context.
 
 ### Updating Memory and Rules
 
