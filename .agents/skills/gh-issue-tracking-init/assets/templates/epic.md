@@ -27,15 +27,15 @@ Component the epic lives in.
 
 ## Brief Technology Stack
 
-*(Technology specific to this epic and its component.)*
+<!-- List ONLY the technologies actually used by THIS epic's stories. Remove any row below that does not apply to this epic. Do NOT reuse the same technology block across multiple epics — each epic's stack must be specific to it (e.g. an AI-centric epic lists AI/Runtime + embeddings; a UI-centric epic lists the UI framework + charting library; a data-pipeline epic lists the ORM + queue). A 5-line stack block that appears verbatim in every epic is filler and will trip the DryRun filler detector. -->
 
-- Language: [e.g., C# .NET 9.0]
-- UI Framework: [e.g., Avalonia/Blazor/etc.]
-- AI/Runtime: [e.g., ONNX Runtime / Azure OpenAI / etc.]
-- Architecture: [e.g., RAG / MCP / Microservices]
-- Databases/Storage: [e.g., Neo4j / SQLite / Postgres / Vector DB]
-- Logging/Observability: [e.g., Serilog, OpenTelemetry]
-- Containerization/Infra: [e.g., Docker, Compose, Terraform]
+- Language: [e.g., C# .NET 8.0]
+- UI Framework: [if applicable; omit if not]
+- AI/Runtime: [if applicable; omit if not]
+- Architecture: [e.g., RAG / event-driven / microservices — omit if not specific to this epic]
+- Databases/Storage: [only the DBs this epic writes to or reads from]
+- Logging/Observability: [omit if epic does not add observability surface]
+- Containerization/Infra: [omit if epic does not touch infra]
 
 ## Epic Stories
 
@@ -173,10 +173,11 @@ Component the epic lives in.
 
 ## Risk Mitigation Strategies
 
-| Risk | Mitigation |
-|------|------------|
-| [Risk 1] | [Mitigation 1] |
-| [Risk 2] | [Mitigation 2] |
+<!-- Pull ONLY the risk rows from the plan's risk register whose mitigation references a task within this epic. Do not copy the entire risk register into every epic. If the plan provides no epic-specific risks, omit this section entirely rather than inserting generic placeholder rows. The full risk register lives on the Plan body — not on every epic. -->
+
+| Risk | Impact | Mitigation (task id) |
+|------|--------|----------------------|
+| [Risk specific to this epic] | [Low/Med/High] | [Mitigation referencing a task id within this epic] |
 
 ## Timeline Estimate
 
@@ -192,10 +193,6 @@ Component the epic lives in.
 - [Metric 1]
 - [Metric 2]
 - [Metric 3]
-
-## Repository Branch
-
-Target branch for implementation: [e.g., copilot/[project-slug]]
 
 ## Implementation Notes
 

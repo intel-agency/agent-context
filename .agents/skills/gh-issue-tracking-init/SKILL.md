@@ -122,6 +122,70 @@ the single most load-bearing decision in the run; apply it deliberately:
   (`application-plan.md`, `epic.md`, `story.md`, `task.md`) — fill placeholders, then
   pass the result to `ensure-issue.ps1` via `-BodyFile`.
 
+## Body composition specification
+
+The templates in `assets/templates/` are skeletons — their placeholders must be
+filled with **plan-derived content**, not agent-composed boilerplate. The rules
+below govern what lands where. They are enforced at DryRun time (see the filler
+detector in *DryRun must assert completeness* below). The single root cause of
+the prior content-fidelity defects was that the skill left body composition to
+inference, and inference defaulted to filler; this section makes the contract
+explicit.
+
+### Plan-content transfer manifest
+
+Each row declares where a class of plan content **must** land, and at what
+fidelity. When the plan **does not** contain content for a row, **omit** the
+corresponding issue section entirely — do not fabricate placeholder content.
+
+| Plan element | Target issue | Fidelity |
+|---|---|---|
+| Per-task inline code/config snippet (a `Reference:` block, or equivalent) | Story `Plan → Implementation approach → Reference (from plan T-x.y)` | **Verbatim** in a fenced code block with matching language tag |
+| Per-task agent note (e.g. ⚠️ warning, "verify before committing") | Story `Implementation Notes` | **Verbatim** |
+| Per-task out-of-scope items | Story `Scope → Out of Scope` | **Omit** the subsection if the task has none specific |
+| Cross-cutting mandatory rules / operating principles | Plan body `Development Standards → Mandatory rules` | **Verbatim** (one canonical copy) |
+| Naming & code conventions | Plan body `Development Standards → Naming & code conventions` | **Verbatim** |
+| Definition of Done | Plan body `Development Standards → Definition of Done` | **Verbatim** |
+| Handoff checklist / escalation protocol | Plan body `Development Standards` (last two sub-sections) | **Verbatim** |
+| Exact package-version table | Plan body `Exact package versions` | **Verbatim table** — not summarized into prose |
+| Repository file tree | Plan body `Repository layout` | **Verbatim tree** — not summarized into a 3-line summary |
+| Risk-register rows | Epic `Risk Mitigation Strategies` (relevant rows only) + Plan body full table | Split: each epic gets only the rows whose mitigation references a task within it |
+| Prompt-text catalog (if the plan includes one) | The stories whose `Plan` section implements the corresponding prompt | **Verbatim** inside the story's `Reference` fenced block |
+| Parallel-execution map / task groups | Plan body (optional summary) | Summarized; blocked-by edges already encode the dependencies structurally |
+| Per-epic technology subset | Epic `Brief Technology Stack` | Only rows applicable to that epic; remove the rest |
+
+### Filler prohibition
+
+No two sibling issues (stories under the same epic, or epics under the same
+plan) may share a body section whose text is **byte-identical** unless that
+section is genuinely common cross-cutting content that has been placed
+canonically on the Plan body. Concretely:
+
+- A story's `Plan`, `Implementation Notes`, `Validation Commands`, `Out of Scope`,
+  and `Test Strategy` sections must differ in substance from the same sections
+  in any sibling story. "Implement per the AC…" / "Add tests…" / "dotnet build
+  exit 0" / "CancellationToken / Never hardcode secrets" — these are filler
+  when they repeat across stories.
+- An epic's `Brief Technology Stack` and `Risk Mitigation Strategies` must
+  differ across epics. A 5-line stack block or a 2-row risk table that
+  appears in every epic is filler (and, in the case of cross-epic stack
+  bleed like "AI/Runtime: …" on a non-AI epic, actively wrong).
+
+When a section has nothing task- or epic-specific to say, **omit the section
+entirely** rather than paste boilerplate. The DryRun filler detector (below)
+makes this load-bearing: a section body byte-identical across ≥ 3 sibling
+issues throws at preview time.
+
+### Canonical cross-cutting content
+
+Cross-cutting rules (mandatory rules / operating principles, naming
+conventions, DoD, handoff checklist, escalation protocol, exact versions,
+repository layout) live **once** on the Plan body's `Development Standards`,
+`Exact package versions`, and `Repository layout` sections. They are **not**
+copied into individual story or epic bodies. If a story needs to reference
+them, it links to the Plan issue by number (`Part of #<plan-issue>`) — it does
+not re-paste the rules.
+
 ## Orchestration steps
 
 Work top-down. Always do a `-DryRun` pass first, show the plan, then apply.
@@ -273,6 +337,57 @@ foreach ($n in $nodes) {
     if ($n.Level -in 'epic','story' -and [string]::IsNullOrWhiteSpace($n.Milestone)) { throw "Node $($n.Title) missing milestone" }
 }
 ```
+
+### DryRun must assert no filler (body duplication across siblings)
+
+After the title/milestone check above, also assert that no `##`/`###` section body is
+**byte-identical across ≥ 3 sibling issues** at the same level (stories under one epic,
+or epics under one plan). Identical section bodies across siblings is the strongest
+filler signal — it means the section was pasted from a template rather than derived from
+the plan. See [Body composition specification](#body-composition-specification) above for
+the rules this enforces. Run this over the rendered body files in the DryRun pass (before
+any `gh` create call):
+
+```pwsh
+# $bodies = array of [pscustomobject]@{ Title=...; Level=...; BodyFile=... }
+# Group by Level so siblings are only compared to siblings (stories vs. stories, epics vs. epics).
+$byLevel = $bodies | Group-Object Level
+foreach ($group in $byLevel) {
+    $sectionHashes = @{}   # key = "depth|heading|bodyHash" -> list of titles
+    foreach ($b in $group.Group) {
+        $text = Get-Content -Raw -LiteralPath $b.BodyFile
+        foreach ($m in [regex]::Matches($text, '(?ms)^(#{2,}) .+?(?=^#{2,} |\z)')) {
+            $lines   = $m.Value -split "`r?`n", 2
+            $heading = $lines[0].Trim()
+            $depth   = ($lines[0] -match '^(#+)') ? $Matches[1].Length : 2
+            $body    = if ($lines.Count -gt 1) { $lines[1].Trim() } else { '' }
+            if ([string]::IsNullOrWhiteSpace($body)) { continue }   # skip empty sections
+            $sha = [System.Security.Cryptography.SHA256]::Create().ComputeHash(
+                       [System.Text.Encoding]::UTF8.GetBytes($body))
+            $hash = [System.BitConverter]::ToString($sha).Replace('-','').Substring(0,16)
+            $key  = "$depth|$heading|$hash"
+            if (-not $sectionHashes.ContainsKey($key)) { $sectionHashes[$key] = New-Object System.Collections.Generic.List[string] }
+            [void]$sectionHashes[$key].Add($b.Title)
+        }
+    }
+    foreach ($key in $sectionHashes.Keys) {
+        if ($sectionHashes[$key].Count -ge 3) {
+            $parts    = $key -split '\|', 3
+            $heading  = $parts[1]
+            $offenders = ($sectionHashes[$key] -join ', ')
+            throw ("Filler detected: section '$heading' is byte-identical across " +
+                   "$($sectionHashes[$key].Count) $($group.Name) issues: $offenders. " +
+                   "Omit the section where it has no sibling-specific content, or place " +
+                   "common cross-cutting content canonically on the Plan body.")
+        }
+    }
+}
+```
+
+The threshold is ≥ 3 (not 2): two sibling issues legitimately sharing a section (e.g. two
+stories that both reference the same config fragment) is allowed; three or more is a
+filler pattern. Cross-cutting content that genuinely belongs in every issue must live
+**once** on the Plan body — see [Canonical cross-cutting content](#canonical-cross-cutting-content).
 
 ## Idempotency & re-runs
 

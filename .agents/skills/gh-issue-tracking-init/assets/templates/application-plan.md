@@ -107,6 +107,56 @@ Provide a concise summary of the application, the problem it solves, the desired
 - [ ] Story 5.4: IaC/Environments/CI-CD pipelines
 - [ ] Story 5.5: Final hardening and release checklist
 
+---
+
+## Development Standards
+
+<!-- Canonical landing site for cross-cutting rules that apply to EVERY story and epic. Copy VERBATIM from the plan's mandatory-rules / operating-principles / naming-conventions / DoD / handoff-checklist / escalation-protocol sections. These rules live here ONCE — do not paste them into individual story or epic bodies. Omit any sub-section below for which the plan provides no content rather than leave placeholder text. -->
+
+### Mandatory rules / operating principles
+
+<!-- Verbatim from the plan's mandatory-rules table (e.g. R1–R8, or whatever form the plan uses). -->
+
+### Naming & code conventions
+
+<!-- Verbatim from the plan's naming-conventions table (namespace, entity, repository, command, endpoint, column, queue-key patterns). -->
+
+### Definition of Done
+
+<!-- Verbatim from the plan's global Definition of Done checklist. -->
+
+### Handoff checklist (human reviewer)
+
+<!-- Verbatim from the plan's handoff checklist for human reviewer. -->
+
+### Escalation protocol
+
+<!-- Verbatim from the plan's escalation / "never-guess" list. -->
+
+---
+
+## Exact package versions
+
+<!-- Copy the plan's exact-version table VERBATIM. Do not summarize to prose — exact versions are mandatory and must be pinned. Omit this section entirely if the plan provides no version table. -->
+
+| Component | Technology | Version |
+|---|---|---|
+| [row 1] | | |
+| [row 2] | | |
+
+---
+
+## Repository layout
+
+<!-- Copy the plan's file-level tree VERBATIM (full directory structure, not a 3-line summary). Omit this section entirely if the plan provides no file tree. -->
+
+```text
+[ProjectName]/
+├─ ...
+```
+
+---
+
 ## Validation Plan
 
 [Overall validation strategy for the application: how each epic and its stories will be verified, including test pyramid coverage, integration points, and release-gating criteria.]
