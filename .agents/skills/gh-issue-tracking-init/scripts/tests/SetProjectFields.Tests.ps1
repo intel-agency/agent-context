@@ -42,7 +42,7 @@ Describe 'set-project-fields.ps1 single-select parameter guards' {
                     continue
                 }
                 $argList += "-$k"
-                if ($v -ne $null) { $argList += $v }
+                if ($null -ne $v) { $argList += $v }
             }
 
             # Build an outer command string that invokes set-project-fields.ps1
