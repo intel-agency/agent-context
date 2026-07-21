@@ -422,6 +422,36 @@ stories that both reference the same config fragment) is allowed; three or more 
 filler pattern. Cross-cutting content that genuinely belongs in every issue must live
 **once** on the Plan body — see [Canonical cross-cutting content](#canonical-cross-cutting-content).
 
+### DryRun must assert no secrets in body files
+
+After rendering bodies (and after the filler check above), run
+`assert-no-secrets.ps1` over **every** rendered body file before any
+`gh issue create` call. Plan-doc `Reference:` snippets reproduced verbatim into
+issue bodies can carry credentials (connection strings with passwords, API keys,
+bearer tokens). Secrets posted to public GitHub issues are a one-way door —
+scraped within seconds, cached by archives even after deletion.
+
+```pwsh
+& "$Skill/assert-no-secrets.ps1" -BodyFiles $bodies.BodyFile
+```
+
+The script throws on confident detection and **halts the run** — no automatic
+redaction. The error message reports file + line + pattern category + the
+offending line. To remediate: redact the secret in the plan doc and re-run.
+
+Placeholder allowlist: the scanner recognizes `${VAR}`, `changeme`, `redacted`,
+`<YOUR_API_KEY>`, `example.com`, `…` as safe — plan docs that use interpolation
+do not false-positive. See `scripts/assert-no-secrets.ps1` for the full pattern
+and allowlist inventory.
+
+**Escape hatch:** if the scan false-positives on content the user has verified is
+safe, call with `-DryRun` (report-only, no throw) and relay the findings for
+manual confirmation before proceeding:
+
+```pwsh
+& "$Skill/assert-no-secrets.ps1" -BodyFiles $bodies.BodyFile -DryRun
+```
+
 ## Idempotency & re-runs
 
 The scripts match existing labels/milestones/fields/issues (by numbered title)/links

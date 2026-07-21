@@ -22,6 +22,7 @@ This directory is **self-contained**: `common-auth.ps1`, `import-labels.ps1`, an
 | `link-sub-issue.ps1` | Attach a child issue as a sub-issue of a parent | `-Repo -ParentNumber -ChildNumber` |
 | `set-project-fields.ps1` | Add an issue to the board and set `Level/Priority/Phase/Status/Estimate` | `-Owner -ProjectNumber -Repo -IssueNumber [...]` |
 | `set-dependency.ps1` | Record a "blocked by" relationship | `-Repo -IssueNumber -BlockedByNumber` |
+| `assert-no-secrets.ps1` | Scan rendered issue-body files for secrets before `gh issue create`; **throws on confident detection** (throw-and-halt, no auto-redaction) | `-BodyFiles [-DryRun]` |
 
 **Milestones** (conceptual work groups such as `POC`, `MVP`, `UI`, `Server`) are created with the vendored [`create-milestones.ps1`](./create-milestones.ps1) — no dedicated op script is needed.
 
