@@ -353,30 +353,59 @@ any `gh` create call):
 # Group by Level so siblings are only compared to siblings (stories vs. stories, epics vs. epics).
 $byLevel = $bodies | Group-Object Level
 foreach ($group in $byLevel) {
-    $sectionHashes = @{}   # key = "depth|heading|bodyHash" -> list of titles
-    foreach ($b in $group.Group) {
-        $text = Get-Content -Raw -LiteralPath $b.BodyFile
-        foreach ($m in [regex]::Matches($text, '(?ms)^(#{2,}) .+?(?=^#{2,} |\z)')) {
-            $lines   = $m.Value -split "`r?`n", 2
-            $heading = $lines[0].Trim()
-            $depth   = ($lines[0] -match '^(#+)') ? $Matches[1].Length : 2
-            $body    = if ($lines.Count -gt 1) { $lines[1].Trim() } else { '' }
-            if ([string]::IsNullOrWhiteSpace($body)) { continue }   # skip empty sections
-            $sha = [System.Security.Cryptography.SHA256]::Create().ComputeHash(
-                       [System.Text.Encoding]::UTF8.GetBytes($body))
-            $hash = [System.BitConverter]::ToString($sha).Replace('-','').Substring(0,16)
-            $key  = "$depth|$heading|$hash"
-            if (-not $sectionHashes.ContainsKey($key)) { $sectionHashes[$key] = New-Object System.Collections.Generic.List[string] }
-            [void]$sectionHashes[$key].Add($b.Title)
+    $sectionHashes = @{}   # key = "depth|bodyHash" -> @{ Heading = ...; Titles = ... }
+    $hasher = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        foreach ($b in $group.Group) {
+            $lines = Get-Content -LiteralPath $b.BodyFile
+            $inCodeBlock = $false
+            $currentHeading = $null
+            $currentDepth = 2
+            $currentBody = [System.Text.StringBuilder]::new()
+
+            $saveSection = {
+                if ($currentHeading) {
+                    $bodyText = $currentBody.ToString().Trim()
+                    if (-not [string]::IsNullOrWhiteSpace($bodyText)) {
+                        $sha = $hasher.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($bodyText))
+                        $hash = [System.BitConverter]::ToString($sha).Replace('-','').Substring(0,16)
+                        $key  = "$currentDepth|$hash"
+                        if (-not $sectionHashes.ContainsKey($key)) {
+                            $sectionHashes[$key] = [pscustomobject]@{
+                                Heading = $currentHeading
+                                Titles  = New-Object System.Collections.Generic.List[string]
+                            }
+                        }
+                        [void]$sectionHashes[$key].Titles.Add($b.Title)
+                    }
+                }
+            }
+
+            foreach ($line in $lines) {
+                if ($line.StartsWith(([string][char]96) * 3)) {
+                    $inCodeBlock = -not $inCodeBlock
+                }
+                if (-not $inCodeBlock -and $line -match '^(#{2,})\s+(.+)$') {
+                    . $saveSection
+                    $currentDepth = $Matches[1].Length
+                    $currentHeading = $Matches[2].Trim()
+                    [void]$currentBody.Clear()
+                } elseif ($currentHeading) {
+                    [void]$currentBody.AppendLine($line)
+                }
+            }
+            . $saveSection
         }
+    } finally {
+        $hasher.Dispose()
     }
     foreach ($key in $sectionHashes.Keys) {
-        if ($sectionHashes[$key].Count -ge 3) {
-            $parts    = $key -split '\|', 3
-            $heading  = $parts[1]
-            $offenders = ($sectionHashes[$key] -join ', ')
+        $entry = $sectionHashes[$key]
+        if ($entry.Titles.Count -ge 3) {
+            $heading  = $entry.Heading
+            $offenders = ($entry.Titles -join ', ')
             throw ("Filler detected: section '$heading' is byte-identical across " +
-                   "$($sectionHashes[$key].Count) $($group.Name) issues: $offenders. " +
+                   "$($entry.Titles.Count) $($group.Name) issues: $offenders. " +
                    "Omit the section where it has no sibling-specific content, or place " +
                    "common cross-cutting content canonically on the Plan body.")
         }
