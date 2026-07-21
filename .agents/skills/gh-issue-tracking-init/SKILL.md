@@ -355,31 +355,33 @@ $byLevel = $bodies | Group-Object Level
 foreach ($group in $byLevel) {
     $sectionHashes = @{}   # key = "depth|bodyHash" -> @{ Heading = ...; Titles = ... }
     $hasher = [System.Security.Cryptography.SHA256]::Create()
+    # Defined once per group: PowerShell resolves $b, $currentHeading, etc. via dynamic
+    # scoping at call time, so the script block is independent of where it is defined.
+    $saveSection = {
+        if ($currentHeading) {
+            $bodyText = $currentBody.ToString().Trim()
+            if (-not [string]::IsNullOrWhiteSpace($bodyText)) {
+                $sha = $hasher.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($bodyText))
+                $hash = [System.BitConverter]::ToString($sha).Replace('-','').Substring(0,16)
+                $key  = "$currentDepth|$hash"
+                if (-not $sectionHashes.ContainsKey($key)) {
+                    $sectionHashes[$key] = [pscustomobject]@{
+                        Heading = $currentHeading
+                        Titles  = New-Object System.Collections.Generic.List[string]
+                    }
+                }
+                [void]$sectionHashes[$key].Titles.Add($b.Title)
+            }
+        }
+    }
     try {
         foreach ($b in $group.Group) {
-            $lines = Get-Content -LiteralPath $b.BodyFile
+            # Filter nulls defensively so .StartsWith() below can't hit a NullReferenceException.
+            $lines = Get-Content -LiteralPath $b.BodyFile | Where-Object { $null -ne $_ }
             $inCodeBlock = $false
             $currentHeading = $null
             $currentDepth = 2
             $currentBody = [System.Text.StringBuilder]::new()
-
-            $saveSection = {
-                if ($currentHeading) {
-                    $bodyText = $currentBody.ToString().Trim()
-                    if (-not [string]::IsNullOrWhiteSpace($bodyText)) {
-                        $sha = $hasher.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($bodyText))
-                        $hash = [System.BitConverter]::ToString($sha).Replace('-','').Substring(0,16)
-                        $key  = "$currentDepth|$hash"
-                        if (-not $sectionHashes.ContainsKey($key)) {
-                            $sectionHashes[$key] = [pscustomobject]@{
-                                Heading = $currentHeading
-                                Titles  = New-Object System.Collections.Generic.List[string]
-                            }
-                        }
-                        [void]$sectionHashes[$key].Titles.Add($b.Title)
-                    }
-                }
-            }
 
             foreach ($line in $lines) {
                 if ($line.StartsWith(([string][char]96) * 3)) {
