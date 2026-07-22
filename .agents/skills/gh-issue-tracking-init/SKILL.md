@@ -244,6 +244,19 @@ and is covered by `.gitignore` (`gh-init-*.log`).
 8. **Dependencies:** for each "blocked by" edge, `set-dependency.ps1 -IssueNumber <blocked> -BlockedByNumber <blocker>`.
 9. **Views:** `ensure-project.ps1` prints the four views to add once in the Project UI
    (not automatable). Relay that to the user.
+10. **Signal completion:** on a successful **apply** run (never in `-DryRun`, never after a
+    partial/failed run), apply the `gh-issue-tracking:init-success` label to the **Plan
+    issue** (the single plan-level node created in step 5). This label is the orchestration
+    hand-off signal — a downstream orchestrator matches it to learn the hierarchy is
+    initialized and ready. The label was ensured by step 2, so apply it directly:
+    ```pwsh
+    # $planNumber = the Plan issue number captured in step 5; $ghrepo = target repo.
+    # Guard on success: only the final action of a fully-applied (non-DryRun) run.
+    & gh issue edit $planNumber --repo $ghrepo --add-label 'gh-issue-tracking:init-success'
+    ```
+    A Plan issue is required: if no plan-level node was created (no apply happened, or the
+    run was `-DryRun`), skip this step. If the label apply fails, log a warning but do not
+    fail the run — the hierarchy itself is already complete.
 
 ## Delegation performance (batching)
 
