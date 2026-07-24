@@ -14,17 +14,18 @@ permission:
   glob: allow
   grep: allow
   list: allow
-  external_directory: ask
+  external_directory: deny
   todowrite: allow
   webfetch: allow         # best-practice / dependency / design research
   websearch: allow        # surveys & competitive analysis
   lsp: allow              # trace symbols & contracts while designing
-  skill: ask
+  skill: deny
   question: allow
   doom_loop: allow
   bash:
-    # Read-only investigation: default ask, allow reads, deny mutations.
-    "*": ask
+    # Read-only investigation: allow reads, deny everything else. Catch-all is
+    # DENY (not ask) so a headless dispatch never deadlocks on an unanswered ask.
+    "*": deny
     "git status*": allow
     "git diff*": allow
     "git log*": allow
