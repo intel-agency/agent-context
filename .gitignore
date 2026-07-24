@@ -12,3 +12,33 @@ testResults.xml
 
 # Scratch / temporary issue-body files
 scripts/tmp-*.txt
+
+# Environment files (never commit real secrets)
+.env
+.env.*
+!.env.example
+
+# Node dependencies
+node_modules/
+
+# Build artifacts
+bin/
+obj/
+dist/
+build/
+out/
+
+# Coverage artifacts
+coverage/
+coverage.xml
+coverage-html/
+
+# IDE / editor
+.idea/
+.vs/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

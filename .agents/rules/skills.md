@@ -4,7 +4,7 @@ Skill creation conventions.
 
 ## Spec compliance is mandatory
 
-**All skills must be strictly compliant with the [Agent Skills specification](https://agentskills.io/specification).** Before creating or modifying any skill, review the current spec at https://agentskills.io/specification and follow it exactly — do not work from memory of the spec, which may be stale. This applies to `SKILL.md` frontmatter (field names, constraints, `name` naming/length rules), the directory layout (`scripts/`, `references/`, `assets/`), progressive-disclosure token budgets, and file-reference conventions.
+**All skills must be strictly compliant with the [Agent Skills specification](https://agentskills.io/specification).** Before creating or modifying any skill, review the current spec at <https://agentskills.io/specification> and follow it exactly — do not work from memory of the spec, which may be stale. This applies to `SKILL.md` frontmatter (field names, constraints, `name` naming/length rules), the directory layout (`scripts/`, `references/`, `assets/`), progressive-disclosure token budgets, and file-reference conventions.
 
 Validate with the official validator before finishing:
 
