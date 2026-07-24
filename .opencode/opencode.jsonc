@@ -4,7 +4,7 @@
   "instructions": ["AGENTS.md"],
   "default_agent": "orchestrator",
   "model": "zai-coding-plan/glm-5.2",
-  "small_model": "google/gemini-3.5-flash",
+  "small_model": "zai-coding-plan/glm-4.5-air",
   "permission": {
     "websearch": "allow",
   },
@@ -113,14 +113,6 @@
         },
         "qwen3.6-plus": {
           "name": "Qwen 3.6 Plus",
-        },
-      },
-    },
-    // Google AI Studio — built-in provider, reads GEMINI_API_KEY from env.
-    "google": {
-      "models": {
-        "gemini-3.5-flash": {
-          "name": "Gemini 3.5 Flash",
         },
       },
     },
