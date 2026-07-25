@@ -34,7 +34,7 @@ Transform tasks into verifiable goals before implementing:
 
 For multi-step tasks, state a brief plan with explicit verification:
 
-```
+```text
 1. [Step] → verify: [check]
 2. [Step] → verify: [check]
 3. [Step] → verify: [check]

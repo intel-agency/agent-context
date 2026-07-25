@@ -1,0 +1,53 @@
+name: Task
+description: Create a tracked task or work item
+title: "[Task]: "
+labels: ["task"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear description of the task
+    validations:
+      required: true
+  - type: dropdown
+    id: level
+    attributes:
+      label: Level
+      options:
+        - plan
+        - epic
+        - story
+        - task
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0 (critical)
+        - P1 (high)
+        - P2 (medium)
+        - P3 (low)
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - area/ai
+        - area/ui
+        - area/core
+        - area/infra
+        - area/docs
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Criteria that must be met for this task to be considered complete
+    validations:
+      required: true

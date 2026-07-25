@@ -26,3 +26,31 @@
 - Once reviews have left comments, address all comments before merging.
 - For each comment that is addressed, leave a comment explaining the resolution and mark the thread as RESOLVED state.
 - ADDRESS ALL COMMENTS BEFORE MERGING.
+
+## Resolving review comments
+
+When resolving PR review comments (automatically or manually), follow this sequence for **every** unresolved thread:
+
+1. **Analyze** the comment. If no code change is needed (functionality works as designed, comment is outdated, etc.), skip to step 3 and explain why no change is warranted.
+2. **Make the code change**, commit, and push.
+3. **Reply to the comment thread** with a summary of the fix or the reason no change was needed. Use the GraphQL `addPullRequestReviewThreadReply` mutation (or `gh pr comment` for non-thread comments) so the reply is attached to the thread.
+4. **Mark the thread as RESOLVED** via the GraphQL `resolveReviewThread` mutation (or the GitHub REST API equivalent). Do not leave threads open after replying.
+
+```graphql
+# Reply to a review thread
+mutation {
+  addPullRequestReviewThreadReply(input: {
+    pullRequestReviewThreadId: "<thread-id>"
+    body: "Fixed: <summary of change>"
+  }) { comment { id } }
+}
+
+# Resolve the thread
+mutation {
+  resolveReviewThread(input: {
+    threadId: "<thread-id>"
+  }) { thread { id isResolved } }
+}
+```
+
+After resolving all threads, verify zero unresolved comments remain by querying `reviewThreads` and filtering `isResolved == false`. Leave a final summary comment on the PR listing all resolved threads and their fixes.
