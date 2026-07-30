@@ -51,7 +51,7 @@ $ErrorActionPreference = 'Stop'
 Initialize-Auth -DryRun:$DryRun
 
 if ($DryRun) {
-    Write-DryRun "Would mark #$IssueNumber as blocked by #$BlockedByNumber."
+    Write-DryRun "Would mark #$IssueNumber as blocked by #$BlockedByNumber. (dry-run skips discovery; relationship may already exist)"
     return
 }
 

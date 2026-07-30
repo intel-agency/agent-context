@@ -51,7 +51,7 @@ $ErrorActionPreference = 'Stop'
 Initialize-Auth -DryRun:$DryRun
 
 if ($DryRun) {
-    Write-DryRun "Would add #$ChildNumber as a sub-issue of #$ParentNumber."
+    Write-DryRun "Would add #$ChildNumber as a sub-issue of #$ParentNumber. (dry-run skips discovery; relationship may already exist)"
     return
 }
 
