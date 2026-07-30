@@ -5,8 +5,15 @@
   "default_agent": "orchestrator",
   "model": "zai-coding-plan/glm-5.2",
   "small_model": "zai-coding-plan/glm-4.5-air",
+  // "small_model": "cline-pass/deepseek-v4-flash",
   "permission": {
     "websearch": "allow",
+    "zread": "allow",
+    "web-reader": "allow",
+    "exa": "allow",
+    "web-search-prime": "allow",
+    "sequential-thinking": "allow",
+    "memory-graph": "allow"
   },
   "mcp": {
     "sequential-thinking": {
