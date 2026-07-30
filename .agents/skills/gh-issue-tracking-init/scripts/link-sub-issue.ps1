@@ -50,6 +50,11 @@ $ErrorActionPreference = 'Stop'
 
 Initialize-Auth -DryRun:$DryRun
 
+if ($DryRun) {
+    Write-DryRun "Would add #$ChildNumber as a sub-issue of #$ParentNumber."
+    return
+}
+
 # Idempotency: is the child already a sub-issue of the parent?
 $already = $false
 try {
@@ -62,11 +67,6 @@ catch {
 
 if ($already) {
     Write-Skip "#$ChildNumber is already a sub-issue of #$ParentNumber."
-    return
-}
-
-if ($DryRun) {
-    Write-DryRun "Would add #$ChildNumber as a sub-issue of #$ParentNumber."
     return
 }
 

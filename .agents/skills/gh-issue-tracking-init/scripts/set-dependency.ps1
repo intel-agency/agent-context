@@ -50,6 +50,11 @@ $ErrorActionPreference = 'Stop'
 
 Initialize-Auth -DryRun:$DryRun
 
+if ($DryRun) {
+    Write-DryRun "Would mark #$IssueNumber as blocked by #$BlockedByNumber."
+    return
+}
+
 # Idempotency: is the relationship already recorded?
 $already = $false
 try {
@@ -62,11 +67,6 @@ catch {
 
 if ($already) {
     Write-Skip "#$IssueNumber is already blocked by #$BlockedByNumber."
-    return
-}
-
-if ($DryRun) {
-    Write-DryRun "Would mark #$IssueNumber as blocked by #$BlockedByNumber."
     return
 }
 
