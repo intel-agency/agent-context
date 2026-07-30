@@ -38,7 +38,7 @@ permission:
     "gh run*": allow
     "gh issue*": allow
     "gh repo view*": allow
-    "gh auth*": allow
+    "gh auth status*": allow
     "ls*": allow
     "cat *": allow
     "head *": allow
