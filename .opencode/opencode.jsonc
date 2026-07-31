@@ -21,12 +21,12 @@
       "command": [
         "npx",
         "-y",
-        "@modelcontextprotocol/server-sequential-thinking",
+        "@modelcontextprotocol/server-sequential-thinking@2026.7.4",
       ],
     },
     "memory-graph": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
+      "command": ["npx", "-y", "@modelcontextprotocol/server-memory@2026.7.4"],
       "environment": {
       },
     },
