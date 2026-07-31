@@ -27,10 +27,11 @@ Python
 
 ### Frontend
 
-- Vite + React/Vue/Svelte
+- Vite + React
 
 ### Database
 
+- sqlite
 - PostgreSQL (SQLAlchemy)
 
 ### Packages
@@ -41,6 +42,11 @@ Python
 
 - Docker
 - Docker Compose
+
+### Scripting
+
+- python
+- powershell ps1
 
 ### Testing
 
