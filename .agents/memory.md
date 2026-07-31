@@ -23,6 +23,10 @@ Current project and its sub-work items that we are working on actively. This sec
 
 ## Completed Work Items
 
+### Project: Agent-readiness hardening (cont.)
+
+- **PR #15 round-3 review resolution** (2026-07-30, commits `07a2bab` + `8235628`): Resolved all 3 remaining unresolved review threads on PR #15 (`nam/alpha61-run-report-fixes`). (1) Stale-docs thread — corrected references in `memory.md` and `template-content-strategy.md` to the deleted `.github/CODEOWNERS` + issue form templates, added a Decision entry recording the removal (commit `ea18c8e`); (2) orchestrator web-access thread — no code change, resolved as an accepted-by-design user decision (commit `131ac5a`); (3) MCP supply-chain thread — pinned both local MCP servers to `@2026.7.4` (verified npm `latest`). Result: 8/8 threads resolved, 0 unresolved.
+
 ### Project: gh-issue-tracking-init plan-source auto-resolution (2026-07-18)
 
 Applied the plan documented in [`docs/plans/.completed/gh-issue-tracking-plan-source-resolution.md`](../docs/plans/.completed/gh-issue-tracking-plan-source-resolution.md). Downstream template-clone test revealed the skill was stopping to ask "which plan doc?" between a development plan and a reference doc — a defect for a non-interactive skill. Fix (commits `9a0cf01` + `1e516a8`): replaced the "confirm the selection (or merge) with the user" default in `SKILL.md` Inputs and the "ask before doing anything" orchestration preface with a deterministic filename-role resolver (primary → issue tree; architecture/reference → Plan-body context; empty `plan_docs/` is the only hard stop). Mirrored in `README.md`. Prose-only; Pester 46/46 green; both edited files markdownlint-clean.
