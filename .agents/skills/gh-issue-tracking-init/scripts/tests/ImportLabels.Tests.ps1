@@ -486,9 +486,9 @@ Describe 'label management scripts (import-labels / ensure-labels)' {
                 } -ExistingLabelsJson '[]'
                 $r.Errors | Should -BeNullOrEmpty
                 $posts = @($r.GhCalls | Where-Object { $_ -match '-X POST' })
-                # The canonical assets/labels.json defines 18 labels; with an empty
+                # The canonical assets/labels.json defines 19 labels; with an empty
                 # target repo every label is a create.
-                $posts.Count | Should -Be 18
+                $posts.Count | Should -Be 19
                 @($r.GhCalls | Where-Object { $_ -match '-X PATCH' }).Count | Should -Be 0
                 @($r.GhCalls | Where-Object { $_ -match '-X DELETE' }).Count | Should -Be 0
             }
