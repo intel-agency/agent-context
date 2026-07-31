@@ -113,10 +113,10 @@ branch vs. **"Include all branches."** Consequences:
   be PR'd/merged across.
 - No fork parent linkage — the clone is fully independent and commits count on the
   contributor's graph.
-- Special `.github/` files transfer *and activate* in the clone: `CODEOWNERS`,
-  `ISSUE_TEMPLATE/`, `FUNDING.yml`, `workflow-templates/` (starter Actions
-  workflows). Org-level `/.github/` default community-health files are a separate
-  fallback.
+- Special `.github/` files transfer *and activate* in the clone: `FUNDING.yml`,
+  `workflow-templates/` (starter Actions workflows). `CODEOWNERS` and
+  `ISSUE_TEMPLATE/` were removed from this template (2026-07-30). Org-level
+  `/.github/` default community-health files are a separate fallback.
 - Classroom integration (template as assignment starter code).
 
 **What does NOT transfer** (only the file tree copies — nothing else): settings,
