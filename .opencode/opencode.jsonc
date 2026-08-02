@@ -64,17 +64,40 @@
   },
   "provider": {
     "qwencloud": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "[qwencloud]",
+      "npm": "@ai-sdk/anthropic",
+      "name": "QwenCloud",
       "options": {
-        "baseURL": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "baseURL": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
         "apiKey": "{env:QWENCLOUD_TOKEN_PLAN_API_KEY}"
       },
       "models": {
-        "[qwencloud]qwen3.7-max": {
-          "id": "qwen3.7-max",
-          "tool_call": true,
-          "reasoning": true,
+        "qwen3.8-max-preview": {
+          "name": "Qwen3.8 Max Preview",
+          "limit": {
+            "context": 983616,
+            "output": 131072
+          },
+          "options": {
+            "thinking": {
+              "type": "enabled", // always enabled by default/cannot be disabled
+              "budgetTokens": 99072,
+              "reasoning_effort": "xhigh" // xhigh, medium, low (defaults to xhigh)
+            },
+            "temperature": 0.6, // >= 0.6
+            "reasoning": true,
+          },
+        },
+        "qwen3.7-max": {
+          "name": "Qwen3.7 Max",
+          "options": {
+            "thinking": {
+              "type": "enabled",
+              "budgetTokens": 8192,
+            },
+          },
+        },
+        "qwen3.7-plus": {
+          "name": "Qwen3.7 Plus",
           "modalities": {
             "input": [
               "text",
@@ -82,34 +105,17 @@
             ],
             "output": [
               "text"
-            ]
-          },
-          "limit": {
-            "context": 131072,
-            "output": 8192
-          }
-        },
-        "[qwencloud]qwen3.7-plus": {
-          "id": "qwen3.7-plus",
-          "tool_call": true,
-          "reasoning": false,
-          "modalities": {
-            "input": [
-              "text"
             ],
-            "output": [
-              "text"
-            ]
           },
-          "limit": {
-            "context": 131072,
-            "output": 8192
-          }
+          "options": {
+            "thinking": {
+              "type": "enabled",
+              "budgetTokens": 8192,
+            },
+          },
         },
-        "[qwencloud]qwen3.8-max-preview": {
-          "id": "qwen3.8-max-preview",
-          "tool_call": true,
-          "reasoning": true,
+        "qwen3.6-plus": {
+          "name": "Qwen3.6 Plus",
           "modalities": {
             "input": [
               "text",
@@ -117,13 +123,86 @@
             ],
             "output": [
               "text"
-            ]
+            ],
           },
-          "limit": {
-            "context": 131072,
-            "output": 8192
-          }
+          "options": {
+            "thinking": {
+              "type": "enabled",
+              "budgetTokens": 8192,
+            },
+          },
+        },
+        "qwen3.6-flash": {
+          "name": "Qwen3.6 Flash",
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ],
+          },
+          "options": {
+            "thinking": {
+              "type": "enabled",
+              "budgetTokens": 8192,
+            },
+          },
         }
+        // "qwen3.7-max": {
+        //   "id": "qwen3.7-max",
+        //   "tool_call": true,
+        //   "reasoning": true,
+        //   "modalities": {
+        //     "input": [
+        //       "text",
+        //       "image"
+        //     ],
+        //     "output": [
+        //       "text"
+        //     ]
+        //   },
+        //   "limit": {
+        //     "context": 131072,
+        //     "output": 8192
+        //   }
+        // },
+        // "qwen3.7-plus": {
+        //   "id": "qwen3.7-plus",
+        //   "tool_call": true,
+        //   "reasoning": false,
+        //   "modalities": {
+        //     "input": [
+        //       "text"
+        //     ],
+        //     "output": [
+        //       "text"
+        //     ]
+        //   },
+        //   "limit": {
+        //     "context": 131072,
+        //     "output": 8192
+        //   }
+        // },
+        // "qwen3.8-max-preview": {
+        //   "id": "qwen3.8-max-preview",
+        //   "tool_call": true,
+        //   "reasoning": true,
+        //   "modalities": {
+        //     "input": [
+        //       "text",
+        //       "image"
+        //     ],
+        //     "output": [
+        //       "text"
+        //     ]
+        //   },
+        //   "limit": {
+        //     "context": 131072,
+        //     "output": 8192
+        //   }
+        // }
       }
     },
     // Z.AI Coding Plan — built-in provider (creds resolved from auth.json;
@@ -249,51 +328,7 @@
         "cline-pass/qwen3.7-plus": {
           "name": "Qwen 3.7 Plus",
         },
-      },
-    },
-    // // Alibaba Cloud Model Studio (Bailian / DashScope) — uses the
-    // // Anthropic-compatible endpoint via @ai-sdk/anthropic (recommended for
-    // // OpenCode: tool-calling + thinking support). API key resolved from env:
-    // // DASHSCOPE_API_KEY. The baseURL below is the China (Beijing)
-    // // pay-as-you-go endpoint; swap in another plan/region as needed:
-    // //   Singapore PAYG:    https://{WorkspaceId}.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1
-    // //   Coding Plan:       https://coding.dashscope.aliyuncs.com/apps/anthropic/v1
-    // //   Token Plan (Team): https://token-plan.cn-beijing.maas.aliyuncs.com/apps/anthropic/v1
-    // "alibaba-model-studio": {
-    //   "npm": "@ai-sdk/anthropic",
-    //   "name": "Alibaba Cloud Model Studio",
-    //   "options": {
-    //     "apiKey": "{env:DASHSCOPE_API_KEY}",
-    //     "baseURL": "https://dashscope.aliyuncs.com/apps/anthropic/v1",
-    //   },
-    //   "models": {
-    //     "qwen3.6-plus": {
-    //       "name": "Qwen3.6 Plus",
-    //       "modalities": {
-    //         "input": ["text", "image"],
-    //         "output": ["text"],
-    //       },
-    //       "options": {
-    //         "thinking": {
-    //           "type": "enabled",
-    //           "budgetTokens": 8192,
-    //         },
-    //       },
-    //     },
-    //     "qwen3.7-plus": {
-    //       "name": "Qwen3.7 Plus",
-    //       "modalities": {
-    //         "input": ["text", "image"],
-    //         "output": ["text"],
-    //       },
-    //       "options": {
-    //         "thinking": {
-    //           "type": "enabled",
-    //           "budgetTokens": 8192,
-    //         },
-    //       },
-    //     },
-    //   },
-    // },
-  },
+      }
+    }
+  }
 }
