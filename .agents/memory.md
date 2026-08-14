@@ -21,6 +21,10 @@ Current project and its sub-work items that we are working on actively. This sec
 
 #### Work Items
 
+### Project: Rules upkeep
+
+- **Kilo Code docs rule** (2026-08-14): Created `.agents/rules/kilo-code-docs.md` — mandates answering any Kilo Code CLI/IDE-extension question or setup/config instruction from the official docs via `https://kilo.ai/docs/llms.txt` (full LLM dump) or `https://kilo.ai/docs/api/raw-markdown?path=<url-encoded-path>` (per-page raw Markdown, no `/docs` prefix), instead of from memory. Distilled from `docs/using-docs-with-agents.md`; AGENTS.md Rules list updated with the entry. Source doc subsequently lint-fixed (removed duplicate YAML `title:`, added `text` fence languages) so it passes CI lint if committed.
+
 ## Completed Work Items
 
 ### Project: Agent-readiness hardening (cont.)
