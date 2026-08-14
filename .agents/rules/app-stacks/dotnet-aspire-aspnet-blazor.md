@@ -59,7 +59,7 @@ web
 - bunit
 - coverlet
 - reportgenerator
-- mock
+- NSubstitute
 
 ### Linting
 

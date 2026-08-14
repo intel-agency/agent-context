@@ -31,7 +31,7 @@ to:
 Then add a new Decision entry under `## Decisions`:
 
 ```
-- **Removed `.github/CODEOWNERS` and issue form templates** (2026-07-31): Deleted `.github/CODEOWNERS` and the 3 issue form templates (bug/feature/task). CODEOWNERS was a single-owner repo where the sole maintainer was also the only code owner, adding no review value. Issue form templates were replaced by the gh-issue-tracking-init skill's programmatic issue creation, which uses the GitHub API directly and does not need form templates.
+- **Removed `.github/CODEOWNERS` and issue form templates** (2026-07-30): Deleted `.github/CODEOWNERS` and the 4 `ISSUE_TEMPLATE/` files (`bug_report.yml`, `feature_request.yml`, `task.yml`, and `config.yml`). CODEOWNERS was a single-owner repo where the sole maintainer was also the only code owner, adding no review value. Issue form templates were replaced by the gh-issue-tracking-init skill's programmatic issue creation, which uses the GitHub API directly and does not need form templates.
 ```
 
 **`docs/plans/.completed/template-content-strategy.md` lines 116-119**: Update the bullet to note these files were removed. Change:
