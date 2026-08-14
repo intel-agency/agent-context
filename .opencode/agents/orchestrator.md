@@ -48,7 +48,6 @@ permission:
     "head *": allow
     "tail *": allow
     "rg *": allow
-    "find *": allow
     "tree *": allow
     "jq *": allow
     "wc *": allow
@@ -57,6 +56,8 @@ permission:
     "git push*": deny
     "git commit*": deny
     "git config*": deny
+    "find *": deny           # `find ... -delete` / `-exec` mutates files — not read-only
+    "echo*": deny            # shell redirection (`echo > file`) bypasses edit: deny
   task:
     "*": allow
 ---

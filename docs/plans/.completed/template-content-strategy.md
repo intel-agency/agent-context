@@ -72,7 +72,7 @@ clone.
 - This repo's own `docs/plans/.deferred/*` — e.g. `defect-level-plan.md`.
 - **Foreign/contaminating artifacts** — downstream run reports that leaked up into
   the template. Concrete case:
-  [`docs/plans/.completed/run-issues-review/gh-issue-tracking-init-run-review.md`](.completed/run-issues-review/gh-issue-tracking-init-run-review.md)
+  [`docs/plans/.completed/run-issues-review/gh-issue-tracking-init-run-review.md`](run-issues-review/gh-issue-tracking-init-run-review.md)
   reviews a run against `intel-agency/gap-miner-v2-oscar32` ("Gap Mining Platform
   v1.0") with plan source `plan_docs/development-plan.md` — a downstream app's
   review report sitting in the generic template, referencing a repo and a plan doc
