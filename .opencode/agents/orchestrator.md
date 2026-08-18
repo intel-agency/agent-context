@@ -42,7 +42,7 @@ permission:
     "gh run*": allow
     "gh issue*": allow
     "gh repo view*": allow
-    "gh auth status*": allow
+    "gh auth status*": deny     # `--show-token` prints the GitHub token — coordinator must never be able to leak credentials
     "ls*": allow
     "cat *": allow
     "head *": allow
@@ -51,7 +51,6 @@ permission:
     "tree *": allow
     "jq *": allow
     "wc *": allow
-    "echo*": allow
     "pwd": allow
     "git push*": deny
     "git commit*": deny

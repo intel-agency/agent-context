@@ -48,7 +48,7 @@ to:
 ```
 - Special `.github/` files transfer *and activate* in the clone: `FUNDING.yml`,
   `workflow-templates/` (starter Actions workflows). `CODEOWNERS` and
-  `ISSUE_TEMPLATE/` were removed from this template (2026-07-31). Org-level
+  `ISSUE_TEMPLATE/` were removed from this template (2026-07-30). Org-level
   `/.github/` default community-health files are a separate fallback.
 ```
 
