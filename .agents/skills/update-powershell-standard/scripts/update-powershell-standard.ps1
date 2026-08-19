@@ -276,7 +276,7 @@ if ($CheckOnly) {
         Status          = 'CheckOnly'
         UpstreamVersion = $upstreamVersion
         PreviousVersion = $currentIndexVersion
-        UpdateAvailable = $true
+        UpdateAvailable = $updateAvailable
         CheckOnly       = $true
         FilesWritten    = 0
         FilesUnchanged  = 0
@@ -377,7 +377,7 @@ return [pscustomobject]@{
     Status          = 'Refreshed'
     UpstreamVersion = $upstreamVersion
     PreviousVersion = $currentIndexVersion
-    UpdateAvailable = $true
+    UpdateAvailable = $updateAvailable
     CheckOnly       = $false
     FilesWritten    = $filesWritten.Count
     FilesUnchanged  = $filesUnchanged.Count

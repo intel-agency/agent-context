@@ -177,6 +177,7 @@ content 2
             $summary = & $script:UpdateScript -SourceFile $fixture -RepoRoot $script:Repo -Force
 
             $summary.Status | Should -Be 'Refreshed'
+            $summary.UpdateAvailable | Should -BeFalse
             $summary.FilesWritten | Should -Be 0
             $summary.FilesUnchanged | Should -Be 11
         }
@@ -210,6 +211,18 @@ content 2
                 Join-Path $script:Repo ".agents/rules/powershell/$name" | Should -Not -Exist
             }
             (Get-Content -LiteralPath $script:IndexPath -Raw) | Should -Match '\*\*Upstream version:\*\* 1\.0\.0'
+        }
+
+        It 'with -Force -CheckOnly at the same version reports no update available' {
+            $fixture = Join-Path $script:FixtureDir 'full.md'
+            Set-Content -LiteralPath $fixture -Value "# Title`n`n**Version:** v9.9.9`n`nPreamble marker text.`n`n$($script:FixtureBody)`n" -Encoding utf8NoBOM -NoNewline
+            $null = & $script:UpdateScript -SourceFile $fixture -RepoRoot $script:Repo
+
+            $summary = & $script:UpdateScript -SourceFile $fixture -RepoRoot $script:Repo -Force -CheckOnly
+
+            $summary.Status | Should -Be 'CheckOnly'
+            $summary.UpdateAvailable | Should -BeFalse
+            $summary.FilesWritten | Should -Be 0
         }
     }
 
