@@ -11,6 +11,8 @@ concurrency:
 jobs:
   droid-review:
     if: github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
+    # Requires the Blacksmith GitHub App on this repo (see README Prerequisites).
+    # Template clones without it must revert to a GitHub-hosted label (e.g. ubuntu-latest).
     runs-on: blacksmith-8vcpu-ubuntu-2404
     permissions:
       contents: read

@@ -16,6 +16,12 @@ other repo name is a clone instance seeded from this one.
   ```
 
 - **Node.js** (optional) — only needed to run `markdownlint-cli2` for Markdown linting.
+- **Blacksmith GitHub App** (CI only) — the workflows in `.github/workflows/` run on
+  [Blacksmith](https://docs.blacksmith.sh/introduction/quickstart) runners
+  (`runs-on: blacksmith-*`). Repositories cloned from this template must have the
+  Blacksmith GitHub App installed (and the repo included in the installation's scope),
+  otherwise CI jobs will queue indefinitely with no matching runner. Alternatively,
+  switch `runs-on` back to a GitHub-hosted label (e.g. `ubuntu-latest`) in the clone.
 
 ## Getting started
 
