@@ -53,8 +53,10 @@ verbatim Standard text, grouped by when an agent needs them:
 | `powershell/07-security.md` | §12 | secrets, untrusted input, supply chain, execution context |
 | `powershell/08-platform-style-encoding.md` | §13, §16, §17 | cross-platform code, localization, formatting/encoding |
 | `powershell/09-output-logging-files.md` | §15, §20 | logging, CSV/JSON/HTML/markdown export |
+| `powershell/99-definition-of-done.md` | *Definition of done*, *Lineage*, *Deeper guidance* | DoD checklist, provenance, deeper guidance |
 
-*Definition of done* / *Lineage* fold into the index (short checklists). Each
+*Definition of done*, *Lineage*, and *Deeper guidance* fold into
+`powershell/99-definition-of-done.md`. Each
 topic file keeps original section numbers in headings (e.g. `## §5 Output and
 the pipeline`) so citations stay stable against upstream.
 
@@ -199,8 +201,9 @@ self-contained, scripts over prose, `pwsh`, validated with `skills-ref validate`
 
 1. **Skill first** `.agents/skills/update-powershell-standard/`: author `SKILL.md` +
    `scripts/update-powershell-standard.ps1` (fetch upstream `AGENTS.md`, compare version
-   against the index, split on §0–§20 + Definition-of-done/Lineage boundaries per the
-   mapping table, write the 10 topic files with generated-by headers, write-only-on-change).
+   against the index, split on §0–§20 + Definition-of-done/Lineage/Deeper-guidance
+   boundaries per the mapping table, write the 11 topic files with generated-by
+   headers, write-only-on-change).
    Running it produces the vendored `.agents/rules/powershell/` files — no hand-splitting.
    Validate with `skills-ref validate`.
 2. **Index** `.agents/rules/powershell.md` authored by hand: source metadata (version,
@@ -217,8 +220,10 @@ self-contained, scripts over prose, `pwsh`, validated with `skills-ref validate`
 6. **Validation:** markdownlint (`.agents/rules/**/*.md` already in lint globs);
    `skills-ref validate` on the new skill; Pester tests for the split script (>85%
    coverage per repo rules).
-7. **Cleanup:** delete `docs/plans/powershellengineers_AGENTS.md` — the planning-time
-   snapshot of upstream. After step 1 the generated `.agents/rules/powershell/` files
-   plus upstream itself supersede it; keeping it would add a third, drift-prone copy.
-   Pester tests use trimmed local fixtures under the skill's `scripts/tests/`, never a
-   network fetch and never this snapshot.
+7. **Cleanup:** no file deletion needed — the planning-time snapshot this step
+   originally referenced (`docs/plans/powershellengineers_AGENTS.md`) was never
+   committed to the repo; the skill fetches upstream by URL and Pester tests use
+   trimmed local fixtures under the skill's `scripts/tests/`. If a stray local
+   snapshot copy ever appears, delete it: the generated `.agents/rules/powershell/`
+   files plus upstream itself supersede it, and keeping one would add a third,
+   drift-prone copy.
