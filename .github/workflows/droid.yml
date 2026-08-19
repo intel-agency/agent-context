@@ -71,3 +71,4 @@ jobs:
         uses: Factory-AI/droid-action@e3d1f5e7861c36fe4a9c4dca3edec87b964b2bc4 # v5
         with:
           factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+          allowed_bots: 'blacksmith-sh'
