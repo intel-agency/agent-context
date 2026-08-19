@@ -42,9 +42,16 @@ permission:
     "git branch -d*": deny    # branch delete — same carve-out
     "git remote remove*": deny  # remote removal — carves out "git remote*" allow
     "git remote set-url*": deny # remote URL mutation — same carve-out
-    "gh pr*": allow
-    "gh run*": allow
-    "gh issue*": allow
+    "gh pr view*": allow
+    "gh pr diff*": allow
+    "gh pr checks*": allow
+    "gh pr status*": allow
+    "gh pr list*": allow
+    "gh run view*": allow
+    "gh run list*": allow
+    "gh run watch*": allow
+    "gh issue view*": allow
+    "gh issue list*": allow
     "gh repo view*": allow
     "gh auth status*": deny     # `--show-token` prints the GitHub token — coordinator must never be able to leak credentials
     "ls*": allow
