@@ -71,7 +71,8 @@ which this mirrors.
 
 ## Decision: Option A+ (A with the split/refresh script)
 
-Vendored hierarchy in this repo **plus** `scripts/update-powershell-standard.ps1`, which
+Vendored hierarchy in this repo **plus** the skill script
+`.agents/skills/update-powershell-standard/scripts/update-powershell-standard.ps1`, which
 fetches the upstream monolithic `AGENTS.md`, splits it on section boundaries, and writes
 the topic files. Rationale:
 
@@ -183,8 +184,9 @@ self-contained, scripts over prose, `pwsh`, validated with `skills-ref validate`
 - `SKILL.md` — triggers (upstream version bump suspected, periodic check, corpus
   refresh requested), decision guidance (version comparison, what gets regenerated),
   and the call site invoking the script.
-- `scripts/update-powershell-standard.ps1` — the split/refresh engine (previously
-  planned for repo-root `scripts/`; relocated into the skill to honor
+- `scripts/update-powershell-standard.ps1` — the split/refresh engine, living inside the
+  skill at `.agents/skills/update-powershell-standard/scripts/update-powershell-standard.ps1`
+  (relocated from the earlier plan's repo-root `scripts/` to honor
   skills-must-be-self-contained): fetch upstream `AGENTS.md`, parse the version line,
   no-op when it matches the version recorded in `.agents/rules/powershell.md`,
   otherwise split on section boundaries per the mapping table and write the topic

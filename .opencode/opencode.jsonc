@@ -7,7 +7,6 @@
   "default_agent": "orchestrator",
   "model": "zai-coding-plan/glm-5.2",
   "small_model": "zai-coding-plan/glm-4.5-air",
-  // "small_model": "cline-pass/deepseek-v4-flash",
   "permission": {
     "websearch": "allow",
     "zread": "allow",
@@ -153,59 +152,6 @@
             },
           },
         }
-        // "qwen3.7-max": {
-        //   "id": "qwen3.7-max",
-        //   "tool_call": true,
-        //   "reasoning": true,
-        //   "modalities": {
-        //     "input": [
-        //       "text",
-        //       "image"
-        //     ],
-        //     "output": [
-        //       "text"
-        //     ]
-        //   },
-        //   "limit": {
-        //     "context": 131072,
-        //     "output": 8192
-        //   }
-        // },
-        // "qwen3.7-plus": {
-        //   "id": "qwen3.7-plus",
-        //   "tool_call": true,
-        //   "reasoning": false,
-        //   "modalities": {
-        //     "input": [
-        //       "text"
-        //     ],
-        //     "output": [
-        //       "text"
-        //     ]
-        //   },
-        //   "limit": {
-        //     "context": 131072,
-        //     "output": 8192
-        //   }
-        // },
-        // "qwen3.8-max-preview": {
-        //   "id": "qwen3.8-max-preview",
-        //   "tool_call": true,
-        //   "reasoning": true,
-        //   "modalities": {
-        //     "input": [
-        //       "text",
-        //       "image"
-        //     ],
-        //     "output": [
-        //       "text"
-        //     ]
-        //   },
-        //   "limit": {
-        //     "context": 131072,
-        //     "output": 8192
-        //   }
-        // }
       }
     },
     // Z.AI Coding Plan — built-in provider (creds resolved from auth.json;

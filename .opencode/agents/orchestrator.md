@@ -38,12 +38,28 @@ permission:
     "git show*": allow
     "git branch*": allow
     "git blame*": allow
+    "git branch -D*": deny    # branch force-delete — carves out "git branch*" allow; not read-only
+    "git branch -d*": deny    # branch delete — same carve-out
+    "git remote remove*": deny  # remote removal — carves out "git remote*" allow
+    "git remote set-url*": deny # remote URL mutation — same carve-out
     "gh pr*": allow
     "gh run*": allow
     "gh issue*": allow
     "gh repo view*": allow
     "gh auth status*": deny     # `--show-token` prints the GitHub token — coordinator must never be able to leak credentials
     "ls*": allow
+    # --- Kept intentionally (redirect-write risk accepted) ---
+    # These produce output useful for live monitoring and log inspection,
+    # which the orchestrator routinely performs (watching CI runs, reading
+    # subagent progress, inspecting files inline). Shell redirection
+    # (command > file) can technically bypass edit:deny, but: (a) the
+    # orchestrator is a trusted agent operating under explicit prose
+    # guardrails ("You implement nothing"), (b) the glob-based permission
+    # system cannot parse shell syntax to distinguish reads from
+    # redirect-writes without breaking legitimate commands (2>&1, --format
+    # strings), and (c) removing these would force delegation to a
+    # subagent for routine monitoring, losing visibility into the
+    # orchestrator's tool calls and relayed output.
     "cat *": allow
     "head *": allow
     "tail *": allow

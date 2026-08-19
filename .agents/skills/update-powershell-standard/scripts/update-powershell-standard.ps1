@@ -222,7 +222,7 @@ if ($SourceFile) {
     $resolvedSource = (Resolve-Path -LiteralPath $SourceFile).Path
 }
 else {
-    $response = Invoke-WebRequest -Uri $SourceUrl
+    $response = Invoke-WebRequest -Uri $SourceUrl -TimeoutSec 60
     $content = [string] $response.Content
     $resolvedSource = $SourceUrl
 }
