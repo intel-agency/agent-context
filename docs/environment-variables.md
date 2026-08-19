@@ -21,7 +21,7 @@ shipped tools and scripts function without error.
 | Variable | Used by | Purpose |
 |---|---|---|
 | `EXA_API_KEY` | `.opencode/opencode.jsonc` — Exa MCP server | Exa neural web search, code-context lookup, and crawling tools. Sent via the `x-api-key` request header (kept out of the MCP server URL to avoid disclosure via logs/proxies). |
-| `Z_AI_API_KEY` | `.opencode/opencode.jsonc` — Z.AI MCP servers | `Authorization` header for the Z.AI MCP servers (`webSearchPrime`, `webReader`, `zread`). |
+| `Z_AI_API_KEY` | `.opencode/opencode.jsonc` — Z.AI MCP servers | `Authorization` header for the Z.AI MCP servers (`web-search-prime`, `web-reader`, `zread`). |
 | `GITHUB_AUTH_TOKEN` | `scripts/gh-auth.ps1`, `scripts/test-github-permissions.ps1` | Primary GitHub auth token used by repo automation scripts. |
 | `GITHUB_USERNAME` | `scripts/test-github-permissions.ps1` | Default repository owner used when running permission checks. |
 
