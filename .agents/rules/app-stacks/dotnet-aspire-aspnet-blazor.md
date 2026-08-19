@@ -49,11 +49,17 @@ web
 - Docker
 - Docker Compose
 
+### Scripting
+
+- powershell ps1
+
 ### Testing
 
 - xUnit
+- bunit
 - coverlet
 - reportgenerator
+- NSubstitute
 
 ### Linting
 

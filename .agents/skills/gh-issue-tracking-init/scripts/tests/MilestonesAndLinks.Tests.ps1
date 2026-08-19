@@ -311,10 +311,17 @@ Describe 'link-sub-issue.ps1' {
     Context 'DryRun path' {
 
         BeforeEach {
+            # Regression guard for the PR #17 behavioral contract: under -DryRun
+            # the script must make ZERO gh api calls (dry-run skips discovery
+            # entirely). Initialize-Auth may still run `gh auth status` (a
+            # non-mutating credential check), so only `gh api` invocations are
+            # recorded and asserted.
+            $global:GhCalls = @()
             function global:gh {
                 param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Arguments)
                 $global:LASTEXITCODE = 0
                 if ($null -eq $Arguments -or $Arguments.Count -eq 0) { return }
+                if ($Arguments[0] -eq 'api') { $global:GhCalls += ($Arguments -join ' ') }
                 if ($Arguments[0] -eq 'auth' -and $Arguments.Count -gt 1 -and $Arguments[1] -eq 'status') { return }
                 if ($Arguments[0] -eq 'api' -and $Arguments.Count -gt 1 -and $Arguments[1] -match '/sub_issues$') { return '[]' }
                 if ($Arguments[0] -eq 'api' -and $Arguments.Count -gt 1 -and $Arguments[1] -match '/issues/\d+$' -and ($Arguments -contains '--jq')) { return '12345' }
@@ -325,11 +332,13 @@ Describe 'link-sub-issue.ps1' {
 
         AfterEach {
             Remove-Item Function:\global:gh -ErrorAction SilentlyContinue
+            Remove-Item Variable:\global:GhCalls -ErrorAction SilentlyContinue
         }
 
-        It 'reports it would add the sub-issue (child not already linked)' {
+        It 'makes zero gh api calls and reports the planned action' {
             $output = & $script:LinkSubIssueScript -Repo 'o/r' -ParentNumber 10 -ChildNumber 12 -DryRun 6>&1
             ($output -join "`n") | Should -Match 'Would add #12 as a sub-issue of #10'
+            $global:GhCalls | Should -HaveCount 0
         }
     }
 
@@ -447,10 +456,14 @@ Describe 'set-dependency.ps1' {
     Context 'DryRun path' {
 
         BeforeEach {
+            # Same regression guard as link-sub-issue.ps1: zero gh api calls
+            # under -DryRun (Initialize-Auth's `gh auth status` is excluded).
+            $global:GhCalls = @()
             function global:gh {
                 param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Arguments)
                 $global:LASTEXITCODE = 0
                 if ($null -eq $Arguments -or $Arguments.Count -eq 0) { return }
+                if ($Arguments[0] -eq 'api') { $global:GhCalls += ($Arguments -join ' ') }
                 if ($Arguments[0] -eq 'auth' -and $Arguments.Count -gt 1 -and $Arguments[1] -eq 'status') { return }
                 if ($Arguments[0] -eq 'api' -and $Arguments.Count -gt 1 -and $Arguments[1] -match '/dependencies/blocked_by$') { return '[]' }
                 if ($Arguments[0] -eq 'api' -and $Arguments.Count -gt 1 -and $Arguments[1] -match '/issues/\d+$' -and ($Arguments -contains '--jq')) { return '67890' }
@@ -461,11 +474,13 @@ Describe 'set-dependency.ps1' {
 
         AfterEach {
             Remove-Item Function:\global:gh -ErrorAction SilentlyContinue
+            Remove-Item Variable:\global:GhCalls -ErrorAction SilentlyContinue
         }
 
-        It 'reports it would mark the dependency (not already blocked)' {
+        It 'makes zero gh api calls and reports the planned action' {
             $output = & $script:SetDependencyScript -Repo 'o/r' -IssueNumber 14 -BlockedByNumber 12 -DryRun 6>&1
             ($output -join "`n") | Should -Match 'Would mark #14 as blocked by #12'
+            $global:GhCalls | Should -HaveCount 0
         }
     }
 

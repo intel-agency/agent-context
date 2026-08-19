@@ -32,6 +32,7 @@ Rules dictate coding conventions, tools, validation, testing, source control, de
 - **Skills**: [`.agents/rules/skills.md`](.agents/rules/skills.md) — skill creation conventions. Core rules: all skills must be strictly compliant with the [Agent Skills spec](https://agentskills.io/specification) — always review the current spec before creating or modifying any skill; and prefer scripts under `scripts/` over prose steps for any repeatable operation so the skill produces deterministic output across runs.
 - **Scripts**: [`.agents/rules/scripts.md`](.agents/rules/scripts.md) — repo-root `scripts/` inventory (auth helpers, `import-labels.ps1` for label sync, `query.ps1` as the canonical PR review-thread manager, dispatch-issue creator, permission verifier, remote-index regenerator). Read each script's header + `param()` block for authoritative docs.
 - **Agent-Instructions Modules**: [`.agents/rules/ai-instructions-modules.md`](.agents/rules/ai-instructions-modules.md) — lookup tables for `nam20485/agent-instructions` workflow assignments and dynamic workflows, stored at `local_ai_instruction_modules/` (hard-coded path; refreshed by `scripts/update-remote-indices.ps1`).
+- **Kilo Code Docs**: [`.agents/rules/kilo-code-docs.md`](.agents/rules/kilo-code-docs.md) — consult the official Kilo docs site for any question about, or instruction to configure/setup, the Kilo Code CLI or IDE extension. Access points: full-docs LLM dump at `https://kilo.ai/docs/llms.txt` and per-page raw Markdown at `https://kilo.ai/docs/api/raw-markdown?path=<url-encoded-path>`.
 - **App Stacks**: pre-defined language and tech stack profiles in `.agents/rules/app-stacks/`. Each file is a stack definition named by slug ID, referenced from app development/implementation plans to specify the language, tech stack, tools, and packages to use. Available stacks:
   - `dotnet-aspire-aspnet-blazor` — .NET Aspire + ASP.NET Core + Blazor WASM
   - `dotnet-avalonia-xplatform-desktop` — .NET Avalonia cross-platform desktop
@@ -53,7 +54,7 @@ When relocating content into a rules file, the AGENTS.md section that replaces i
 
 ## Validation
 
-All non-trivial changes must be validated using build, scan, and test steps after making them and always before committing. Detailed validation, testing, and TDD rules live in [`.agents/rules/validation.md`](.agents/rules/validation.md). Test coverage must be maintained > 85%.
+Detailed validation, testing, and TDD rules live in [`.agents/rules/validation.md`](.agents/rules/validation.md). Test coverage must be maintained > 85%. Includes repo-verified Pester 5 gotchas (single `BeforeAll` per `Describe`; no backtick fences inside `@"…"@` here-strings) — read before writing Pester tests.
 
 ## CI/CD Pipeline Requirements
 

@@ -72,7 +72,7 @@ clone.
 - This repo's own `docs/plans/.deferred/*` — e.g. `defect-level-plan.md`.
 - **Foreign/contaminating artifacts** — downstream run reports that leaked up into
   the template. Concrete case:
-  [`docs/plans/.completed/run-issues-review/gh-issue-tracking-init-run-review.md`](.completed/run-issues-review/gh-issue-tracking-init-run-review.md)
+  [`docs/plans/.completed/run-issues-review/gh-issue-tracking-init-run-review.md`](run-issues-review/gh-issue-tracking-init-run-review.md)
   reviews a run against `intel-agency/gap-miner-v2-oscar32` ("Gap Mining Platform
   v1.0") with plan source `plan_docs/development-plan.md` — a downstream app's
   review report sitting in the generic template, referencing a repo and a plan doc
@@ -113,10 +113,10 @@ branch vs. **"Include all branches."** Consequences:
   be PR'd/merged across.
 - No fork parent linkage — the clone is fully independent and commits count on the
   contributor's graph.
-- Special `.github/` files transfer *and activate* in the clone: `CODEOWNERS`,
-  `ISSUE_TEMPLATE/`, `FUNDING.yml`, `workflow-templates/` (starter Actions
-  workflows). Org-level `/.github/` default community-health files are a separate
-  fallback.
+- Special `.github/` files transfer *and activate* in the clone: `FUNDING.yml`,
+  `workflow-templates/` (starter Actions workflows). `CODEOWNERS` and
+  `ISSUE_TEMPLATE/` were removed from this template (2026-07-30). Org-level
+  `/.github/` default community-health files are a separate fallback.
 - Classroom integration (template as assignment starter code).
 
 **What does NOT transfer** (only the file tree copies — nothing else): settings,

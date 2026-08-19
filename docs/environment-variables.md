@@ -20,8 +20,8 @@ shipped tools and scripts function without error.
 
 | Variable | Used by | Purpose |
 |---|---|---|
-| `EXA_API_KEY` | `.opencode/opencode.jsonc` — Exa MCP server | Exa neural web search, code-context lookup, and crawling tools. Passed as `exaApiKey` in the MCP server URL. |
-| `Z_AI_API_KEY` | `.opencode/opencode.jsonc` — Z.AI MCP servers | `Authorization` header for the Z.AI MCP servers (`webSearchPrime`, `webReader`, `zread`). |
+| `EXA_API_KEY` | `.opencode/opencode.jsonc` — Exa MCP server | Exa neural web search, code-context lookup, and crawling tools. Sent via the `x-api-key` request header (kept out of the MCP server URL to avoid disclosure via logs/proxies). |
+| `Z_AI_API_KEY` | `.opencode/opencode.jsonc` — Z.AI MCP servers | `Authorization` header for the Z.AI MCP servers (`web-search-prime`, `web-reader`, `zread`). |
 | `GITHUB_AUTH_TOKEN` | `scripts/gh-auth.ps1`, `scripts/test-github-permissions.ps1` | Primary GitHub auth token used by repo automation scripts. |
 | `GITHUB_USERNAME` | `scripts/test-github-permissions.ps1` | Default repository owner used when running permission checks. |
 
@@ -41,6 +41,7 @@ is never selected, its variable may be left unset.
 | `NVIDIA_NIM_API_KEY` | `.opencode/opencode.jsonc` — NVIDIA NIM provider | API key for the NVIDIA NIM (OpenAI-compatible) provider. |
 | `NVIDIA_NIM_BASE_URL` | `.opencode/opencode.jsonc` — NVIDIA NIM provider | Base URL for the NVIDIA NIM provider endpoint. |
 | `CLINE_API_KEY` | `.opencode/opencode.jsonc` — Cline provider | API key for the Cline (OpenAI-compatible) provider. |
+| `QWENCLOUD_TOKEN_PLAN_API_KEY` | `.opencode/opencode.jsonc` — QwenCloud provider | API key for the QwenCloud (Anthropic-compatible, Alibaba Token Plan) provider. |
 
 ### Optional — provider credential fallbacks
 

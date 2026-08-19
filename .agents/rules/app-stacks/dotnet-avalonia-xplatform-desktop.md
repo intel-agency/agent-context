@@ -46,6 +46,10 @@ Avalonia Desktop App template
 - Docker
 - Docker Compose
 
+### Scripting
+
+- powershell ps1
+
 ### Testing
 
 - xUnit

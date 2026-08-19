@@ -99,6 +99,7 @@ function Step-Scan {
 
     $scanDirs = @(
         (Join-Path $repoRoot '.agents/skills/gh-issue-tracking-init/scripts'),
+        (Join-Path $repoRoot '.agents/skills/update-powershell-standard/scripts'),
         (Join-Path $repoRoot 'scripts')
     )
 
@@ -139,14 +140,20 @@ function Step-Test {
 
     Install-RequiredModule -Name 'Pester' -MinVersion '5.0.0'
 
-    $testPath = Join-Path $repoRoot '.agents/skills/gh-issue-tracking-init/scripts/tests'
-    $coveragePath = Join-Path $repoRoot '.agents/skills/gh-issue-tracking-init/scripts'
+    $testPaths = @(
+        (Join-Path $repoRoot '.agents/skills/gh-issue-tracking-init/scripts/tests'),
+        (Join-Path $repoRoot '.agents/skills/update-powershell-standard/scripts/tests')
+    )
+    $coveragePaths = @(
+        (Join-Path $repoRoot '.agents/skills/gh-issue-tracking-init/scripts'),
+        (Join-Path $repoRoot '.agents/skills/update-powershell-standard/scripts')
+    )
     $coverageFile = Join-Path $repoRoot 'coverage.xml'
 
     $cfg = New-PesterConfiguration
-    $cfg.Run.Path = $testPath
+    $cfg.Run.Path = $testPaths
     $cfg.CodeCoverage.Enabled = $true
-    $cfg.CodeCoverage.Path = $coveragePath
+    $cfg.CodeCoverage.Path = $coveragePaths
     $cfg.CodeCoverage.OutputFormat = 'JaCoCo'
     $cfg.CodeCoverage.OutputPath = $coverageFile
     $cfg.Output.Verbosity = 'Minimal'
