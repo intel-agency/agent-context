@@ -73,8 +73,8 @@
         "apiKey": "{env:QWENCLOUD_TOKEN_PLAN_API_KEY}"
       },
       "models": {
-        "qwen3.8-max-preview": {
-          "name": "Qwen3.8 Max Preview",
+        "qwen3.8-max": {
+          "name": "Qwen3.8 Max",
           "limit": {
             "context": 983616,
             "output": 131072
@@ -169,6 +169,9 @@
         },
         "glm-5.3": {
           "name": "GLM 5.3",
+        },
+        "glm-5.3-flash": {
+          "name": "GLM 5.3 Flash",
         },
       },
     },
