@@ -107,17 +107,75 @@ Full guide: [Codebase Indexing](https://github.com/Kilo-Org/kilocode/blob/main/p
 
 ## Web & Repository Research (Z.AI MCP)
 
-These three **remote** Z.AI MCP servers authenticate via the `Authorization: {env:Z_AI_API_KEY}` header and require no local install. Use them for reliable, structured external information retrieval instead of ad-hoc fetching.
+These three **remote** Z.AI MCP servers (configured in [`.opencode/opencode.jsonc`](../../.opencode/opencode.jsonc)) authenticate via the `Authorization: {env:Z_AI_API_KEY}` header. Z.AI requires the `Bearer <api-key>` header format and opencode substitutes the env var verbatim as the full header value, so **`Z_AI_API_KEY` must be the full header value, `Bearer <api-key>`**. The servers require no local install; use them for reliable, structured external information retrieval instead of ad-hoc fetching.
 
-- **`web-search-prime`** → `webSearchPrime` — Web search returning titles, URLs, summaries, site names, and icons. Use for best-practice surveys, competitive analysis, dependency/API research, and factual questions needing current external info. Key params: `content_size` (`medium` default, `high` for comprehensive), `location` (`cn` / `us`), `search_domain_filter` (whitelist a domain), `search_recency_filter` (`oneDay` / `oneWeek` / `oneMonth` / `oneYear` / `noLimit`). Keep queries ≤ 70 chars.
-- **`web-reader`** → `webReader` — Fetches a URL and converts it to large-model-friendly input (markdown/text/html). Returns page title, main content, metadata, and optional link/image summaries. Use to read API docs, articles, release notes, and reference pages. Prefer this over generic `webfetch` when available.
-- **`zread`** — Reads **public** GitHub repositories without cloning: `search_doc` (search docs/issues/commits/PRs/contributors), `get_repo_structure` (directory tree + file list), and `read_file` (full file contents). Use for dependency evaluation, "how does library X work?" questions, and issue/commit history lookups. Requires `owner/repo` names; only public repos are supported.
+### `web-search-prime` — web search
 
-Decision points:
+Tool: **`webSearchPrime`** — searches the web; returns page titles, URLs, summaries, site names, and site icons.
+
+Features:
+
+- Comprehensive web search to retrieve the latest web information and resources.
+- Real-time updated information: news, stock prices, weather, and more.
+- HTTP-based remote MCP service — no local installation required.
+
+Key params: `content_size` (`medium` default, `high` for comprehensive), `location` (`cn` / `us`), `search_domain_filter` (whitelist a domain), `search_recency_filter` (`oneDay` / `oneWeek` / `oneMonth` / `oneYear` / `noLimit`). Keep queries ≤ 70 chars.
+
+Example scenarios:
+
+- Best-practice surveys, competitive analysis, and dependency/API research.
+- Factual questions needing current external info (e.g. "find best practices for Python asynchronous programming").
+
+### `web-reader` — URL reader
+
+Tool: **`webReader`** — fetches a URL and converts it to large-model-friendly input (markdown / text / html). Prefer this over generic `webfetch` when available.
+
+Features:
+
+- **Web Content Reading** — fetch the complete content of any webpage, including text and links.
+- **Structured Data** — extract structured data such as title, main body, and metadata.
+- **Remote Service** — HTTP-based remote MCP service, no local installation required.
+
+Example scenarios:
+
+- **API documentation reading and summarization** — fetch official docs pages (titles, body, examples, release notes) and distill key takeaways to speed integration.
+- **Open-source project page parsing** — parse project sites and repository pages (README, release notes, usage guides) into core info and link lists for evaluation.
+- **Technical article knowledge extraction** — pull steps, commands, and caveats out of blogs/tutorials/guides into actionable developer notes and task lists.
+- **Bug resolution from reference documentation** — read publicly documented fixes on a specified page and apply them as the reference solution.
+- **Knowledge-base construction and synchronization** — convert pages to structured data and follow in-page links for incremental synchronization.
+
+### `zread` — public GitHub repository reader
+
+Reads **public** GitHub repositories without cloning (powered by zread.ai) — open-source repository Q&A: documentation, code structure, and file content.
+
+Features:
+
+- Search documentation, code, and comments in GitHub repositories.
+- Get the directory structure and file list of a repository to quickly master project layout.
+- Read the complete code content of specified files to deeply analyze implementation details.
+
+Tools:
+
+- **`search_doc`** — search a repository's knowledge documentation: repo knowledge, news, recent issues, PRs, and contributors.
+- **`get_repo_structure`** — directory structure and file list; understand module splitting and organization.
+- **`read_file`** — complete contents of a specified file; analyze implementation details in depth.
+
+Constraints: requires `owner/repo` names; only **public** repositories are supported.
+
+Example scenarios:
+
+- **Learn a library fast** — `search_doc` + `get_repo_structure` for core concepts, installation steps, and code organization before writing code against it.
+- **Mine issue/commit history** — find solutions or fix records for a problem you are hitting ("has anyone hit this before?").
+- **Secondary development and debugging** — `read_file` the core files to analyze implementation logic before extending or fixing.
+- **Pre-adoption dependency evaluation** — activity, code quality, and maintenance status before introducing a new dependency.
+
+### Decision points
 
 - Need current facts from the open web → `webSearchPrime`, then `webReader` to drill into a specific result.
 - Need to understand an open-source repo → `zread` first (`get_repo_structure` + `search_doc`), then `read_file` for implementation details.
 - For broad, multi-source surveys, delegate to the `researcher` subagent; use these tools directly for quick, single-shot lookups.
+
+Sources: Z.AI DevPack docs — [Web Search](https://docs.z.ai/devpack/mcp/search-mcp-server) · [Web Reader](https://docs.z.ai/devpack/mcp/reader-mcp-server) · [Zread](https://docs.z.ai/devpack/mcp/zread-mcp-server) (overview → Example Scenarios sections).
 
 ## Exa Search (MCP)
 

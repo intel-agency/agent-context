@@ -21,7 +21,7 @@ shipped tools and scripts function without error.
 | Variable | Used by | Purpose |
 |---|---|---|
 | `EXA_API_KEY` | `.opencode/opencode.jsonc` — Exa MCP server | Exa neural web search, code-context lookup, and crawling tools. Sent via the `x-api-key` request header (kept out of the MCP server URL to avoid disclosure via logs/proxies). |
-| `Z_AI_API_KEY` | `.opencode/opencode.jsonc` — Z.AI MCP servers | `Authorization` header for the Z.AI MCP servers (`web-search-prime`, `web-reader`, `zread`). |
+| `Z_AI_API_KEY` | `.opencode/opencode.jsonc` — Z.AI MCP servers | `Authorization` header for the Z.AI MCP servers (`web-search-prime`, `web-reader`, `zread`). Must be the full `Authorization` header value including the `Bearer` prefix (e.g. `Bearer <api-key>`) — opencode substitutes the variable verbatim. If you run without `auth.json` and need the `zai-coding-plan` provider env fallback, set `ZAI_CODING_PLAN_OPEN_AI_API_KEY` separately to the raw key to avoid conflicts. |
 | `GITHUB_AUTH_TOKEN` | `scripts/gh-auth.ps1`, `scripts/test-github-permissions.ps1` | Primary GitHub auth token used by repo automation scripts. |
 | `GITHUB_USERNAME` | `scripts/test-github-permissions.ps1` | Default repository owner used when running permission checks. |
 
@@ -74,7 +74,7 @@ automation, define these four variables:
 
 ```sh
 export EXA_API_KEY="..."
-export Z_AI_API_KEY="..."
+export Z_AI_API_KEY="Bearer <api-key>"   # full header value — see Required table
 export GITHUB_AUTH_TOKEN="ghp_..."   # or GITHUB_TOKEN
 export GITHUB_USERNAME="..."
 ```
