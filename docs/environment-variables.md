@@ -74,7 +74,7 @@ automation, define these four variables:
 
 ```sh
 export EXA_API_KEY="..."
-export Z_AI_API_KEY="..."
+export Z_AI_API_KEY="Bearer <api-key>"   # full header value — see Required table
 export GITHUB_AUTH_TOKEN="ghp_..."   # or GITHUB_TOKEN
 export GITHUB_USERNAME="..."
 ```
