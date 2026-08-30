@@ -66,7 +66,7 @@ Source control rules — safe commits, workflow monitoring, branching, and pull 
 
 ## Delegation & Orchestration
 
-Delegate work to the appropriate subagent and orchestrate multi-agent tasks using the smallest layer that fits the scope. Detailed delegation and orchestration rules live in [`.agents/rules/delegation.md`](.agents/rules/delegation.md).
+Delegate work to the appropriate subagent and orchestrate multi-agent tasks using the smallest layer that fits the scope. Structure every task input with four elements — Goal, Context, Constraints, Done when. Detailed delegation and orchestration rules live in [`.agents/rules/delegation.md`](.agents/rules/delegation.md).
 
 ## Orientation
 
