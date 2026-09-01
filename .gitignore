@@ -42,3 +42,6 @@ coverage-html/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Qwen Code agent session state
+.qwen/
