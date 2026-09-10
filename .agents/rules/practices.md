@@ -42,7 +42,7 @@ Before implementing, apply these checks:
 
 ### Exploration discipline (act from anchors)
 
-Pattern validated by the VS Code GPT-5.5 prompt experiment (July 2026: −8.5% tool calls, −9.3% p95 time-to-first-edit, −7.6% p95 tokens, quality neutral; `code.visualstudio.com/blogs/2026/07/06/optimizing-vscode-coding-harness-model-providers`): wandering before acting costs time and tokens without buying quality.
+Pattern validated by the [VS Code GPT-5.5 prompt experiment](https://code.visualstudio.com/blogs/2026/07/06/optimizing-vscode-coding-harness-model-providers) (July 2026: −8.5% tool calls, −9.3% p95 time-to-first-edit, −7.6% p95 tokens, quality neutral): wandering before acting costs time and tokens without buying quality.
 
 - Start from the most concrete anchor available — the file, symbol, failing behavior, failing command, or nearby implementation the request names. If none is named, use one targeted search or nearby read to find the anchor, then continue locally from there.
 - Before the first change, gather only enough evidence to state one falsifiable local hypothesis and the cheapest check that could disconfirm it.

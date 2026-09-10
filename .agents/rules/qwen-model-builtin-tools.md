@@ -1,6 +1,6 @@
 # Qwen Model Built-in Tools (Harness Tools)
 
-Reference for the built-in **Harness tools** in Qwen models offered via the QwenCloud **Token Plan**: server-side capabilities (web search, code interpreter, web scraping, two image-search tools) that a supported model invokes on its own — no tool configuration in the coding client. Applicable to **Token Plan only, not Coding Plan**. Source: [Integrate Harness tools](https://docs.qwencloud.com/token-plan/best-practices/built-in-tools) (verified 2026-09-05).
+Reference for the built-in **Harness tools** in Qwen models offered via the QwenCloud **Token Plan**: server-side capabilities (web search, code interpreter, web scraping, two image-search tools) that a supported model invokes on its own — no tool configuration in the coding client. Applicable to **Token Plan only, not Coding Plan**. Source: [Integrate Harness tools](https://docs.qwencloud.com/token-plan/best-practices/built-in-tools.md) (verified 2026-09-05).
 
 ## Tool overview
 
