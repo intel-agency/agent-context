@@ -37,7 +37,7 @@ and are never committed to the repository.
 | `AGENTS.md` | Operating manual for AI agents (coding guidelines, validation, source control) |
 | `.agents/memory.md` | Durable project context: current activity, completed work, decisions |
 | `.agents/rules/` | Coding conventions, tool usage, validation, and practices (one file per subject) |
-| `.agents/skills/` | Agent Skills (currently `gh-issue-tracking-init`) |
+| `.agents/skills/` | Agent Skills (`gh-issue-tracking-init`, `update-powershell-standard`) |
 | `docs/` | Reference documentation including environment variables |
 | `scripts/` | GitHub CLI helpers: auth, label sync, PR review-thread management, index refresh |
 | `local_ai_instruction_modules/` | Workflow assignment and dynamic workflow lookup tables |

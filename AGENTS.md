@@ -76,7 +76,7 @@ Always orient to the project's history and current state before starting any wor
 
 ## Planning, Investigation & Making Changes
 
-Always plan non-trivial tasks before starting, investigate root causes using first-hand sources, and make the smallest surgical changes possible. Detailed rules for the full lifecycle live in [`.agents/rules/practices.md`](.agents/rules/practices.md).
+Always plan non-trivial tasks before starting, investigate root causes using first-hand sources with exploration discipline (act from concrete anchors, form one falsifiable hypothesis, validate early), and make the smallest surgical changes possible. Detailed rules for the full lifecycle live in [`.agents/rules/practices.md`](.agents/rules/practices.md).
 
 ## Coding Style Discipline
 
