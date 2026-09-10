@@ -1,7 +1,7 @@
 ---
 description: Provides rigorous code reviews covering correctness, security, performance, and documentation. Read-only — never edits code. Invoke when reviewing PRs, diffs, or proposed changes.
 mode: subagent
-model: zai-coding-plan/glm-5.2
+model: zai-coding-plan/glm-5.3-flash
 color: accent
 temperature: 0.1
 permission:
@@ -26,18 +26,85 @@ permission:
     "git log*": allow
     "git show*": allow
     "git blame*": allow
-    "git branch*": allow
-    "git remote*": allow
-    "gh pr*": allow
-    "gh run*": allow
-    "gh issue*": allow
+    # Read-only branch inspection — explicit subset only; bare creation
+    # (`git branch <name>`) and any mutating flag fall through to the catch-all.
+    "git branch": allow
+    "git branch --list*": allow
+    "git branch --all*": allow
+    "git branch --remotes*": allow
+    "git branch --show-current*": allow
+    "git branch --contains*": allow
+    "git branch --no-contains*": allow
+    "git branch --merged*": allow
+    "git branch --no-merged*": allow
+    "git branch --points-at*": allow
+    "git branch --sort*": allow
+    "git branch --format*": allow
+    # Short read flags are exact-match only: a prefix like "-v*" would admit
+    # flag-combo mutations ("-vd x", "-q <new-branch>"). Compose reads with the
+    # long forms instead ("--all --sort=..."), which the globs above cover.
+    "git branch -a": allow
+    "git branch -r": allow
+    "git branch -v": allow
+    "git branch -vv": allow
+    "git branch -q": allow
+    "git branch -av": allow
+    "git branch -va": allow
+    "git branch -rv": allow
+    "git branch -vr": allow
+    "git branch -arv": allow
+    # Mutating short flags deny over the prefix allows above (later rules win);
+    # long-form mutation equivalents are denied outright.
+    "git branch -d*": deny
+    "git branch -D*": deny
+    "git branch -m*": deny
+    "git branch -M*": deny
+    "git branch -c*": deny
+    "git branch -C*": deny
+    "git branch -f*": deny
+    "git branch -t*": deny
+    "git branch -u*": deny
+    "git branch --delete*": deny
+    "git branch --move*": deny
+    "git branch --copy*": deny
+    "git branch --force*": deny
+    "git branch --track*": deny
+    "git branch --no-track*": deny
+    "git branch --set-upstream*": deny
+    "git branch --unset-upstream*": deny
+    "git branch --edit-description*": deny
+    # Read-only remote inspection; mutating subcommands denied outright.
+    "git remote": allow
+    "git remote -v": allow
+    "git remote --verbose": allow
+    "git remote show*": allow
+    "git remote get-url*": allow
+    "git remote rm*": deny
+    "git remote remove*": deny
+    "git remote add*": deny
+    "git remote rename*": deny
+    "git remote set-url*": deny
+    "git remote set-head*": deny
+    "git remote set-branches*": deny
+    "git remote prune*": deny
+    "git remote update*": deny
+    "gh pr view*": allow
+    "gh pr diff*": allow
+    "gh pr checks*": allow
+    "gh pr status*": allow
+    "gh pr list*": allow
+    "gh run view*": allow
+    "gh run list*": allow
+    "gh run watch*": allow
+    "gh issue view*": allow
+    "gh issue list*": allow
     "gh repo view*": allow
     "ls*": allow
     "cat *": allow
     "head *": allow
     "tail *": allow
     "rg *": allow
-    "find *": allow
+    "find *": deny           # `find ... -delete` / `-exec` mutates files — not read-only
     "tree *": allow
     "jq *": allow
     "wc *": allow
@@ -52,6 +119,8 @@ permission:
 ---
 
 You are a strict, constructive code reviewer. You **analyze** changes — you do **not** make them.
+
+Action bias: read exactly the diff/files you were given and anchor every finding to a file:line. Read a surrounding definition only to confirm a suspected finding — never survey the wider repo for extra issues.
 
 ## Scope
 

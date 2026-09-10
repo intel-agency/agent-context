@@ -1,7 +1,7 @@
 ---
 description: Converts strategic goals into sequenced milestones with dependencies and acceptance criteria. Read-mostly analysis agent — produces plans, not code. Invoke before implementation to scope and design an approach.
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: zai-coding-plan/glm-5.3-flash
 color: info
 temperature: 0.1
 permission:
@@ -31,16 +31,70 @@ permission:
     "git log*": allow
     "git show*": allow
     "git blame*": allow
-    "git branch*": allow
-    "gh pr*": allow
-    "gh issue*": allow
-    "gh run*": allow
+    # Read-only branch inspection — explicit subset only; bare creation
+    # (`git branch <name>`) and any mutating flag fall through to the deny catch-all.
+    "git branch": allow
+    "git branch --list*": allow
+    "git branch --all*": allow
+    "git branch --remotes*": allow
+    "git branch --show-current*": allow
+    "git branch --contains*": allow
+    "git branch --no-contains*": allow
+    "git branch --merged*": allow
+    "git branch --no-merged*": allow
+    "git branch --points-at*": allow
+    "git branch --sort*": allow
+    "git branch --format*": allow
+    # Short read flags are exact-match only: a prefix like "-v*" would admit
+    # flag-combo mutations ("-vd x", "-q <new-branch>"). Compose reads with the
+    # long forms instead ("--all --sort=..."), which the globs above cover.
+    "git branch -a": allow
+    "git branch -r": allow
+    "git branch -v": allow
+    "git branch -vv": allow
+    "git branch -q": allow
+    "git branch -av": allow
+    "git branch -va": allow
+    "git branch -rv": allow
+    "git branch -vr": allow
+    "git branch -arv": allow
+    # Mutating short flags deny over the prefix allows above (later rules win);
+    # long-form mutation equivalents are denied outright.
+    "git branch -d*": deny
+    "git branch -D*": deny
+    "git branch -m*": deny
+    "git branch -M*": deny
+    "git branch -c*": deny
+    "git branch -C*": deny
+    "git branch -f*": deny
+    "git branch -t*": deny
+    "git branch -u*": deny
+    "git branch --delete*": deny
+    "git branch --move*": deny
+    "git branch --copy*": deny
+    "git branch --force*": deny
+    "git branch --track*": deny
+    "git branch --no-track*": deny
+    "git branch --set-upstream*": deny
+    "git branch --unset-upstream*": deny
+    "git branch --edit-description*": deny
+    "gh pr view*": allow
+    "gh pr diff*": allow
+    "gh pr checks*": allow
+    "gh pr status*": allow
+    "gh pr list*": allow
+    "gh run view*": allow
+    "gh run list*": allow
+    "gh run watch*": allow
+    "gh issue view*": allow
+    "gh issue list*": allow
+    "gh repo view*": allow
     "ls*": allow
     "cat *": allow
     "head *": allow
     "tail *": allow
     "rg *": allow
-    "find *": allow
+    "find *": deny           # `find ... -delete` / `-exec` mutates files — not read-only
     "tree *": allow
     "jq *": allow
     "file *": allow
@@ -54,6 +108,8 @@ permission:
 ---
 
 You are the planner. You explore the codebase, surface constraints, and produce an **implementation plan** that another agent can execute without further design decisions.
+
+Action bias: plan from anchors — start from the concrete artifacts the task names (existing plan docs, specs, code paths); use one targeted search to find an anchor when none is named. Surface gaps and open questions instead of surveying the whole codebase; roughly 5 discovery calls past the named sources with no direction is drift: report what is missing and plan around it.
 
 ## Workflow
 

@@ -38,20 +38,17 @@ is never selected, its variable may be left unset.
 
 | Variable | Used by | Purpose |
 |---|---|---|
-| `NVIDIA_NIM_API_KEY` | `.opencode/opencode.jsonc` — NVIDIA NIM provider | API key for the NVIDIA NIM (OpenAI-compatible) provider. |
-| `NVIDIA_NIM_BASE_URL` | `.opencode/opencode.jsonc` — NVIDIA NIM provider | Base URL for the NVIDIA NIM provider endpoint. |
 | `CLINE_API_KEY` | `.opencode/opencode.jsonc` — Cline provider | API key for the Cline (OpenAI-compatible) provider. |
 | `QWENCLOUD_TOKEN_PLAN_API_KEY` | `.opencode/opencode.jsonc` — QwenCloud provider | API key for the QwenCloud (Anthropic-compatible, Alibaba Token Plan) provider. |
 
 ### Optional — provider credential fallbacks
 
-The two built-in providers below resolve credentials from an `auth.json` file first and fall
+The built-in provider below resolves credentials from an `auth.json` file first and falls
 back to these environment variables. Define them only when not using `auth.json`.
 
 | Variable | Used by | Purpose |
 |---|---|---|
 | `ZAI_CODING_PLAN_OPEN_AI_API_KEY` | `.opencode/opencode.jsonc` — `zai-coding-plan` provider | Fallback API key when `auth.json` is absent. |
-| `OPENCODE_GO_API_KEY` | `.opencode/opencode.jsonc` — `opencode-go` provider | Fallback API key when `auth.json` is absent. |
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 description: Defines test strategies, writes and executes validation suites, and enforces quality gates before release. Invoke for test authoring, regression coverage analysis, and running/fixing failing test suites.
 mode: subagent
-model: zai-coding-plan/glm-5.2
+model: zai-coding-plan/glm-5.3-flash
 color: success
 temperature: 0.2
 permission:
@@ -48,6 +48,8 @@ permission:
 ---
 
 You are a QA test engineer. You own **test strategy, coverage, and the quality gate**.
+
+Action bias: zero pre-exploration. Run or write the checks for the named slice and report; never survey the repo to "understand context" first. If a command cannot run as given, that IS the finding (report the verbatim error), not a reason to explore.
 
 ## Responsibilities
 

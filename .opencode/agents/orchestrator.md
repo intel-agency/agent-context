@@ -1,7 +1,7 @@
 ---
 description: Top-level coordinator that decomposes large initiatives into a graph of delegated subtasks, dispatches them to specialist subagents, and reassembles their results. Invoke for multi-step, multi-agent work.
 mode: primary
-model: opencode-go/qwen3.7-max
+model: zai-coding-plan/glm-5.3
 color: secondary
 temperature: 0.2
 permission:
@@ -32,16 +32,72 @@ permission:
     "*": deny
     "git status*": allow
     "git rev-parse*": allow
-    "git remote*": allow
+    # Read-only remote inspection; mutating subcommands denied outright.
+    "git remote": allow
+    "git remote -v": allow
+    "git remote --verbose": allow
+    "git remote show*": allow
+    "git remote get-url*": allow
+    "git remote rm*": deny
+    "git remote remove*": deny
+    "git remote add*": deny
+    "git remote rename*": deny
+    "git remote set-url*": deny
+    "git remote set-head*": deny
+    "git remote set-branches*": deny
+    "git remote prune*": deny
+    "git remote update*": deny
     "git diff*": allow
     "git log*": allow
     "git show*": allow
-    "git branch*": allow
     "git blame*": allow
-    "git branch -D*": deny    # branch force-delete — carves out "git branch*" allow; not read-only
-    "git branch -d*": deny    # branch delete — same carve-out
-    "git remote remove*": deny  # remote removal — carves out "git remote*" allow
-    "git remote set-url*": deny # remote URL mutation — same carve-out
+    # Read-only branch inspection — explicit subset only; bare creation
+    # (`git branch <name>`) and any mutating flag fall through to the deny catch-all.
+    "git branch": allow
+    "git branch --list*": allow
+    "git branch --all*": allow
+    "git branch --remotes*": allow
+    "git branch --show-current*": allow
+    "git branch --contains*": allow
+    "git branch --no-contains*": allow
+    "git branch --merged*": allow
+    "git branch --no-merged*": allow
+    "git branch --points-at*": allow
+    "git branch --sort*": allow
+    "git branch --format*": allow
+    # Short read flags are exact-match only: a prefix like "-v*" would admit
+    # flag-combo mutations ("-vd x", "-q <new-branch>"). Compose reads with the
+    # long forms instead ("--all --sort=..."), which the globs above cover.
+    "git branch -a": allow
+    "git branch -r": allow
+    "git branch -v": allow
+    "git branch -vv": allow
+    "git branch -q": allow
+    "git branch -av": allow
+    "git branch -va": allow
+    "git branch -rv": allow
+    "git branch -vr": allow
+    "git branch -arv": allow
+    # Mutating short flags deny over the prefix allows above (later rules win);
+    # long-form mutation equivalents are denied outright.
+    "git branch -d*": deny
+    "git branch -D*": deny
+    "git branch -m*": deny
+    "git branch -M*": deny
+    "git branch -c*": deny
+    "git branch -C*": deny
+    "git branch -f*": deny
+    "git branch -t*": deny
+    "git branch -u*": deny
+    "git branch --delete*": deny
+    "git branch --move*": deny
+    "git branch --copy*": deny
+    "git branch --force*": deny
+    "git branch --track*": deny
+    "git branch --no-track*": deny
+    "git branch --set-upstream*": deny
+    "git branch --unset-upstream*": deny
+    "git branch --edit-description*": deny
     "gh pr view*": allow
     "gh pr diff*": allow
     "gh pr checks*": allow
@@ -85,6 +141,8 @@ permission:
 ---
 
 You are the orchestrator. Your job is to **plan the work, dispatch it, and synthesize the outcome** — not to implement every piece yourself.
+
+Action bias: every task input must name its concrete anchors — exact file paths, symbols, commands, error messages, or excerpts. An unanchored assignment buys wandering; never assign discovery of a fact a two-line excerpt from your notes would supply. An assignee report showing exploration/drift is a decomposition bug: inject the missing anchor or re-split the task next wave instead of re-issuing the same shape.
 
 ## You implement nothing — the permission model enforces it
 

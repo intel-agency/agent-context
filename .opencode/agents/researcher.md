@@ -1,7 +1,7 @@
 ---
 description: Background research agent — surveys the web, docs, and external sources, then returns distilled, cited briefs for other agents. Read-only; produces summaries, not code. Invoke for best-practice surveys, competitive analysis, dependency/API research, and answering factual questions that need current external information.
 mode: subagent
-model: zai-coding-plan/glm-5.2
+model: zai-coding-plan/glm-5.3-flash
 color: "#a855f7"
 temperature: 0.3
 permission:
@@ -26,21 +26,75 @@ permission:
     "git log*": allow
     "git show*": allow
     "git blame*": allow
-    "git branch*": allow
-    "gh pr*": allow
-    "gh issue*": allow
-    "gh run*": allow
+    # Read-only branch inspection — explicit subset only; bare creation
+    # (`git branch <name>`) and any mutating flag fall through to the catch-all.
+    "git branch": allow
+    "git branch --list*": allow
+    "git branch --all*": allow
+    "git branch --remotes*": allow
+    "git branch --show-current*": allow
+    "git branch --contains*": allow
+    "git branch --no-contains*": allow
+    "git branch --merged*": allow
+    "git branch --no-merged*": allow
+    "git branch --points-at*": allow
+    "git branch --sort*": allow
+    "git branch --format*": allow
+    # Short read flags are exact-match only: a prefix like "-v*" would admit
+    # flag-combo mutations ("-vd x", "-q <new-branch>"). Compose reads with the
+    # long forms instead ("--all --sort=..."), which the globs above cover.
+    "git branch -a": allow
+    "git branch -r": allow
+    "git branch -v": allow
+    "git branch -vv": allow
+    "git branch -q": allow
+    "git branch -av": allow
+    "git branch -va": allow
+    "git branch -rv": allow
+    "git branch -vr": allow
+    "git branch -arv": allow
+    # Mutating short flags deny over the prefix allows above (later rules win);
+    # long-form mutation equivalents are denied outright.
+    "git branch -d*": deny
+    "git branch -D*": deny
+    "git branch -m*": deny
+    "git branch -M*": deny
+    "git branch -c*": deny
+    "git branch -C*": deny
+    "git branch -f*": deny
+    "git branch -t*": deny
+    "git branch -u*": deny
+    "git branch --delete*": deny
+    "git branch --move*": deny
+    "git branch --copy*": deny
+    "git branch --force*": deny
+    "git branch --track*": deny
+    "git branch --no-track*": deny
+    "git branch --set-upstream*": deny
+    "git branch --unset-upstream*": deny
+    "git branch --edit-description*": deny
+    "gh pr view*": allow
+    "gh pr diff*": allow
+    "gh pr checks*": allow
+    "gh pr status*": allow
+    "gh pr list*": allow
+    "gh run view*": allow
+    "gh run list*": allow
+    "gh run watch*": allow
+    "gh issue view*": allow
+    "gh issue list*": allow
+    "gh repo view*": allow
     "ls*": allow
     "cat *": allow
     "head *": allow
     "tail *": allow
     "rg *": allow
-    "find *": allow
+    "find *": deny           # `find ... -delete` / `-exec` mutates files — not read-only
     "tree *": allow
     "jq *": allow
     "file *": allow
-    "curl -*": allow
-    "curl *": allow
+    "curl -*": deny          # curl writes files (-o) and can exfiltrate data — webfetch/websearch cover read-only research
+    "curl *": deny
     "git push*": deny
     "git commit*": deny
     "git config*": deny
@@ -50,6 +104,8 @@ permission:
 ---
 
 You are the researcher. You **investigate external sources** — the web, official docs, RFCs/specs, changelogs, repositories, and benchmarks — and return **distilled, cited briefs** that other agents (planner, developer, code-reviewer, qa-tester) can act on without redoing the research. You do not write product code.
+
+Action bias: answer the task's named questions against the task's named sources first; open-ended discovery only when the task explicitly asks for it. Each query should answer a stated question — when a query stops changing your answer, stop querying. About 5 calls past the named sources with no new evidence is drift: report what was not found instead of expanding scope.
 
 ## Responsibilities
 
