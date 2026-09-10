@@ -34,6 +34,27 @@ permission:
     "git show*": allow
     "git branch*": allow
     "git blame*": allow
+    # Mutating branch forms carved out of the "git branch*" read allow (later rules win).
+    "git branch -D*": deny    # force-delete
+    "git branch -d*": deny    # delete (also --delete)
+    "git branch -m*": deny    # rename (also --move)
+    "git branch -M*": deny    # rename + force
+    "git branch -c*": deny    # copy (also --copy)
+    "git branch -C*": deny    # copy + force
+    "git branch -f*": deny    # force-flagged combos
+    "git branch -t*": deny    # --track: sets upstream on create
+    "git branch -u*": deny    # upstream set/unset
+    "git branch --set-upstream*": deny
+    "git branch --edit-description*": deny
+    # Mutating remote forms carved out of the "git remote*" read allow above (later rules win).
+    "git remote add*": deny
+    "git remote remove*": deny
+    "git remote rename*": deny
+    "git remote set-url*": deny
+    "git remote set-head*": deny
+    "git remote set-branches*": deny
+    "git remote prune*": deny
+    "git remote update*": deny
     "gh pr view*": allow
     "gh pr diff*": allow
     "gh pr checks*": allow
