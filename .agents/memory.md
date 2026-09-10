@@ -4,6 +4,10 @@
 
 Current project and its sub-work items that we are working on actively. This section is a placeholder for the current project and its work items, which will be updated as we progress. Once completed, the work items will be moved to the "Completed Work Items" section below.
 
+### Project: Exploration inhibitors
+
+- **Exploration inhibitors (action bias) ported from the swarm-context clone** (2026-09-10): Added the "### Exploration discipline (act from anchors)" subsection to `.agents/rules/practices.md` under Investigation — verbatim from the clone's practices.md (PR #3 there), including the VS Code GPT-5.5 prompt-experiment citation and its measured effects (July 2026: −8.5% tool calls, −9.3% p95 time-to-first-edit, −7.6% p95 tokens, quality neutral). Added role-tuned "Action bias:" paragraphs to all 8 `.opencode/agents/` definitions (developer=implementer, code-reviewer=reviewer, qa-tester=verifier, researcher=researcher, orchestrator/team-orchestrator/team-lead=delegation variant from swarm-orchestrator.md, planner=planning variant) and to the user-wide ZCode ports at `~/.zcode/agents/` (body-only, outside any repo — not committed).
+
 ### Project: Agent-readiness hardening
 
 - **Root README.md** (2026-07-24): Created `README.md` at repo root with repository identity, prerequisites (`pwsh` 7+, `gh` with `repo`/`project`/`user:email` scopes), getting-started steps, configuration pointer to `docs/environment-variables.md`, repository layout table, Pester test command (`Invoke-Pester -Path .agents/skills/gh-issue-tracking-init/scripts/tests -Output Detailed`, 101 tests), linting instructions, and contributing guidelines. Closes readiness criterion `readme`.
