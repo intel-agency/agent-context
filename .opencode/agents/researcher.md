@@ -27,15 +27,23 @@ permission:
     "git show*": allow
     "git blame*": allow
     "git branch*": allow
-    "gh pr*": allow
-    "gh issue*": allow
-    "gh run*": allow
+    "gh pr view*": allow
+    "gh pr diff*": allow
+    "gh pr checks*": allow
+    "gh pr status*": allow
+    "gh pr list*": allow
+    "gh run view*": allow
+    "gh run list*": allow
+    "gh run watch*": allow
+    "gh issue view*": allow
+    "gh issue list*": allow
+    "gh repo view*": allow
     "ls*": allow
     "cat *": allow
     "head *": allow
     "tail *": allow
     "rg *": allow
-    "find *": allow
+    "find *": deny           # `find ... -delete` / `-exec` mutates files — not read-only
     "tree *": allow
     "jq *": allow
     "file *": allow
