@@ -34,7 +34,6 @@ permission:
     "git rev-parse*": allow
     # Read-only remote inspection; mutating subcommands denied outright.
     "git remote": allow
-    "git remote": allow
     "git remote -v": allow
     "git remote --verbose": allow
     "git remote show*": allow
