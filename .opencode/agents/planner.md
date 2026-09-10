@@ -45,10 +45,19 @@ permission:
     "git branch --points-at*": allow
     "git branch --sort*": allow
     "git branch --format*": allow
-    "git branch -a*": allow
-    "git branch -r*": allow
-    "git branch -v*": allow
-    "git branch -q*": allow
+    # Short read flags are exact-match only: a prefix like "-v*" would admit
+    # flag-combo mutations ("-vd x", "-q <new-branch>"). Compose reads with the
+    # long forms instead ("--all --sort=..."), which the globs above cover.
+    "git branch -a": allow
+    "git branch -r": allow
+    "git branch -v": allow
+    "git branch -vv": allow
+    "git branch -q": allow
+    "git branch -av": allow
+    "git branch -va": allow
+    "git branch -rv": allow
+    "git branch -vr": allow
+    "git branch -arv": allow
     # Mutating short flags deny over the prefix allows above (later rules win);
     # long-form mutation equivalents are denied outright.
     "git branch -d*": deny
