@@ -37,4 +37,4 @@ Decision points:
 
 - Raw markdown (canonical): append `.md` to the page URL — `https://docs.qwencloud.com/token-plan/best-practices/built-in-tools.md`.
 - Docs-wide index: `https://docs.qwencloud.com/llms.txt`.
-- **Divergence gotcha:** the rendered HTML tables omit the `qwen3.8-flash` row and the Token-Plan-only note, while the raw `.md` export carries both — when re-verifying, fetch the raw `.md` and treat it as canonical.
+- **Divergence gotcha:** the rendered HTML can diverge from the raw `.md` export (observed 2026-09-05, e.g. the `qwen3.8-flash` row and the Token-Plan-only note missing from HTML; no longer reproducing as of 2026-09-10) — when re-verifying, fetch the raw `.md` and treat it as canonical.

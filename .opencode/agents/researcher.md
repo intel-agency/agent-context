@@ -47,8 +47,8 @@ permission:
     "tree *": allow
     "jq *": allow
     "file *": allow
-    "curl -*": allow
-    "curl *": allow
+    "curl -*": deny          # curl writes files (-o) and can exfiltrate data — webfetch/websearch cover read-only research
+    "curl *": deny
     "git push*": deny
     "git commit*": deny
     "git config*": deny
