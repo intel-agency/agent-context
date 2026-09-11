@@ -11,7 +11,9 @@ concurrency:
 jobs:
   droid-review:
     if: github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
+    # Requires the Blacksmith GitHub App on this repo (see README Prerequisites).
+    # Template clones without it must revert to a GitHub-hosted label (e.g. ubuntu-latest).
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     permissions:
       contents: read
       pull-requests: write
@@ -29,3 +31,5 @@ jobs:
           factory_api_key: ${{ secrets.FACTORY_API_KEY }}
           automatic_review: true
           automatic_security_review: true
+          allowed_bots: 'blacksmith-sh'
+

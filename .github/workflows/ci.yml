@@ -10,7 +10,9 @@ permissions:
 
 jobs:
   validate:
-    runs-on: ubuntu-24.04
+    # Requires the Blacksmith GitHub App on this repo (see README Prerequisites).
+    # Template clones without it must revert to a GitHub-hosted label (e.g. ubuntu-latest).
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
